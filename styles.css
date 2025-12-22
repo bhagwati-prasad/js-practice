@@ -1,0 +1,345 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    overflow: hidden;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 300px;
+    background-color: #252526;
+    border-right: 1px solid #3e3e42;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, margin-left 0.3s ease;
+    position: relative;
+    z-index: 100;
+}
+
+.sidebar.collapsed {
+    transform: translateX(-100%);
+    margin-left: -300px;
+}
+
+.sidebar-header {
+    padding: 15px 20px;
+    background-color: #2d2d30;
+    border-bottom: 1px solid #3e3e42;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h2 {
+    font-size: 18px;
+    color: #cccccc;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #cccccc;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+    background-color: #3e3e42;
+    border-radius: 4px;
+}
+
+.sidebar-content {
+    overflow-y: auto;
+    padding: 10px 0;
+    flex: 1;
+}
+
+.topic {
+    margin-bottom: 10px;
+}
+
+.topic-header {
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #4ec9b0;
+    cursor: pointer;
+    user-select: none;
+    background-color: #2d2d30;
+    transition: background-color 0.2s;
+}
+
+.topic-header:hover {
+    background-color: #37373d;
+}
+
+.problem-list {
+    list-style: none;
+    padding: 5px 0;
+}
+
+.problem-item {
+    padding: 8px 20px 8px 40px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #cccccc;
+    transition: background-color 0.2s;
+}
+
+.problem-item:hover {
+    background-color: #2a2d2e;
+}
+
+.problem-item.active {
+    background-color: #37373d;
+    color: #ffffff;
+    border-left: 3px solid #007acc;
+}
+
+/* Toggle Button */
+.toggle-btn {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    background-color: #007acc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 99;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-btn:hover {
+    background-color: #005a9e;
+}
+
+.sidebar:not(.collapsed) ~ .toggle-btn {
+    display: none;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.problem-description {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #1e1e1e;
+    border-right: 1px solid #3e3e42;
+}
+
+.problem-description h1 {
+    color: #4ec9b0;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.problem-content {
+    line-height: 1.6;
+    color: #d4d4d4;
+}
+
+.problem-content h2 {
+    color: #4ec9b0;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.problem-content h3 {
+    color: #569cd6;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.problem-content p {
+    margin-bottom: 10px;
+}
+
+.problem-content ul, .problem-content ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.problem-content li {
+    margin-bottom: 5px;
+}
+
+.problem-content code {
+    background-color: #2d2d30;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: #ce9178;
+}
+
+.problem-content pre {
+    background-color: #2d2d30;
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 10px 0;
+}
+
+.problem-content pre code {
+    background: none;
+    padding: 0;
+}
+
+/* Editor Section */
+.editor-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #1e1e1e;
+}
+
+.editor-header {
+    padding: 15px 20px;
+    background-color: #2d2d30;
+    border-bottom: 1px solid #3e3e42;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.editor-header h2 {
+    font-size: 18px;
+    color: #cccccc;
+}
+
+.run-btn {
+    background-color: #0e639c;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.run-btn:hover {
+    background-color: #1177bb;
+}
+
+.run-btn:active {
+    background-color: #005a9e;
+}
+
+.editor-container {
+    flex: 1;
+    min-height: 300px;
+}
+
+.input-output-section {
+    display: flex;
+    border-top: 1px solid #3e3e42;
+    height: 200px;
+}
+
+.input-panel, .output-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.input-panel {
+    border-right: 1px solid #3e3e42;
+}
+
+.input-panel h3, .output-panel h3 {
+    color: #569cd6;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+#sampleInput {
+    flex: 1;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    border: 1px solid #3e3e42;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    resize: none;
+}
+
+#sampleInput:focus {
+    outline: none;
+    border-color: #007acc;
+}
+
+#output {
+    flex: 1;
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+    border: 1px solid #3e3e42;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+}
+
+#output.error {
+    color: #f48771;
+}
+
+#output.success {
+    color: #4ec9b0;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #424242;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4e4e4e;
+}
