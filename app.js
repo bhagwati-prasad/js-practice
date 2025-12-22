@@ -1,3 +1,6 @@
+// Constants
+const MOBILE_BREAKPOINT = 1200;
+
 // Problem definitions
 const problems = {
     'two-sum': {
@@ -324,7 +327,7 @@ problemItems.forEach(item => {
             document.getElementById('sampleInput').value = '';
             
             // Close sidebar on mobile/small screens
-            if (window.innerWidth < 1200) {
+            if (window.innerWidth < MOBILE_BREAKPOINT) {
                 sidebar.classList.add('collapsed');
             }
         }
@@ -383,6 +386,8 @@ runButton.addEventListener('click', () => {
         }
         
         // Execute the code
+        // NOTE: eval() is used here for local practice purposes only.
+        // This should NOT be used in production environments due to security risks.
         eval(code);
         
         // Display output
