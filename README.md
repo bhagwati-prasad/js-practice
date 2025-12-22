@@ -36,10 +36,19 @@ A web-based platform for practicing Data Structures and Algorithms in JavaScript
 
 ```
 js-practice/
-├── index.html      # Main HTML file with layout structure
-├── styles.css      # CSS styling for the entire application
-├── app.js          # JavaScript logic, Monaco editor setup, and problem definitions
-└── README.md       # This file
+├── index.html              # Main HTML file with layout structure
+├── styles.css              # CSS styling for the entire application
+├── app.js                  # JavaScript logic, Monaco editor setup, and UI functionality
+├── problems/               # Problem definitions organized by topic
+│   ├── arrays.js           # Array problems (Two Sum, Reverse Array, etc.)
+│   ├── strings.js          # String problems (Palindrome, Reverse String, etc.)
+│   ├── linked-lists.js     # Linked List problems
+│   ├── stack-queue.js      # Stack & Queue problems
+│   ├── trees.js            # Tree problems
+│   ├── graphs.js           # Graph problems
+│   ├── dynamic-programming.js  # Dynamic Programming problems
+│   └── index.js            # Problem registry that combines all topics
+└── README.md               # This file
 ```
 
 ## Technical Details
@@ -75,10 +84,17 @@ cd js-practice
 
 ## Contributing
 
-Feel free to add more problems by editing the `problems` object in `app.js`. Each problem should have:
+Feel free to add more problems by editing the topic-specific files in the `problems/` directory. Each problem should have:
 - `title`: Problem name
 - `description`: HTML description of the problem
 - `starterCode`: Initial code template
+
+### Adding New Problems
+
+1. Navigate to the appropriate topic file in the `problems/` directory (e.g., `problems/arrays.js` for array problems)
+2. Add your problem definition to the topic's object following the existing pattern
+3. If creating a new topic, create a new file in `problems/` directory and add it to `problems/index.js`
+4. Update `index.html` to include the new script file if you added a new topic
 
 ## License
 
