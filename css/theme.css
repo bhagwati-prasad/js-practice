@@ -1,0 +1,102 @@
+:root {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-tertiary: #2d2d30;
+    --bg-hover: #2a2d2e;
+    --bg-active: #37373d;
+    --bg-input: #1e1e1e;
+    
+    --border-primary: #3e3e42;
+    --border-accent: #007acc;
+    
+    --text-primary: #d4d4d4;
+    --text-secondary: #cccccc;
+    --text-muted: #969696;
+    --text-white: #ffffff;
+    --text-accent: #4ec9b0;
+    --text-link: #569cd6;
+    --text-code: #ce9178;
+    --text-error: #f48771;
+    --text-success: #4ec9b0;
+    
+    --accent-primary: #007acc;
+    --accent-primary-hover: #005a9e;
+    --accent-secondary: #4ec9b0;
+    
+    --shadow-panel: -2px 0 8px rgba(0, 0, 0, 0.3);
+    
+    --scrollbar-track: #1e1e1e;
+    --scrollbar-thumb: #424242;
+    --scrollbar-thumb-hover: #4e4e4e;
+    
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 10px;
+    --spacing-lg: 15px;
+    --spacing-xl: 20px;
+    
+    --header-height: 35px;
+    --footer-height: 35px;
+    --sidebar-width: 300px;
+    --right-sidebar-width: 350px;
+    --resizer-width: 4px;
+    
+    --font-xs: 13px;
+    --font-sm: 14px;
+    --font-md: 16px;
+    --font-lg: 18px;
+    --font-xl: 20px;
+    --font-2xl: 24px;
+    
+    --radius-sm: 3px;
+    --radius-md: 4px;
+    --radius-lg: 5px;
+    
+    --transition-fast: 0.2s;
+    --transition-normal: 0.3s;
+    
+    --icon-sm: 20px;
+    --icon-md: 24px;
+    --icon-lg: 28px;
+    
+    --btn-height-sm: 26px;
+    --btn-height-md: 28px;
+    --btn-height-lg: 30px;
+    
+    --z-sidebar: 100;
+    --z-right-sidebar: 200;
+    --z-header: 300;
+    --z-resizer: 10;
+}
+
+body.light-theme {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f3f3f3;
+    --bg-tertiary: #e8e8e8;
+    --bg-hover: #e5e5e5;
+    --bg-active: #d6d6d6;
+    --bg-input: #ffffff;
+    
+    --border-primary: #d4d4d4;
+    --border-accent: #0078d4;
+    
+    --text-primary: #1e1e1e;
+    --text-secondary: #3b3b3b;
+    --text-muted: #707070;
+    --text-white: #1e1e1e;
+    --text-accent: #008080;
+    --text-link: #0066cc;
+    --text-code: #a31515;
+    --text-error: #d13438;
+    --text-success: #008000;
+    
+    --accent-primary: #0078d4;
+    --accent-primary-hover: #005a9e;
+    --accent-secondary: #008080;
+    
+    --shadow-panel: -2px 0 8px rgba(0, 0, 0, 0.1);
+    
+    --scrollbar-track: #f3f3f3;
+    --scrollbar-thumb: #c4c4c4;
+    --scrollbar-thumb-hover: #a6a6a6;
+}

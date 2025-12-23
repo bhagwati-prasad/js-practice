@@ -1,13 +1,8 @@
-// Constants
 const MOBILE_BREAKPOINT = 1200;
 
-// Problems are now loaded from separate topic files via index.html script tags
-
-// Monaco Editor instance
 let editor;
 let monacoLoaded = false;
 
-// Initialize Monaco Editor
 function initMonaco() {
     if (typeof require !== 'undefined' && typeof monaco === 'undefined') {
         require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } });
@@ -42,7 +37,6 @@ function initMonaco() {
         const editorContainer = document.getElementById('editor');
         editorContainer.innerHTML = '<textarea id="fallback-editor" style="width: 100%; height: 100%; background-color: #1e1e1e; color: #d4d4d4; border: none; padding: 15px; font-family: \'Consolas\', \'Monaco\', monospace; font-size: 14px; resize: none; outline: none;">// Welcome to JS Practice!\n// Select a problem from the sidebar to begin.\n\nconsole.log("Hello, World!");</textarea>';
         
-        // Use the textarea as editor
         editor = {
             getValue: function() {
                 return document.getElementById('fallback-editor').value;
@@ -54,25 +48,40 @@ function initMonaco() {
     }
 }
 
-// Wait for page load
 window.addEventListener('load', function() {
     setTimeout(initMonaco, 100);
 });
 
-// Sidebar toggle functionality
 const sidebar = document.getElementById('sidebar');
 const toggleBtn = document.getElementById('toggleSidebar');
 const closeBtn = document.getElementById('closeSidebar');
 
 toggleBtn.addEventListener('click', () => {
-    sidebar.classList.remove('collapsed');
+    sidebar.classList.toggle('collapsed');
 });
 
 closeBtn.addEventListener('click', () => {
     sidebar.classList.add('collapsed');
 });
 
-// Problem selection functionality
+const tabHeaders = document.querySelectorAll('.tab-header');
+const tabPanels = document.querySelectorAll('.tab-panel');
+
+tabHeaders.forEach(header => {
+    header.addEventListener('click', () => {
+        const tabName = header.getAttribute('data-tab');
+        
+        tabHeaders.forEach(h => h.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+        
+        header.classList.add('active');
+        const targetPanel = tabName === 'input' ? document.getElementById('inputTab') : document.getElementById('consoleTab');
+        if (targetPanel) {
+            targetPanel.classList.add('active');
+        }
+    });
+});
+
 const problemItems = document.querySelectorAll('.problem-item');
 const problemTitle = document.getElementById('problemTitle');
 const problemContent = document.getElementById('problemContent');
@@ -83,25 +92,20 @@ problemItems.forEach(item => {
         const problem = problems[problemId];
         
         if (problem) {
-            // Update active state
             problemItems.forEach(p => p.classList.remove('active'));
             item.classList.add('active');
             
-            // Update problem description
             problemTitle.textContent = problem.title;
             problemContent.innerHTML = problem.description;
             
-            // Update editor code
             if (editor) {
                 editor.setValue(problem.starterCode);
             }
             
-            // Clear output and input
-            document.getElementById('output').textContent = '';
-            document.getElementById('output').className = '';
+            document.getElementById('console').textContent = '';
+            document.getElementById('console').className = '';
             document.getElementById('sampleInput').value = '';
             
-            // Close sidebar on mobile/small screens
             if (window.innerWidth < MOBILE_BREAKPOINT) {
                 sidebar.classList.add('collapsed');
             }
@@ -109,9 +113,8 @@ problemItems.forEach(item => {
     });
 });
 
-// Run button functionality
 const runButton = document.getElementById('runButton');
-const outputElement = document.getElementById('output');
+const outputElement = document.getElementById('console');
 const sampleInputElement = document.getElementById('sampleInput');
 
 runButton.addEventListener('click', () => {
@@ -124,11 +127,9 @@ runButton.addEventListener('click', () => {
     const code = editor.getValue();
     const input = sampleInputElement.value;
     
-    // Clear previous output
     outputElement.textContent = '';
     outputElement.className = '';
     
-    // Capture console.log output
     const logs = [];
     const originalLog = console.log;
     const originalError = console.error;
@@ -155,17 +156,13 @@ runButton.addEventListener('click', () => {
     };
     
     try {
-        // If there's input, make it available as a global variable
         if (input.trim()) {
             window.INPUT = input;
         }
         
-        // Execute the code
-        // NOTE: eval() is used here for local practice purposes only.
-        // This should NOT be used in production environments due to security risks.
+        // RISKY: Evil Eval used for code execution
         eval(code);
         
-        // Display output
         if (logs.length > 0) {
             outputElement.textContent = logs.join('\n');
             outputElement.className = 'success';
@@ -177,7 +174,6 @@ runButton.addEventListener('click', () => {
         outputElement.textContent = `Error: ${error.message}\n\nStack trace:\n${error.stack}`;
         outputElement.className = 'error';
     } finally {
-        // Restore original console methods
         console.log = originalLog;
         console.error = originalError;
         console.warn = originalWarn;
@@ -189,5 +185,87 @@ document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
         runButton.click();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('themeToggle');
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            const isLightTheme = document.body.classList.contains('light-theme');
+            
+            if (monacoLoaded && editor && monaco) {
+                monaco.editor.setTheme(isLightTheme ? 'vs' : 'vs-dark');
+            }
+            
+            if (isLightTheme) {
+                // Moon icon
+                themeToggle.innerHTML = `
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                `;
+            } else {
+                // Sun icon
+                themeToggle.innerHTML = `
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    </svg>
+                `;
+            }
+        });
+    }
+
+    const rightSidebar = document.getElementById('rightSidebar');
+    const settingsToggle = document.getElementById('settingsToggle');
+    const closeRightSidebar = document.getElementById('closeRightSidebar');
+
+    console.log('Right sidebar elements:', { rightSidebar, settingsToggle, closeRightSidebar });
+
+    if (settingsToggle && rightSidebar) {
+        settingsToggle.addEventListener('click', () => {
+            console.log('Settings toggle clicked');
+            rightSidebar.classList.toggle('open');
+            console.log('Right sidebar classes:', rightSidebar.className);
+        });
+    }
+
+    if (closeRightSidebar && rightSidebar) {
+        closeRightSidebar.addEventListener('click', () => {
+            console.log('Close right sidebar clicked');
+            rightSidebar.classList.remove('open');
+        });
+    }
+
+    const minimapToggle = document.getElementById('minimapToggle');
+    const wordWrapToggle = document.getElementById('wordWrapToggle');
+    const fontSizeInput = document.getElementById('fontSizeInput');
+
+    if (minimapToggle) {
+        minimapToggle.addEventListener('change', (e) => {
+            if (editor && editor.updateOptions) {
+                editor.updateOptions({ minimap: { enabled: e.target.checked } });
+            }
+        });
+    }
+
+    if (wordWrapToggle) {
+        wordWrapToggle.addEventListener('change', (e) => {
+            if (editor && editor.updateOptions) {
+                editor.updateOptions({ wordWrap: e.target.checked ? 'on' : 'off' });
+            }
+        });
+    }
+
+    if (fontSizeInput) {
+        fontSizeInput.addEventListener('change', (e) => {
+            const fontSize = parseInt(e.target.value);
+            if (editor && editor.updateOptions && fontSize >= 10 && fontSize <= 24) {
+                editor.updateOptions({ fontSize: fontSize });
+            }
+        });
     }
 });

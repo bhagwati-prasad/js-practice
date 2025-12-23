@@ -4,18 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JS Practice - Data Structures & Algorithms</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/styles.css?ver=1">
 </head>
 <body>
+    <header class="header">
+        <div class="flex1">
+            <button id="toggleSidebar" class="primary-btn">Practice Problems</button>
+        </div>
+        <h1>JS Practice Platform</h1>
+        <div class="flex1 end-align">
+            <button id="runButton" class="primary-btn">Run</button>
+        </div>
+    </header>
+
     <div class="container">
-        <!-- Collapsible Left Sidebar -->
         <aside id="sidebar" class="sidebar collapsed">
             <div class="sidebar-header">
                 <h2>Problems</h2>
                 <button id="closeSidebar" class="close-btn" title="Close sidebar">×</button>
             </div>
             <div class="sidebar-content">
-                <!-- Array Problems -->
                 <div class="topic">
                     <h3 class="topic-header">Arrays</h3>
                     <ul class="problem-list">
@@ -26,7 +35,6 @@
                     </ul>
                 </div>
                 
-                <!-- String Problems -->
                 <div class="topic">
                     <h3 class="topic-header">Strings</h3>
                     <ul class="problem-list">
@@ -37,7 +45,6 @@
                     </ul>
                 </div>
                 
-                <!-- Linked List Problems -->
                 <div class="topic">
                     <h3 class="topic-header">Linked Lists</h3>
                     <ul class="problem-list">
@@ -47,7 +54,6 @@
                     </ul>
                 </div>
                 
-                <!-- Stack & Queue Problems -->
                 <div class="topic">
                     <h3 class="topic-header">Stack & Queue</h3>
                     <ul class="problem-list">
@@ -57,7 +63,6 @@
                     </ul>
                 </div>
                 
-                <!-- Tree Problems -->
                 <div class="topic">
                     <h3 class="topic-header">Trees</h3>
                     <ul class="problem-list">
@@ -67,7 +72,6 @@
                     </ul>
                 </div>
                 
-                <!-- Graph Problems -->
                 <div class="topic">
                     <h3 class="topic-header">Graphs</h3>
                     <ul class="problem-list">
@@ -77,7 +81,6 @@
                     </ul>
                 </div>
                 
-                <!-- Dynamic Programming -->
                 <div class="topic">
                     <h3 class="topic-header">Dynamic Programming</h3>
                     <ul class="problem-list">
@@ -89,20 +92,15 @@
             </div>
         </aside>
 
-        <!-- Toggle Button (visible when sidebar is collapsed) -->
-        <button id="toggleSidebar" class="toggle-btn">☰</button>
-
-        <!-- Main Content Area -->
         <main class="main-content">
-            <!-- Left Panel: Problem Description -->
             <section class="problem-description">
-                <h1 id="problemTitle">Welcome to JS Practice</h1>
                 <div id="problemContent" class="problem-content">
+                    <h1 id="problemTitle">Welcome to JS Practice</h1>
                     <p>Select a problem from the sidebar to get started.</p>
                     <p>This platform allows you to practice Data Structures and Algorithms in JavaScript.</p>
                     <h3>How to use:</h3>
                     <ol>
-                        <li>Click the menu button (☰) to open the problem list</li>
+                        <li>Click the "Practice Problems" button to open the problem list</li>
                         <li>Select a problem from the topic-wise organized list</li>
                         <li>Read the problem description on the left</li>
                         <li>Write your solution in the Monaco editor on the right</li>
@@ -112,44 +110,105 @@
                 </div>
             </section>
 
-            <!-- Right Panel: Code Editor -->
+            <div class="resizer vertical-resizer" id="verticalResizer"></div>
+
             <section class="editor-section">
-                <div class="editor-header">
-                    <h2>Code Editor</h2>
-                    <button id="runButton" class="run-btn">Run</button>
-                </div>
                 <div id="editor" class="editor-container"></div>
                 
+                <div class="resizer horizontal-resizer" id="horizontalResizer"></div>
+                
                 <div class="input-output-section">
-                    <div class="input-panel">
-                        <h3>Sample Input</h3>
-                        <textarea id="sampleInput" placeholder="Enter your sample input here..."></textarea>
+                    <div class="tab-headers">
+                        <div class="tab-header active" data-tab="console">
+                            <span>Console</span>
+                        </div>
+                        <div class="tab-header" data-tab="input">
+                            <span>Sample Input</span>
+                        </div>
                     </div>
-                    <div class="output-panel">
-                        <h3>Output</h3>
-                        <pre id="output"></pre>
+                    <div class="tab-content">
+                        <div class="tab-panel active" id="consoleTab">
+                            <pre id="console"></pre>
+                        </div>
+                        <div class="tab-panel" id="inputTab">
+                            <textarea id="sampleInput" placeholder="Enter your sample input here..."></textarea>
+                        </div>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Monaco Editor Loader -->
+    <aside id="rightSidebar" class="right-sidebar">
+        <div class="sidebar-header">
+            <h2>Settings</h2>
+            <button id="closeRightSidebar" class="close-btn" title="Close settings">×</button>
+        </div>
+        <div class="sidebar-content">
+            <div class="settings-section">
+                <h3>Editor Settings</h3>
+                <label>
+                    <input type="checkbox" id="minimapToggle" checked>
+                    Show Minimap
+                </label>
+                <label>
+                    <input type="checkbox" id="wordWrapToggle" checked>
+                    Word Wrap
+                </label>
+            </div>
+            <div class="settings-section">
+                <h3>Display</h3>
+                <label>
+                    Font Size: <input type="number" id="fontSizeInput" min="10" max="24" value="14">
+                </label>
+            </div>
+        </div>
+    </aside>
+
     <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
     
-    <!-- Problem definitions by topic -->
-    <script src="problems/arrays.js"></script>
-    <script src="problems/strings.js"></script>
-    <script src="problems/linked-lists.js"></script>
-    <script src="problems/stack-queue.js"></script>
-    <script src="problems/trees.js"></script>
-    <script src="problems/graphs.js"></script>
-    <script src="problems/dynamic-programming.js"></script>
+    <script src="js/resizer.js"></script>
     
-    <!-- Problem registry -->
-    <script src="problems/index.js"></script>
+    <script src="js/problems/arrays.js"></script>
+    <script src="js/problems/strings.js"></script>
+    <script src="js/problems/linked-lists.js"></script>
+    <script src="js/problems/stack-queue.js"></script>
+    <script src="js/problems/trees.js"></script>
+    <script src="js/problems/graphs.js"></script>
+    <script src="js/problems/dynamic-programming.js"></script>
     
-    <!-- Main application logic -->
-    <script src="app.js"></script>
+    <script src="js/problems/index.js"></script>
+    
+    <script src="js/app.js"></script>
+
+    <footer class="footer">
+        <div class="footer-menu-left">
+            <svg class="js-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <rect width="24" height="24" fill="#F7DF1E" rx="2"/>
+                <text x="4" y="18" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#323330">JS</text>
+            </svg>
+            <a href="#learn" class="footer-link">Learn</a>
+            <a href="#practice" class="footer-link">Practice</a>
+            <a href="#execution-flow" class="footer-link">Execution flow</a>
+            <a href="#execution-context" class="footer-link">Execution context</a>
+        </div>
+        <div class="footer-menu-right">
+            <button id="themeToggle" class="icon-btn" title="Toggle dark/light mode">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                </svg>
+            </button>
+            <button class="icon-btn" title="User account">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </button>
+            <button id="settingsToggle" class="icon-btn" title="Settings">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            </button>
+        </div>
+    </footer>
 </body>
 </html>
