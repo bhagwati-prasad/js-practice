@@ -341,7 +341,6 @@ body {
     overflow: hidden;
 }
 
-/* Vertical Playground - editor and output stacked (50% height each) */
 .main-content.playground.playground-vertical .problem-description {
     display: none;
 }
@@ -370,7 +369,6 @@ body {
     height: 50%;
 }
 
-/* Horizontal Playground - editor and output side by side (50% width each) */
 .main-content.playground.playground-horizontal .problem-description {
     display: none;
 }
@@ -399,6 +397,8 @@ body {
     flex: 1;
     width: 50%;
     height: 100%;
+    border-top: none;
+    border-left: 1px solid var(--border-primary);
 }
 
 .resizer {
