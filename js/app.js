@@ -1,49 +1,53 @@
 const MOBILE_BREAKPOINT = 1200;
 
+const EDITOR_CONFIG = {
+    value: '// Welcome to JS Practice!\n// Select a problem from the sidebar to begin.\n\nconsole.log("Hello, World!");',
+    language: 'javascript',
+    theme: 'vs-dark',
+    fontSize: 14,
+    minimap: { enabled: true },
+    automaticLayout: true,
+    scrollBeyondLastLine: false,
+    wordWrap: 'on'
+};
+
+const THEME = {
+    LIGHT: 'vs',
+    DARK: 'vs-dark'
+};
+
+const FONT_SIZE = {
+    MIN: 10,
+    MAX: 24
+};
+
 let editor;
 let monacoLoaded = false;
+let playgroundMode = 'normal';
+
+function createMonacoEditor() {
+    monacoLoaded = true;
+    editor = monaco.editor.create(document.getElementById('editor'), EDITOR_CONFIG);
+    
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
+        const runButton = document.getElementById('runButton');
+        if (runButton) runButton.click();
+    });
+}
 
 function initMonaco() {
     if (typeof require !== 'undefined' && typeof monaco === 'undefined') {
         require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } });
-        require(['vs/editor/editor.main'], function () {
-            monacoLoaded = true;
-            editor = monaco.editor.create(document.getElementById('editor'), {
-                value: '// Welcome to JS Practice!\n// Select a problem from the sidebar to begin.\n\nconsole.log("Hello, World!");',
-                language: 'javascript',
-                theme: 'vs-dark',
-                fontSize: 14,
-                minimap: { enabled: true },
-                automaticLayout: true,
-                scrollBeyondLastLine: false,
-                wordWrap: 'on'
-            });
-        });
+        require(['vs/editor/editor.main'], createMonacoEditor);
     } else if (typeof monaco !== 'undefined') {
-        // Monaco already loaded
-        monacoLoaded = true;
-        editor = monaco.editor.create(document.getElementById('editor'), {
-            value: '// Welcome to JS Practice!\n// Select a problem from the sidebar to begin.\n\nconsole.log("Hello, World!");',
-            language: 'javascript',
-            theme: 'vs-dark',
-            fontSize: 14,
-            minimap: { enabled: true },
-            automaticLayout: true,
-            scrollBeyondLastLine: false,
-            wordWrap: 'on'
-        });
+        createMonacoEditor();
     } else {
-        // Fallback to textarea if Monaco fails to load
         const editorContainer = document.getElementById('editor');
         editorContainer.innerHTML = '<textarea id="fallback-editor" style="width: 100%; height: 100%; background-color: #1e1e1e; color: #d4d4d4; border: none; padding: 15px; font-family: \'Consolas\', \'Monaco\', monospace; font-size: 14px; resize: none; outline: none;">// Welcome to JS Practice!\n// Select a problem from the sidebar to begin.\n\nconsole.log("Hello, World!");</textarea>';
         
         editor = {
-            getValue: function() {
-                return document.getElementById('fallback-editor').value;
-            },
-            setValue: function(value) {
-                document.getElementById('fallback-editor').value = value;
-            }
+            getValue: () => document.getElementById('fallback-editor').value,
+            setValue: (value) => { document.getElementById('fallback-editor').value = value; }
         };
     }
 }
@@ -52,12 +56,7 @@ const sidebar = document.getElementById('sidebar');
 const toggleBtn = document.getElementById('toggleSidebar');
 const closeBtn = document.getElementById('closeSidebar');
 
-let playgroundMode = 'normal'; // 'normal', 'vertical', 'horizontal'
-
-toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-    
-    // Remove playground classes when opening practice problems
+function resetPlaygroundMode() {
     const mainContent = document.querySelector('.main-content');
     const floatingPlaygroundControl = document.getElementById('floatingPlaygroundControl');
     
@@ -70,6 +69,58 @@ toggleBtn.addEventListener('click', () => {
     }
     
     playgroundMode = 'normal';
+}
+
+function resetElementStyles() {
+    const elements = [
+        { el: document.getElementById('editor'), props: ['width', 'height', 'flex'] },
+        { el: document.querySelector('.input-output-section'), props: ['width', 'height', 'flex'] },
+        { el: document.querySelector('.editor-section'), props: ['flexDirection'] }
+    ];
+    
+    elements.forEach(({ el, props }) => {
+        if (el) props.forEach(prop => el.style[prop] = '');
+    });
+}
+
+function updatePlayground(mode) {
+    const mainContent = document.querySelector('.main-content');
+    const floatingPlaygroundControl = document.getElementById('floatingPlaygroundControl');
+    
+    mainContent.classList.remove('playground', 'playground-vertical', 'playground-horizontal');
+    resetElementStyles();
+    
+    if (mode === 'vertical') {
+        mainContent.classList.add('playground', 'playground-vertical');
+        floatingPlaygroundControl.classList.add('visible');
+        updateFloatingPlaygroundIcon('vertical');
+    } else if (mode === 'horizontal') {
+        mainContent.classList.add('playground', 'playground-horizontal');
+        floatingPlaygroundControl.classList.add('visible');
+        updateFloatingPlaygroundIcon('horizontal');
+    } else {
+        floatingPlaygroundControl.classList.remove('visible');
+        updateFloatingPlaygroundIcon('normal');
+    }
+    playgroundMode = mode;
+}
+
+function updateFloatingPlaygroundIcon(mode) {
+    const icon = document.querySelector('#floatingPlaygroundControl .icon');
+    if (!icon) return;
+    
+    const icons = {
+        'normal': '<path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+        'vertical': '<path d="M3 3h8v18H3zM13 3h8v18h-8z" stroke="currentColor" stroke-width="2" fill="none"/>',
+        'horizontal': '<path d="M3 3h18v8H3zM3 13h18v8H3z" stroke="currentColor" stroke-width="2" fill="none"/>'
+    };
+    
+    icon.innerHTML = icons[mode] || icons.normal;
+}
+
+toggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    resetPlaygroundMode();
 });
 
 closeBtn.addEventListener('click', () => {
@@ -86,55 +137,6 @@ window.addEventListener('load', function() {
     if (!playgroundToggle || !floatingPlaygroundControl || !mainContent) {
         console.error('Playground elements not found');
         return;
-    }
-
-    function updatePlayground(mode) {
-        mainContent.classList.remove('playground', 'playground-vertical', 'playground-horizontal');
-        
-        const editorContainer = document.getElementById('editor');
-        const inputOutputSection = document.querySelector('.input-output-section');
-        const editorSection = document.querySelector('.editor-section');
-        
-        if (editorContainer) {
-            editorContainer.style.width = '';
-            editorContainer.style.height = '';
-            editorContainer.style.flex = '';
-        }
-        
-        if (inputOutputSection) {
-            inputOutputSection.style.width = '';
-            inputOutputSection.style.height = '';
-            inputOutputSection.style.flex = '';
-        }
-        
-        if (editorSection) {
-            editorSection.style.flexDirection = '';
-        }
-        
-        if (mode === 'vertical') {
-            mainContent.classList.add('playground', 'playground-vertical');
-            floatingPlaygroundControl.classList.add('visible');
-            updateFloatingPlaygroundIcon('vertical');
-        } else if (mode === 'horizontal') {
-            mainContent.classList.add('playground', 'playground-horizontal');
-            floatingPlaygroundControl.classList.add('visible');
-            updateFloatingPlaygroundIcon('horizontal');
-        } else {
-            floatingPlaygroundControl.classList.remove('visible');
-            updateFloatingPlaygroundIcon('normal');
-        }
-        playgroundMode = mode;
-    }
-
-    function updateFloatingPlaygroundIcon(mode) {
-        const icon = floatingPlaygroundControl.querySelector('.playground-icon');
-        if (mode === 'vertical') {
-            icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/>';
-        } else if (mode === 'horizontal') {
-            icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/>';
-        } else {
-            icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/>';
-        }
     }
 
     playgroundToggle.addEventListener('click', () => {
@@ -253,7 +255,6 @@ runButton.addEventListener('click', () => {
             window.INPUT = input;
         }
         
-        // RISKY: Evil Eval used for code execution
         eval(code);
         
         if (logs.length > 0) {
@@ -273,7 +274,6 @@ runButton.addEventListener('click', () => {
     }
 });
 
-// Keyboard shortcut for running code (Ctrl+Enter or Cmd+Enter)
 document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
@@ -295,14 +295,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             if (isLightTheme) {
-                // Moon icon
                 themeToggle.innerHTML = `
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                     </svg>
                 `;
             } else {
-                // Sun icon
                 themeToggle.innerHTML = `
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -318,15 +316,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (settingsToggle && rightSidebar) {
         settingsToggle.addEventListener('click', () => {
-            console.log('Settings toggle clicked');
             rightSidebar.classList.toggle('open');
-            console.log('Right sidebar classes:', rightSidebar.className);
         });
     }
 
     if (closeRightSidebar && rightSidebar) {
         closeRightSidebar.addEventListener('click', () => {
-            console.log('Close right sidebar clicked');
             rightSidebar.classList.remove('open');
         });
     }
@@ -354,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fontSizeInput) {
         fontSizeInput.addEventListener('change', (e) => {
             const fontSize = parseInt(e.target.value);
-            if (editor && editor.updateOptions && fontSize >= 10 && fontSize <= 24) {
+            if (editor && editor.updateOptions && fontSize >= FONT_SIZE.MIN && fontSize <= FONT_SIZE.MAX) {
                 editor.updateOptions({ fontSize: fontSize });
             }
         });
