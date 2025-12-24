@@ -6,7 +6,7 @@ A web-based platform for practicing Data Structures and Algorithms in JavaScript
 
 - **Monaco Code Editor**: Full-featured code editor with syntax highlighting, IntelliSense, and keyboard shortcuts
 - **Collapsible Sidebar**: Topic-wise organized problem list (closed by default)
-- **Split View**: Problem description on the left, code editor on the right
+- **Playground**: Problem description on the left, code editor on the right
 - **Run Functionality**: Execute your code instantly and see the output
 - **Sample Input**: Test your solutions with custom inputs
 - **Dark Theme**: Easy on the eyes with VS Code-inspired dark theme
