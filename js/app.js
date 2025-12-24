@@ -48,20 +48,113 @@ function initMonaco() {
     }
 }
 
-window.addEventListener('load', function() {
-    setTimeout(initMonaco, 100);
-});
-
 const sidebar = document.getElementById('sidebar');
 const toggleBtn = document.getElementById('toggleSidebar');
 const closeBtn = document.getElementById('closeSidebar');
 
+let playgroundMode = 'normal'; // 'normal', 'vertical', 'horizontal'
+
 toggleBtn.addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
+    
+    // Remove playground classes when opening practice problems
+    const mainContent = document.querySelector('.main-content');
+    const floatingPlaygroundControl = document.getElementById('floatingPlaygroundControl');
+    
+    if (mainContent) {
+        mainContent.classList.remove('playground', 'playground-vertical', 'playground-horizontal');
+    }
+    
+    if (floatingPlaygroundControl) {
+        floatingPlaygroundControl.classList.remove('visible');
+    }
+    
+    playgroundMode = 'normal';
 });
 
 closeBtn.addEventListener('click', () => {
     sidebar.classList.add('collapsed');
+});
+
+window.addEventListener('load', function() {
+    setTimeout(initMonaco, 100);
+
+    const playgroundToggle = document.getElementById('playgroundToggle');
+    const floatingPlaygroundControl = document.getElementById('floatingPlaygroundControl');
+    const mainContent = document.querySelector('.main-content');
+
+    if (!playgroundToggle || !floatingPlaygroundControl || !mainContent) {
+        console.error('Playground elements not found');
+        return;
+    }
+
+    function updatePlayground(mode) {
+        mainContent.classList.remove('playground', 'playground-vertical', 'playground-horizontal');
+        
+        const editorContainer = document.getElementById('editor');
+        const inputOutputSection = document.querySelector('.input-output-section');
+        const editorSection = document.querySelector('.editor-section');
+        
+        if (editorContainer) {
+            editorContainer.style.width = '';
+            editorContainer.style.height = '';
+            editorContainer.style.flex = '';
+        }
+        
+        if (inputOutputSection) {
+            inputOutputSection.style.width = '';
+            inputOutputSection.style.height = '';
+            inputOutputSection.style.flex = '';
+        }
+        
+        if (editorSection) {
+            editorSection.style.flexDirection = '';
+        }
+        
+        if (mode === 'vertical') {
+            mainContent.classList.add('playground', 'playground-vertical');
+            floatingPlaygroundControl.classList.add('visible');
+            updateFloatingPlaygroundIcon('vertical');
+        } else if (mode === 'horizontal') {
+            mainContent.classList.add('playground', 'playground-horizontal');
+            floatingPlaygroundControl.classList.add('visible');
+            updateFloatingPlaygroundIcon('horizontal');
+        } else {
+            floatingPlaygroundControl.classList.remove('visible');
+            updateFloatingPlaygroundIcon('normal');
+        }
+        playgroundMode = mode;
+    }
+
+    function updateFloatingPlaygroundIcon(mode) {
+        const icon = floatingPlaygroundControl.querySelector('.playground-icon');
+        if (mode === 'vertical') {
+            icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/>';
+        } else if (mode === 'horizontal') {
+            icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/>';
+        } else {
+            icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/>';
+        }
+    }
+
+    playgroundToggle.addEventListener('click', () => {
+        if (playgroundMode === 'normal') {
+            sidebar.classList.add('collapsed');
+            updatePlayground('horizontal');
+        } else if (playgroundMode === 'horizontal') {
+            updatePlayground('vertical');
+        } else {
+            updatePlayground('horizontal');
+        }
+    });
+
+    floatingPlaygroundControl.addEventListener('click', () => {
+        if (playgroundMode === 'horizontal') {
+            updatePlayground('vertical');
+        } else {
+            updatePlayground('horizontal');
+        }
+    });
 });
 
 const tabHeaders = document.querySelectorAll('.tab-header');
@@ -222,8 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const rightSidebar = document.getElementById('rightSidebar');
     const settingsToggle = document.getElementById('settingsToggle');
     const closeRightSidebar = document.getElementById('closeRightSidebar');
-
-    console.log('Right sidebar elements:', { rightSidebar, settingsToggle, closeRightSidebar });
 
     if (settingsToggle && rightSidebar) {
         settingsToggle.addEventListener('click', () => {

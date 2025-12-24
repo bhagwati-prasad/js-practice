@@ -1,23 +1,30 @@
 (function() {
     'use strict';
 
-    function initVerticalResizer() {
-        const resizer = document.getElementById('verticalResizer');
-        const leftPanel = document.querySelector('.problem-description');
-        const rightPanel = document.querySelector('.editor-section');
+    function initResizer(config) {
+        const { direction, panel1Selector, panel2Selector, minSize = 150 } = config;
         
-        if (!resizer || !leftPanel || !rightPanel) return;
+        const resizer = document.querySelector(`.${direction}-resizer`);
+        const panel1 = document.querySelector(panel1Selector);
+        const panel2 = document.querySelector(panel2Selector);
+        
+        if (!resizer || !panel1 || !panel2) return;
 
+        const isHorizontal = direction === 'horizontal';
+        const cursor = isHorizontal ? 'row-resize' : 'col-resize';
+        const dimension = isHorizontal ? 'height' : 'width';
+        const position = isHorizontal ? 'clientY' : 'clientX';
+        
         let isResizing = false;
-        let startX = 0;
-        let startLeftWidth = 0;
+        let startPos = 0;
+        let startSize = 0;
 
         resizer.addEventListener('mousedown', (e) => {
             isResizing = true;
-            startX = e.clientX;
-            startLeftWidth = leftPanel.offsetWidth;
+            startPos = e[position];
+            startSize = isHorizontal ? panel1.offsetHeight : panel1.offsetWidth;
             resizer.classList.add('resizing');
-            document.body.style.cursor = 'col-resize';
+            document.body.style.cursor = cursor;
             document.body.style.userSelect = 'none';
             e.preventDefault();
         });
@@ -25,14 +32,18 @@
         document.addEventListener('mousemove', (e) => {
             if (!isResizing) return;
 
-            const dx = e.clientX - startX;
-            const newLeftWidth = startLeftWidth + dx;
-            const minWidth = 200;
-            const maxWidth = window.innerWidth - 400;
+            const delta = e[position] - startPos;
+            const newSize = startSize + delta;
+            const maxSize = (isHorizontal ? panel1.parentElement.offsetHeight : window.innerWidth) - minSize - 50;
 
-            if (newLeftWidth >= minWidth && newLeftWidth <= maxWidth) {
-                leftPanel.style.flex = 'none';
-                leftPanel.style.width = newLeftWidth + 'px';
+            if (newSize >= minSize && newSize <= maxSize) {
+                panel1.style.flex = 'none';
+                panel1.style[dimension] = newSize + 'px';
+                
+                if (isHorizontal && panel2) {
+                    const remaining = panel1.parentElement.offsetHeight - newSize - resizer.offsetHeight;
+                    panel2.style.height = remaining + 'px';
+                }
             }
         });
 
@@ -46,62 +57,25 @@
         });
     }
 
-    function initHorizontalResizer() {
-        const resizer = document.getElementById('horizontalResizer');
-        const editorContainer = document.getElementById('editor');
-        const inputOutputSection = document.querySelector('.input-output-section');
-        
-        if (!resizer || !editorContainer || !inputOutputSection) return;
-
-        let isResizing = false;
-        let startY = 0;
-        let startEditorHeight = 0;
-
-        resizer.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            startY = e.clientY;
-            startEditorHeight = editorContainer.offsetHeight;
-            resizer.classList.add('resizing');
-            document.body.style.cursor = 'row-resize';
-            document.body.style.userSelect = 'none';
-            e.preventDefault();
+    function init() {
+        initResizer({
+            direction: 'vertical',
+            panel1Selector: '.problem-description',
+            panel2Selector: '.editor-section',
+            minSize: 200
         });
 
-        document.addEventListener('mousemove', (e) => {
-            if (!isResizing) return;
-
-            const dy = e.clientY - startY;
-            const newEditorHeight = startEditorHeight + dy;
-            const minHeight = 150;
-            const editorSection = document.querySelector('.editor-section');
-            const maxHeight = editorSection.offsetHeight - 150;
-
-            if (newEditorHeight >= minHeight && newEditorHeight <= maxHeight) {
-                editorContainer.style.flex = 'none';
-                editorContainer.style.height = newEditorHeight + 'px';
-                
-                const remainingHeight = editorSection.offsetHeight - newEditorHeight - resizer.offsetHeight;
-                inputOutputSection.style.height = remainingHeight + 'px';
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (isResizing) {
-                isResizing = false;
-                resizer.classList.remove('resizing');
-                document.body.style.cursor = '';
-                document.body.style.userSelect = '';
-            }
+        initResizer({
+            direction: 'horizontal',
+            panel1Selector: '#editor',
+            panel2Selector: '.input-output-section',
+            minSize: 150
         });
     }
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            initVerticalResizer();
-            initHorizontalResizer();
-        });
+        document.addEventListener('DOMContentLoaded', init);
     } else {
-        initVerticalResizer();
-        initHorizontalResizer();
+        init();
     }
 })();

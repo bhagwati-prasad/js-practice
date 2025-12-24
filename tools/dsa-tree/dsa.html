@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Directory View</h2>
+    <div id="tree-view"></div>
+
+    <h2>Graph View</h2>
+    <div id="graph-view"></div>
+
+    <script type="text/javascript" src="./dsa1-json.js"></script>
+    <script type="text/javascript" src="./dsa2-json.js"></script>
+    <script type="module">
+        import ConceptVisualizer from './dsa2.js';
+        
+        // The JSON object generated in the previous step
+        const data = JSON.parse(dsa2Data);
+
+        const treeContainer = document.getElementById('tree-view');
+        const graphContainer = document.getElementById('graph-view');
+
+        // Render Directory
+        ConceptVisualizer.render(data, treeContainer, 'directory');
+
+        // Render Graph
+        ConceptVisualizer.render(data, graphContainer, 'graph');
+    </script>
+</body>
+</html>
