@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JS Practice - Data Structures & Algorithms</title>
     <link rel="stylesheet" href="css/theme.css">
-    <link rel="stylesheet" href="css/styles.css?ver=4">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/styles.css?ver=5">
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="manifest" href="/site.webmanifest" crossorigin="use-credentials" />
 </head>
 <body>
     <header class="header">
@@ -178,34 +180,19 @@
         </svg>
     </div>
 
-    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
-    
-    <script src="js/resizer.js"></script>
-
-    <script src="js/lib/router.js"></script>
-    
-    <script src="js/problems/arrays.js"></script>
-    <script src="js/problems/strings.js"></script>
-    <script src="js/problems/linked-lists.js"></script>
-    <script src="js/problems/stack-queue.js"></script>
-    <script src="js/problems/trees.js"></script>
-    <script src="js/problems/graphs.js"></script>
-    <script src="js/problems/dynamic-programming.js"></script>
-    <script src="js/problems/index.js"></script>
-    
-    <script src="js/app.js"></script>
-
     <footer class="footer">
         <div class="footer-menu-left">
-            <svg class="js-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <rect width="24" height="24" fill="#F7DF1E" rx="2"/>
-                <text x="4" y="18" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#323330">JS</text>
-            </svg>
+            <a href ="/">
+                <svg class="js-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <rect width="24" height="24" fill="#F7DF1E" rx="2"/>
+                    <text x="4" y="18" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#323330">JS</text>
+                </svg>
+            </a>
             <a href="#learn" class="footer-link">Learn</a>
             <a href="#practice" class="footer-link">Practice</a>
             <a href="#execution-flow" class="footer-link">Execution flow</a>
             <a href="#execution-context" class="footer-link">Execution context</a>
-            <a href="#notes" class="footer-link">Notes</a>
+            <a href="/tools/notes" class="footer-link">Notes</a>
         </div>
         <div class="footer-menu-right">
             <button id="themeToggle" class="icon-btn" title="Toggle dark/light mode">
@@ -225,5 +212,24 @@
             </button>
         </div>
     </footer>
+
+    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    
+    <script src="js/resizer.js"></script>
+
+    <script src="js/lib/router.js"></script>
+    
+    <script src="js/problems/arrays.js"></script>
+    <script src="js/problems/strings.js"></script>
+    <script src="js/problems/linked-lists.js"></script>
+    <script src="js/problems/stack-queue.js"></script>
+    <script src="js/problems/trees.js"></script>
+    <script src="js/problems/graphs.js"></script>
+    <script src="js/problems/dynamic-programming.js"></script>
+    <script src="js/problems/index.js"></script>
+    
+    
+    <script src="js/page.js?v-1"></script>
+    <script src="js/app.js?v-1"></script>
 </body>
 </html>
