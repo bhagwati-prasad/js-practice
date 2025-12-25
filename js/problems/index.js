@@ -5,5 +5,6 @@ const problems = {
     ...stackQueueProblems,
     ...treeProblems,
     ...graphProblems,
-    ...dynamicProgrammingProblems
+    ...dynamicProgrammingProblems,
+    ...twoPointerProblems
 };
