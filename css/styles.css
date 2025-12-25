@@ -1,51 +1,8 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    overflow: hidden;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-.flex1 {
-    flex: 1;
-    display: flex;
-}
-
-.end-align {
-    justify-content: flex-end;
-}
-
 .container {
     display: flex;
     height: calc(100vh - calc(var(--header-height) + var(--footer-height)));
     position: relative;
     flex: 1;
-}
-
-.header {
-    height: var(--header-height);
-    background-color: var(--bg-tertiary);
-    border-bottom: 1px solid var(--border-primary);
-    display: flex;
-    align-items: center;
-    padding: 0 var(--spacing-xl);
-    z-index: var(--z-header);
-}
-
-.header h1 {
-    font-size: var(--font-md);
-    color: var(--text-accent);
-    font-weight: 600;
-    flex: 2;
-    text-align: center;
 }
 
 .floating-playground-control {
@@ -79,71 +36,6 @@ body {
     width: 24px;
     height: 24px;
     color: white;
-}
-
-.footer {
-    height: var(--footer-height);
-    background-color: var(--bg-tertiary);
-    border-top: 1px solid var(--border-primary);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 var(--spacing-xl);
-    z-index: var(--z-header);
-}
-
-.footer-menu-left {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xl);
-}
-
-.footer-menu-right {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-}
-
-.js-logo {
-    width: var(--icon-md);
-    height: var(--icon-md);
-    margin-right: 5px;
-}
-
-.footer-link {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: var(--font-xs);
-    transition: color var(--transition-fast);
-}
-
-.footer-link:hover {
-    color: var(--text-white);
-}
-
-.icon-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: var(--spacing-xs);
-    width: var(--btn-height-md);
-    height: var(--btn-height-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-md);
-    transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-.icon-btn:hover {
-    background-color: var(--border-primary);
-    color: var(--text-white);
-}
-
-.icon {
-    width: var(--icon-sm);
-    height: var(--icon-sm);
 }
 
 .sidebar {
@@ -306,27 +198,6 @@ body {
     background-color: var(--bg-active);
     color: var(--text-white);
     border-left: 3px solid var(--border-accent);
-}
-
-.primary-btn {
-    background-color: var(--accent-primary);
-    color: white;
-    border: none;
-    border-radius: var(--radius-md);
-    padding: var(--spacing-xs) 12px;
-    font-size: var(--font-xs);
-    cursor: pointer;
-    transition: background-color var(--transition-fast);
-    font-weight: 500;
-    height: var(--btn-height-sm);
-}
-
-.primary-btn + .primary-btn {
-    margin-left: var(--spacing-md);
-}
-
-.primary-btn:hover {
-    background-color: var(--accent-primary-hover);
 }
 
 /*
