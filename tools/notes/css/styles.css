@@ -219,6 +219,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: transparent;
     color: var(--text-primary);
+    display: flex;
 }
 
 .text-block-wrapper {
@@ -239,6 +240,8 @@
     transition: border-color var(--transition-fast);
     background: var(--bg-secondary);
     color: var(--text-primary);
+    overflow-y: hidden;
+    box-sizing: border-box;
 }
 
 .text-block:focus {

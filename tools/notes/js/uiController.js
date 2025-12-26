@@ -369,9 +369,16 @@ const UIController = (function() {
             const textarea = document.createElement('textarea');
             textarea.className = 'text-block';
             textarea.value = text;
-            textarea.placeholder = 'Click to type...';
+            textarea.placeholder = 'Type ...';
+            
+            // Auto-resize function
+            function autoResize() {
+                textarea.style.height = 'auto';
+                textarea.style.height = textarea.scrollHeight + 'px';
+            }
             
             textarea.addEventListener('input', function() {
+                autoResize();
                 const blockIndex = note.content.findIndex(b => b.id === id);
                 if (blockIndex !== -1) {
                     note.content[blockIndex].text = this.value;
@@ -380,6 +387,8 @@ const UIController = (function() {
                 }
                 triggerSave();
             });
+            
+            setTimeout(autoResize, 0);
             
             textarea.addEventListener('blur', function() {
                 if (this.value.trim() === '') {
