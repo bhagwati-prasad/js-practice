@@ -63,7 +63,7 @@ body {
     justify-content: center;
 }
 
-.primary-btn + .primary-btn {
+.toolbar .primary-btn + .primary-btn {
     margin-left: var(--spacing-md);
 }
 

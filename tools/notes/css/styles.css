@@ -9,25 +9,26 @@
     justify-content: flex-end;
 }
 
-.storage-toggle {
+.header-toolbar {
     display: flex;
-    gap: var(--spacing-sm);
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
 }
 
-.storage-toggle button {
-    padding: var(--spacing-xs) var(--spacing-md);
+.header-toolbar .collection-path {
+    margin-right: auto;
+    min-width: 150px;
+}
+
+.header-toolbar input[type="text"] {
+    padding: var(--spacing-sm);
     border: 1px solid var(--border-primary);
-    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    max-width: 200px;
+    background: var(--bg-input);
     color: var(--text-primary);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    font-size: var(--font-xs);
-}
-
-.storage-toggle button.active {
-    background: var(--accent-primary);
-    border-color: var(--accent-primary);
-    color: var(--text-white);
+    font-size: var(--font-sm);
 }
 
 .notes-container {
@@ -60,6 +61,127 @@
     flex: 1;
     overflow-y: auto;
     padding: var(--spacing-md);
+}
+
+.collection-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-md) 0;
+}
+
+.tree-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition-fast);
+    gap: var(--spacing-xs);
+    position: relative;
+}
+
+.tree-item:hover {
+    background: var(--list-item-hover);
+}
+
+.tree-item.active {
+    background: var(--bg-active);
+    color: var(--text-white);
+    border-left: 3px solid var(--border-accent);
+}
+
+.tree-item .expand-btn {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.tree-item .expand-btn.expanded {
+    transform: rotate(90deg);
+}
+
+.tree-item .expand-btn.invisible {
+    visibility: hidden;
+}
+
+.tree-item-icon {
+    font-size: var(--font-md);
+}
+
+.tree-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.tree-item-name {
+    flex: 1;
+    font-size: var(--font-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tree-item-actions {
+    display: none;
+    gap: var(--spacing-xs);
+}
+
+.tree-item:hover .tree-item-actions {
+    display: flex;
+}
+
+.tree-item-actions button {
+    padding: 2px 6px;
+    border: none;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-xs);
+}
+
+.tree-item.active .tree-item-actions button {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--text-white);
+}
+
+.tree-item-actions button:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.tree-item.active .tree-item-actions button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.tree-children {
+    margin-left: 0;
+}
+
+.collection-path {
+    flex: 1;
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.add-collection {
+    padding: var(--spacing-lg);
+    border-top: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.add-collection button {
+    width: 100%;
 }
 
 .notebook-item {
@@ -154,7 +276,7 @@
 }
 
 .note-item:hover {
-    background: var(--bg-hover);
+    background: var(--list-item-hover);
 }
 
 .note-item.active {
@@ -455,4 +577,82 @@
     margin-bottom: var(--spacing-xs);
     font-size: var(--font-xs);
     color: var(--text-muted);
+}
+
+.radio-group {
+    display: flex;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    font-size: var(--font-sm);
+    color: var(--text-primary);
+}
+
+.radio-group input[type="radio"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+.radio-group span {
+    user-select: none;
+}
+
+/* Notes-specific right sidebar content styles */
+.setting-item {
+    margin-bottom: var(--spacing-md);
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.setting-item .storage-toggle {
+    display: flex;
+    gap: var(--spacing-sm);
+    width: 100%;
+}
+
+.setting-item .storage-toggle button {
+    flex: 1;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-primary);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-sm);
+    transition: all var(--transition-fast);
+}
+
+.setting-item .storage-toggle button:hover {
+    background: var(--bg-hover);
+}
+
+.setting-item .storage-toggle button.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--text-white);
+}
+
+.full-width {
+    width: 100%;
+    justify-content: center;
+}
+
+.full-width:not(:last-child) {
+    margin-bottom: var(--spacing-sm);
 }

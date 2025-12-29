@@ -6,5 +6,17 @@ const problems = {
     ...treeProblems,
     ...graphProblems,
     ...dynamicProgrammingProblems,
-    ...twoPointerProblems
+    ...twoPointerProblems,
+    ...classicBinarySearch,
+    ...basicLinearSearch,
+    ...jumpAndStepSearch,
+    ...mathematicalSearch,
+    ...stringMatchingPrimary,
+    ...stringMatchingSecondary,
+    ...treeBasedSearch,
+    ...probabilisticSearch,
+    ...uninformedGraphSearch,
+    ...informedGraphSearch,
+    ...bitwiseSearch,
+    ...specializedSearch
 };

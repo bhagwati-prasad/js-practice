@@ -1,12 +1,14 @@
 const UIController = (function() {
     let elements = {};
     let saveTimeout;
+    let expandedCollections = new Set(); // Track which collections are expanded
 
     function initElements() {
         elements = {
-            notebookList: document.getElementById('notebookList'),
+            collectionList: document.getElementById('collectionList'),
             notesList: document.getElementById('notesList'),
             editorArea: document.getElementById('editorArea'),
+            addCollectionBtn: document.getElementById('addCollectionBtn'),
             addNotebookBtn: document.getElementById('addNotebookBtn'),
             addNoteBtn: document.getElementById('addNoteBtn'),
             deleteNoteBtn: document.getElementById('deleteNoteBtn'),
@@ -22,18 +24,29 @@ const UIController = (function() {
             exportBtn: document.getElementById('exportBtn'),
             importBtn: document.getElementById('importBtn'),
             searchInput: document.getElementById('searchInput'),
+            collectionModal: document.getElementById('collectionModal'),
+            collectionNameInput: document.getElementById('collectionNameInput'),
+            createCollectionBtn: document.getElementById('createCollectionBtn'),
+            cancelCollectionBtn: document.getElementById('cancelCollectionBtn'),
             notebookModal: document.getElementById('notebookModal'),
             notebookNameInput: document.getElementById('notebookNameInput'),
             createNotebookBtn: document.getElementById('createNotebookBtn'),
             cancelNotebookBtn: document.getElementById('cancelNotebookBtn'),
+            addItemModal: document.getElementById('addItemModal'),
+            addItemNameInput: document.getElementById('addItemNameInput'),
+            confirmAddItemBtn: document.getElementById('confirmAddItemBtn'),
+            cancelAddItemBtn: document.getElementById('cancelAddItemBtn'),
             localStorageBtn: document.getElementById('localStorageBtn'),
-            sessionStorageBtn: document.getElementById('sessionStorageBtn')
+            sessionStorageBtn: document.getElementById('sessionStorageBtn'),
+            currentCollectionPath: document.getElementById('currentCollectionPath')
         };
     }
 
     function initEventListeners() {
         bindStorageEvents();
+        bindCollectionEvents();
         bindNotebookEvents();
+        bindAddItemEvents();
         bindNoteEvents();
         bindFloatingToolbarEvents();
         bindSearchEvents();
@@ -46,7 +59,7 @@ const UIController = (function() {
             elements.localStorageBtn.classList.add('active');
             elements.sessionStorageBtn.classList.remove('active');
             NoteBook.init();
-            renderNotebooks();
+            renderCollections();
             renderNotes();
             renderEditor();
         });
@@ -56,14 +69,51 @@ const UIController = (function() {
             elements.sessionStorageBtn.classList.add('active');
             elements.localStorageBtn.classList.remove('active');
             NoteBook.init();
-            renderNotebooks();
+            renderCollections();
             renderNotes();
             renderEditor();
         });
     }
 
+    function bindCollectionEvents() {
+        elements.addCollectionBtn.addEventListener('click', function() {
+            elements.collectionModal.classList.add('show');
+            elements.collectionNameInput.value = '';
+            elements.collectionNameInput.focus();
+        });
+
+        elements.createCollectionBtn.addEventListener('click', function() {
+            const name = elements.collectionNameInput.value.trim();
+            if (name) {
+                const currentCollectionId = NoteBook.getCurrentCollection();
+                const collection = NoteBook.createCollection(name, currentCollectionId);
+                if (collection) {
+                    NoteBook.setCurrentCollection(collection.id);
+                    renderCollections();
+                    renderNotes();
+                }
+                elements.collectionModal.classList.remove('show');
+            }
+        });
+
+        elements.cancelCollectionBtn.addEventListener('click', function() {
+            elements.collectionModal.classList.remove('show');
+        });
+
+        elements.collectionNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                elements.createCollectionBtn.click();
+            }
+        });
+    }
+
     function bindNotebookEvents() {
         elements.addNotebookBtn.addEventListener('click', function() {
+            const currentCollectionId = NoteBook.getCurrentCollection();
+            if (!currentCollectionId) {
+                alert('Please select a collection first.');
+                return;
+            }
             elements.notebookModal.classList.add('show');
             elements.notebookNameInput.value = '';
             elements.notebookNameInput.focus();
@@ -71,11 +121,14 @@ const UIController = (function() {
 
         elements.createNotebookBtn.addEventListener('click', function() {
             const name = elements.notebookNameInput.value.trim();
-            if (name) {
-                const notebook = NoteBook.createNotebook(name);
-                NoteBook.setCurrentNotebook(notebook.id);
-                renderNotebooks();
-                renderNotes();
+            const currentCollectionId = NoteBook.getCurrentCollection();
+            if (name && currentCollectionId) {
+                const notebook = NoteBook.createNotebook(currentCollectionId, name);
+                if (notebook) {
+                    NoteBook.setCurrentNotebook(notebook.id);
+                    renderCollections();
+                    renderNotes();
+                }
                 elements.notebookModal.classList.remove('show');
             }
         });
@@ -87,6 +140,44 @@ const UIController = (function() {
         elements.notebookNameInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 elements.createNotebookBtn.click();
+            }
+        });
+    }
+
+    function bindAddItemEvents() {
+        let targetCollectionId = null;
+
+        window.addItemToCollection = function(collectionId) {
+            targetCollectionId = collectionId;
+            elements.addItemModal.classList.add('show');
+            elements.addItemNameInput.value = '';
+            elements.addItemNameInput.focus();
+            // Reset to collection radio
+            document.querySelector('input[name="itemType"][value="collection"]').checked = true;
+        };
+
+        elements.confirmAddItemBtn.addEventListener('click', function() {
+            const name = elements.addItemNameInput.value.trim();
+            const itemType = document.querySelector('input[name="itemType"]:checked').value;
+            
+            if (name && targetCollectionId) {
+                if (itemType === 'collection') {
+                    NoteBook.createCollection(name, targetCollectionId);
+                } else {
+                    NoteBook.createNotebook(targetCollectionId, name);
+                }
+                renderCollections();
+                elements.addItemModal.classList.remove('show');
+            }
+        });
+
+        elements.cancelAddItemBtn.addEventListener('click', function() {
+            elements.addItemModal.classList.remove('show');
+        });
+
+        elements.addItemNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                elements.confirmAddItemBtn.click();
             }
         });
     }
@@ -217,7 +308,7 @@ const UIController = (function() {
                     const reader = new FileReader();
                     reader.onload = function(event) {
                         if (NoteBook.importData(event.target.result)) {
-                            renderNotebooks();
+                            renderCollections();
                             renderNotes();
                             alert('Data imported successfully!');
                         } else {
@@ -232,38 +323,198 @@ const UIController = (function() {
         });
     }
 
-    function renderNotebooks() {
-        const notebooks = NoteBook.getNotebooks();
+    function renderCollections() {
+        const collections = NoteBook.getCollections();
+        const currentCollectionId = NoteBook.getCurrentCollection();
         const currentNotebookId = NoteBook.getCurrentNotebook();
-        elements.notebookList.innerHTML = '';
+        elements.collectionList.innerHTML = '';
         
-        notebooks.forEach(notebook => {
+        function renderItemElement(item, level = 0) {
             const div = document.createElement('div');
-            div.className = 'primary-btn notebook-item' + (notebook.id === currentNotebookId ? ' active' : '');
+            div.className = 'tree-item';
+            div.style.paddingLeft = (level * 20 + 10) + 'px';
+            
+            const isCollection = item.type === 'collection';
+            const isNotebook = item.type === 'notebook';
+            const isActive = currentNotebookId 
+                ? (isNotebook && item.id === currentNotebookId)
+                : (isCollection && item.id === currentCollectionId);
+            
+            if (isActive) {
+                div.classList.add('active');
+            }
+            
+            const icon = isCollection ? '📁' : '📒';
+            const hasChildren = isCollection && item.items && item.items.length > 0;
+            const isExpanded = expandedCollections.has(item.id);
+            const expandBtn = hasChildren 
+                ? `<span class="expand-btn${isExpanded ? ' expanded' : ''}">➢</span>` 
+                : '<span class="expand-btn invisible">➢</span>';
+            
             div.innerHTML = `
-                <span>${notebook.name}</span>
-                <div class="notebook-actions">
-                    <button onclick="window.renameNotebook('${notebook.id}')">✎</button>
-                    <button onclick="window.deleteNotebook('${notebook.id}')">✕</button>
+                ${expandBtn}
+                <span class="tree-item-icon">${icon}</span>
+                <span class="tree-item-name">${item.name}</span>
+                <div class="tree-item-actions">
+                    ${isCollection ? `<button onclick="window.addItemToCollection('${item.id}')">+</button>` : ''}
+                    <button onclick="window.renameItem('${item.id}', '${item.type}')">✎</button>
+                    <button onclick="window.deleteItem('${item.id}', '${item.type}')">✕</button>
                 </div>
             `;
             
-            div.addEventListener('click', function(e) {
-                if (!e.target.closest('.notebook-actions')) {
-                    NoteBook.setCurrentNotebook(notebook.id);
-                    renderNotebooks();
-                    renderNotes();
-                    renderEditor();
+            const nameSpan = div.querySelector('.tree-item-name');
+            const iconSpan = div.querySelector('.tree-item-icon');
+            const expandBtnEl = div.querySelector('.expand-btn');
+            
+            // Click on name or icon to select (and expand if collection)
+            const selectHandler = function(e) {
+                e.stopPropagation();
+                if (isCollection) {
+                    NoteBook.setCurrentCollection(item.id);
+                    // Auto-expand when selecting a collection
+                    if (hasChildren && !expandedCollections.has(item.id)) {
+                        expandedCollections.add(item.id);
+                    }
+                } else if (isNotebook) {
+                    NoteBook.setCurrentNotebook(item.id);
                 }
+                renderCollections();
+                renderNotes();
+                renderEditor();
+            };
+            
+            nameSpan.addEventListener('click', selectHandler);
+            iconSpan.addEventListener('click', selectHandler);
+            
+            // Expand/collapse functionality - only for collections with children
+            if (hasChildren) {
+                expandBtnEl.classList.remove('invisible');
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'tree-children';
+                childrenContainer.style.display = isExpanded ? 'block' : 'none';
+                
+                expandBtnEl.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (expandedCollections.has(item.id)) {
+                        expandedCollections.delete(item.id);
+                    } else {
+                        expandedCollections.add(item.id);
+                    }
+                    renderCollections();
+                });
+                
+                // Recursively render children
+                item.items.forEach(child => {
+                    childrenContainer.appendChild(renderItemElement(child, level + 1));
+                });
+                
+                // Return fragment containing both the item and its children
+                const fragment = document.createDocumentFragment();
+                fragment.appendChild(div);
+                fragment.appendChild(childrenContainer);
+                return fragment;
+            }
+            
+            return div;
+        }
+        
+        // Show children of root collections instead of root collections themselves
+        if (collections.length === 1 && collections[0].items) {
+            // Single root collection - show its children directly
+            collections[0].items.forEach(item => {
+                const el = renderItemElement(item, 0);
+                elements.collectionList.appendChild(el);
             });
             
-            elements.notebookList.appendChild(div);
-        });
-        
-        if (!currentNotebookId && notebooks.length > 0) {
-            NoteBook.setCurrentNotebook(notebooks[0].id);
-            renderNotes();
+            // Auto-select first item if none selected
+            if (!currentCollectionId && !currentNotebookId && collections[0].items.length > 0) {
+                const firstItem = collections[0].items[0];
+                if (firstItem.type === 'collection') {
+                    NoteBook.setCurrentCollection(firstItem.id);
+                    expandedCollections.add(firstItem.id);
+                } else {
+                    NoteBook.setCurrentNotebook(firstItem.id);
+                }
+            }
+        } else {
+            // Multiple root collections or no collections - show them all
+            collections.forEach(collection => {
+                const el = renderItemElement(collection, 0);
+                elements.collectionList.appendChild(el);
+            });
+            
+            // Auto-select first collection if none selected
+            if (!currentCollectionId && collections.length > 0) {
+                NoteBook.setCurrentCollection(collections[0].id);
+                expandedCollections.add(collections[0].id);
+            }
         }
+        
+        // Update breadcrumb path
+        updateCollectionPath();
+    }
+    
+    function updateCollectionPath() {
+        const currentCollectionId = NoteBook.getCurrentCollection();
+        const currentNotebookId = NoteBook.getCurrentNotebook();
+        const currentNoteId = NoteBook.getCurrentNote();
+        
+        if (!elements.currentCollectionPath) return;
+        
+        // Get complete path including note title
+        const fullPath = NoteBook.getPath();
+        
+        if (fullPath.length === 0) {
+            elements.currentCollectionPath.textContent = 'No selection';
+            return;
+        }
+        
+        // Clear existing content
+        elements.currentCollectionPath.innerHTML = '';
+        
+        // Create clickable breadcrumb segments
+        fullPath.forEach((pathItem, index) => {
+            // Create clickable span for each path segment
+            const span = document.createElement('span');
+            span.className = 'breadcrumb-segment';
+            span.textContent = pathItem.name;
+            span.style.cursor = 'pointer';
+            span.style.color = '#007acc';
+            
+            // Add click handler to navigate to this path level
+            span.addEventListener('click', function() {
+                // Build path up to this segment
+                const targetPath = fullPath.slice(0, index + 1);
+                NoteBook.setPath(targetPath);
+                
+                // Refresh UI to reflect navigation
+                renderCollections();
+                renderNotes();
+                renderEditor();
+            });
+            
+            // Hover effect
+            span.addEventListener('mouseenter', function() {
+                span.style.textDecoration = 'underline';
+            });
+            span.addEventListener('mouseleave', function() {
+                span.style.textDecoration = 'none';
+            });
+            
+            elements.currentCollectionPath.appendChild(span);
+            
+            // Add separator if not the last item
+            if (index < fullPath.length - 1) {
+                const separator = document.createElement('span');
+                separator.textContent = ' > ';
+                separator.style.color = '#999';
+                elements.currentCollectionPath.appendChild(separator);
+            }
+        });
+    }
+
+    function renderNotebooks() {
+        renderCollections();
     }
 
     function renderNotes() {
@@ -295,6 +546,7 @@ const UIController = (function() {
                 NoteBook.setCurrentNote(note.id);
                 renderNotes();
                 renderEditor();
+                updateCollectionPath(); // Update breadcrumb to show note title
             });
             
             elements.notesList.appendChild(div);
@@ -351,6 +603,7 @@ const UIController = (function() {
                     content: note.content
                 });
                 renderNotes();
+                updateCollectionPath(); // Update breadcrumb when note title changes
             }, 500);
         }
 
@@ -449,9 +702,10 @@ const UIController = (function() {
                 NoteBook.setCurrentNotebook(result.notebookId);
                 NoteBook.setCurrentNote(result.note.id);
                 elements.searchInput.value = '';
-                renderNotebooks();
+                renderCollections();
                 renderNotes();
                 renderEditor();
+                updateCollectionPath(); // Update breadcrumb when selecting from search
             });
             
             elements.notesList.appendChild(div);
@@ -461,31 +715,57 @@ const UIController = (function() {
     function init() {
         initElements();
         NoteBook.init();
-        renderNotebooks();
+        
+        if (elements.currentCollectionPath) {
+            elements.currentCollectionPath.textContent = 'No selection';
+        }
+        
+        renderCollections();
         Draggable.init('#floatingToolbar');
         initEventListeners();
 
-        window.renameNotebook = function(notebookId) {
-            const notebook = NoteBook.getNotebook(notebookId);
-            if (!notebook) return;
+        window.renameItem = function(itemId, itemType) {
+            const item = itemType === 'collection' 
+                ? NoteBook.getCollection(itemId) 
+                : NoteBook.getNotebook(itemId);
+            if (!item) return;
             
-            const newName = prompt('Enter new notebook name:', notebook.name);
+            const newName = prompt(`Enter new ${itemType} name:`, item.name);
             if (newName && newName.trim()) {
-                NoteBook.updateNotebook(notebookId, { name: newName.trim() });
-                renderNotebooks();
+                if (itemType === 'collection') {
+                    NoteBook.updateCollection(itemId, { name: newName.trim() });
+                } else {
+                    NoteBook.updateNotebook(itemId, { name: newName.trim() });
+                }
+                renderCollections();
             }
         };
 
-        window.deleteNotebook = function(notebookId) {
-            const notebook = NoteBook.getNotebook(notebookId);
-            if (!notebook) return;
+        window.deleteItem = function(itemId, itemType) {
+            const item = itemType === 'collection' 
+                ? NoteBook.getCollection(itemId) 
+                : NoteBook.getNotebook(itemId);
+            if (!item) return;
             
-            if (confirm(`Are you sure you want to delete "${notebook.name}" and all its notes?`)) {
-                NoteBook.deleteNotebook(notebookId);
-                renderNotebooks();
+            if (confirm(`Are you sure you want to delete "${item.name}"${itemType === 'collection' ? ' and all its contents' : ' and all its notes'}?`)) {
+                if (itemType === 'collection') {
+                    NoteBook.deleteCollection(itemId);
+                } else {
+                    NoteBook.deleteNotebook(itemId);
+                }
+                renderCollections();
                 renderNotes();
                 renderEditor();
             }
+        };
+
+        // Keep old functions for backward compatibility
+        window.renameNotebook = function(notebookId) {
+            window.renameItem(notebookId, 'notebook');
+        };
+
+        window.deleteNotebook = function(notebookId) {
+            window.deleteItem(notebookId, 'notebook');
         };
     }
 

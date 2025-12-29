@@ -1389,11 +1389,11 @@ Output: -1</code></pre>
         `,
         starterCode: `function search(nums, target) {\n    // Implementation\n}`
     },
-    'find-peak-element': {
-        title: 'Find Peak Element',
+    'find-peak-element-two-pointer': {
+        title: 'Find Peak Element (Binary Search on Two Pointer)',
         description: `
             <h2>Problem Description</h2>
-            <p>Find an element that is strictly greater than its neighbors.</p>
+            <p>Find an element that is strictly greater than its neighbors using binary search with two pointer approach.</p>
             <h3>Example 1:</h3>
             <pre><code>Input: nums = [1,2,3,1]
 Output: 2</code></pre>

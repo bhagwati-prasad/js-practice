@@ -19,6 +19,9 @@
     --text-error: #f48771;
     --text-success: #4ec9b0;
     
+    --list-item-hover: #3a3a3e;
+    --link-hover: #6aaed6;
+    
     --accent-primary: #007acc;
     --accent-primary-hover: #005a9e;
     --accent-secondary: #4ec9b0;
@@ -89,6 +92,9 @@ body.light-theme {
     --text-code: #a31515;
     --text-error: #d13438;
     --text-success: #008000;
+    
+    --list-item-hover: #d0d0d0;
+    --link-hover: #0052a3;
     
     --accent-primary: #0078d4;
     --accent-primary-hover: #005a9e;

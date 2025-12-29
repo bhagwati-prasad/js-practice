@@ -15,10 +15,10 @@ class Router {
         });
 
         document.addEventListener('click', (e) => {
-            const link = e.target.closest('[data-route]');
+            const link = e.target.closest('a[href^="/"]');
             if (link) {
                 e.preventDefault();
-                const path = link.getAttribute('data-route');
+                const path = link.getAttribute('href');
                 this.navigate(path);
             }
         });
@@ -85,25 +85,19 @@ const router = new Router();
 
 router.register('/practice/:problemId', (params) => {
     const { problemId } = params;
-    
-    const problemItem = document.querySelector(`[data-problem="${problemId}"]`);
-    if (problemItem) {
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar.classList.contains('collapsed')) {
-            sidebar.classList.remove('collapsed');
-        }
-        
-        problemItem.click();
-        
-        problemItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    loadProblem(problemId);
 });
 
 router.register('/', () => {
     const problemContent = document.getElementById('problemContent');
+    const problemTitle = document.getElementById('problemTitle');
+    
+    if (problemTitle) {
+        problemTitle.textContent = 'Welcome to JS Practice';
+    }
+    
     if (problemContent) {
         problemContent.innerHTML = `
-            <h1 id="problemTitle">Welcome to JS Practice</h1>
             <p>Select a problem from the sidebar to get started.</p>
             <p>This platform allows you to practice Data Structures and Algorithms in JavaScript.</p>
             <h3>How to use:</h3>
@@ -124,23 +118,66 @@ router.register('*', () => {
     router.navigate('/', false);
 });
 
-function setupProblemRouting() {
-    document.addEventListener('DOMContentLoaded', () => {
-        const problemItems = document.querySelectorAll('.problem-item[data-problem]');
-        problemItems.forEach(item => {
-            const problemId = item.getAttribute('data-problem');
-            item.setAttribute('data-route', `/practice/${problemId}`);
-            
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                router.navigate(`/practice/${problemId}`);
-            }, true);
-        });
-    });
-}
-
-setupProblemRouting();
-
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = router;
+}
+
+// Problem loading and UI management
+function loadProblem(problemId) {
+    const problem = typeof problems !== 'undefined' ? problems[problemId] : null;
+    
+    if (!problem) {
+        console.error('Problem not found:', problemId);
+        return;
+    }
+    
+    const MOBILE_BREAKPOINT = 1200;
+    
+    // Update active state
+    const problemItems = document.querySelectorAll('.problem-item');
+    const currentItem = document.querySelector(`.problem-item a[href="/practice/${problemId}"]`)?.parentElement;
+    
+    problemItems.forEach(item => item.classList.remove('active'));
+    if (currentItem) {
+        currentItem.classList.add('active');
+        currentItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // Update problem content
+    const problemTitle = document.getElementById('problemTitle');
+    const problemContent = document.getElementById('problemContent');
+    
+    if (problemTitle) {
+        problemTitle.textContent = problem.title;
+    }
+    
+    if (problemContent) {
+        problemContent.innerHTML = problem.description;
+    }
+    
+    // Update editor
+    if (window.editor && problem.starterCode) {
+        window.editor.setValue(problem.starterCode);
+    }
+    
+    // Clear console and input
+    const consoleElement = document.getElementById('console');
+    const sampleInputElement = document.getElementById('sampleInput');
+    
+    if (consoleElement) {
+        consoleElement.textContent = '';
+        consoleElement.className = '';
+    }
+    
+    if (sampleInputElement) {
+        sampleInputElement.value = '';
+    }
+    
+    // Close sidebar on mobile
+    if (window.innerWidth < MOBILE_BREAKPOINT) {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.classList.add('collapsed');
+        }
+    }
 }

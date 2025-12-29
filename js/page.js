@@ -177,37 +177,6 @@ tabHeaders.forEach(header => {
     });
 });
 
-const problemItems = document.querySelectorAll('.problem-item');
-const problemTitle = document.getElementById('problemTitle');
-const problemContent = document.getElementById('problemContent');
-
-problemItems.forEach(item => {
-    item.addEventListener('click', () => {
-        const problemId = item.getAttribute('data-problem');
-        const problem = problems[problemId];
-        
-        if (problem) {
-            problemItems.forEach(p => p.classList.remove('active'));
-            item.classList.add('active');
-            
-            problemTitle.textContent = problem.title;
-            problemContent.innerHTML = problem.description;
-            
-            if (window.editor) {
-                window.editor.setValue(problem.starterCode);
-            }
-            
-            document.getElementById('console').textContent = '';
-            document.getElementById('console').className = '';
-            document.getElementById('sampleInput').value = '';
-            
-            if (window.innerWidth < MOBILE_BREAKPOINT) {
-                sidebar.classList.add('collapsed');
-            }
-        }
-    });
-});
-
 const runButton = document.getElementById('runButton');
 const outputElement = document.getElementById('console');
 const sampleInputElement = document.getElementById('sampleInput');

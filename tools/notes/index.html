@@ -5,17 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notes</title>
     <link rel="stylesheet" href="../../css/theme.css">
-    <link rel="stylesheet" href="../../css/app.css">
-    <link rel="stylesheet" href="../../css/utilities.css">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../css/app.css?v=6">
+    <link rel="stylesheet" href="../../css/utilities.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
 </head>
 <body>
-    <header class="header">
-        <h1>Notes</h1>
-        <div class="flex1 end-align">
-            <div class="storage-toggle">
-                <button id="localStorageBtn" class="active">Local</button>
-                <button id="sessionStorageBtn">Session</button>
+    <header>
+        <div id="notesPage" class="header">
+            <div id="currentCollectionPath" class="collection-path flex1"></div>
+            <h1>Notes</h1>
+            <div class="flex1 end-align header-toolbar">
+                <button class="primary-btn" id="addNoteBtn">+ New Note</button>
+                <button class="primary-btn" id="deleteNoteBtn">Delete Note</button>
+                <input type="text" id="searchInput" placeholder="Search notes...">
             </div>
         </div>
     </header>
@@ -23,22 +26,16 @@
     <div class="notes-container">
         <div class="sidebar">
             <div class="sidebar-header">
-                <h2>Notebooks</h2>
+                <h2>Collections</h2>
             </div>
-            <div class="notebook-list" id="notebookList"></div>
-            <div class="add-notebook">
+            <div class="collection-list" id="collectionList"></div>
+            <div class="add-collection">
+                <button id="addCollectionBtn" class="primary-btn">+ New Collection</button>
                 <button id="addNotebookBtn" class="primary-btn">+ New Notebook</button>
             </div>
         </div>
 
     <div class="main-content">
-        <div class="toolbar">
-            <button class="primary-btn" id="addNoteBtn">+ New Note</button>
-            <button class="primary-btn" id="deleteNoteBtn">Delete Note</button>
-            <button class="primary-btn" id="exportBtn">Export</button>
-            <button class="primary-btn" id="importBtn">Import</button>
-            <input type="text" id="searchInput" placeholder="Search notes...">
-        </div>
         <div class="notes-area">
             <div class="notes-list" id="notesList"></div>
             <div class="editor-area" id="editorArea">
@@ -60,6 +57,17 @@
     </div>
     </div>
 
+    <div class="modal" id="collectionModal">
+        <div class="modal-content">
+            <h2>New Collection</h2>
+            <input type="text" id="collectionNameInput" placeholder="Enter collection name">
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelCollectionBtn">Cancel</button>
+                <button class="btn-primary" id="createCollectionBtn">Create</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="notebookModal">
         <div class="modal-content">
             <h2>New Notebook</h2>
@@ -67,6 +75,27 @@
             <div class="modal-actions">
                 <button class="btn-secondary" id="cancelNotebookBtn">Cancel</button>
                 <button class="btn-primary" id="createNotebookBtn">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addItemModal">
+        <div class="modal-content">
+            <h2>Add Item to Collection</h2>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="itemType" value="collection" checked>
+                    <span>Collection</span>
+                </label>
+                <label>
+                    <input type="radio" name="itemType" value="notebook">
+                    <span>Notebook</span>
+                </label>
+            </div>
+            <input type="text" id="addItemNameInput" placeholder="Enter name">
+            <div class="modal-actions">
+                <button class="btn-secondary" id="cancelAddItemBtn">Cancel</button>
+                <button class="btn-primary" id="confirmAddItemBtn">Create</button>
             </div>
         </div>
     </div>
@@ -89,6 +118,35 @@
             </div>
         </div>
     </div>
+
+    <aside id="rightSidebar" class="right-sidebar">
+        <div class="sidebar-header">
+            <h2>Settings</h2>
+            <button id="closeRightSidebar" class="close-btn" title="Close settings">×</button>
+        </div>
+        <div class="sidebar-content">
+            <div class="settings-section">
+                <h3>Storage</h3>
+                <div class="setting-item">
+                    <label>Storage Type:</label>
+                    <div class="storage-toggle">
+                        <button id="localStorageBtn" class="active">Local</button>
+                        <button id="sessionStorageBtn">Session</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Data Management</h3>
+                <div class="setting-item">
+                    <button class="primary-btn full-width" id="exportBtn">📤 Export Data</button>
+                </div>
+                <div class="setting-item">
+                    <button class="primary-btn full-width" id="importBtn">📥 Import Data</button>
+                </div>
+            </div>
+        </div>
+    </aside>
 
     <footer class="footer">
         <div class="footer-menu-left">
@@ -124,11 +182,11 @@
     </footer>
 
     <script src="js/storageDriver.js"></script>
-    <script src="js/noteBook.js"></script>
+    <script src="js/noteBook.js?v=2"></script>
     <script src="js/draggable.js"></script>
     <script src="js/codeEditor.js"></script>
     <script src="js/noteProcessor.js"></script>
-    <script src="js/uiController.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="js/uiController.js?v=3"></script>
+    <script src="/js/app.js?v=2"></script>
 </body>
 </html>

@@ -1,4 +1,26 @@
 window.addEventListener('load', function() {
+    // Right Sidebar functionality
+    const settingsToggle = document.getElementById('settingsToggle');
+    const rightSidebar = document.getElementById('rightSidebar');
+    const closeRightSidebar = document.getElementById('closeRightSidebar');
+
+    if (settingsToggle && rightSidebar) {
+        settingsToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            rightSidebar.classList.toggle('open');
+        });
+    }
+
+    if (closeRightSidebar && rightSidebar) {
+        closeRightSidebar.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            rightSidebar.classList.remove('open');
+        });
+    }
+
+    // Theme toggle functionality
     const themeToggle = document.getElementById('themeToggle');
 
     function updateThemeIcon(isLightTheme) {
