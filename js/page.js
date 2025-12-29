@@ -251,22 +251,7 @@ document.addEventListener('keydown', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const rightSidebar = document.getElementById('rightSidebar');
-    const settingsToggle = document.getElementById('settingsToggle');
-    const closeRightSidebar = document.getElementById('closeRightSidebar');
-
-    if (settingsToggle && rightSidebar) {
-        settingsToggle.addEventListener('click', () => {
-            rightSidebar.classList.toggle('open');
-        });
-    }
-
-    if (closeRightSidebar && rightSidebar) {
-        closeRightSidebar.addEventListener('click', () => {
-            rightSidebar.classList.remove('open');
-        });
-    }
-
+    // Editor settings event handlers
     const minimapToggle = document.getElementById('minimapToggle');
     const wordWrapToggle = document.getElementById('wordWrapToggle');
     const fontSizeInput = document.getElementById('fontSizeInput');

@@ -152,8 +152,10 @@ const UIController = (function() {
             elements.addItemModal.classList.add('show');
             elements.addItemNameInput.value = '';
             elements.addItemNameInput.focus();
-            // Reset to collection radio
-            document.querySelector('input[name="itemType"][value="collection"]').checked = true;
+            const collectionRadio = document.querySelector('input[name="itemType"][value="collection"]');
+            if (collectionRadio) {
+                collectionRadio.checked = true;
+            }
         };
 
         elements.confirmAddItemBtn.addEventListener('click', function() {
@@ -418,15 +420,12 @@ const UIController = (function() {
             return div;
         }
         
-        // Show children of root collections instead of root collections themselves
         if (collections.length === 1 && collections[0].items) {
-            // Single root collection - show its children directly
             collections[0].items.forEach(item => {
                 const el = renderItemElement(item, 0);
                 elements.collectionList.appendChild(el);
             });
             
-            // Auto-select first item if none selected
             if (!currentCollectionId && !currentNotebookId && collections[0].items.length > 0) {
                 const firstItem = collections[0].items[0];
                 if (firstItem.type === 'collection') {
@@ -437,20 +436,17 @@ const UIController = (function() {
                 }
             }
         } else {
-            // Multiple root collections or no collections - show them all
             collections.forEach(collection => {
                 const el = renderItemElement(collection, 0);
                 elements.collectionList.appendChild(el);
             });
             
-            // Auto-select first collection if none selected
             if (!currentCollectionId && collections.length > 0) {
                 NoteBook.setCurrentCollection(collections[0].id);
                 expandedCollections.add(collections[0].id);
             }
         }
         
-        // Update breadcrumb path
         updateCollectionPath();
     }
     
@@ -461,7 +457,6 @@ const UIController = (function() {
         
         if (!elements.currentCollectionPath) return;
         
-        // Get complete path including note title
         const fullPath = NoteBook.getPath();
         
         if (fullPath.length === 0) {
@@ -469,25 +464,19 @@ const UIController = (function() {
             return;
         }
         
-        // Clear existing content
         elements.currentCollectionPath.innerHTML = '';
         
-        // Create clickable breadcrumb segments
         fullPath.forEach((pathItem, index) => {
-            // Create clickable span for each path segment
             const span = document.createElement('span');
             span.className = 'breadcrumb-segment';
             span.textContent = pathItem.name;
             span.style.cursor = 'pointer';
             span.style.color = '#007acc';
             
-            // Add click handler to navigate to this path level
             span.addEventListener('click', function() {
-                // Build path up to this segment
                 const targetPath = fullPath.slice(0, index + 1);
                 NoteBook.setPath(targetPath);
                 
-                // Refresh UI to reflect navigation
                 renderCollections();
                 renderNotes();
                 renderEditor();
