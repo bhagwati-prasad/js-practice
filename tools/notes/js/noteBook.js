@@ -1,14 +1,21 @@
 const NoteBook = (function() {
+    /*
+    Collection = Collection + Notebooks
+    Notebook = Notes
+    Note = Cells
+    Cell = { id, text, highlighted, codeMode }
+    */
     const STORAGE_KEY = 'onenote_data';
     let data = {
-        collections: [], // Root level collections
+        collections: [],
         currentCollectionId: null,
         currentNotebookId: null,
         currentNoteId: null
     };
 
     function generateId() {
-        return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const rand = Math.random().toString(36).substring(2, 11);
+        return 'id_' + Date.now() + '_' + rand;
     }
 
     function saveData() {
@@ -18,7 +25,6 @@ const NoteBook = (function() {
     function loadData() {
         const loaded = StorageDriver.load(STORAGE_KEY);
         if (loaded) {
-            // Migration: convert old notebooks structure to new collections structure
             if (loaded.notebooks && !loaded.collections) {
                 data.collections = [{
                     id: generateId(),
@@ -34,10 +40,10 @@ const NoteBook = (function() {
                 data = loaded;
             }
         }
+        normalizeAllNotes();
         return data;
     }
 
-    // Find collection by ID recursively
     function findCollection(id, collections = data.collections) {
         for (let col of collections) {
             if (col.id === id) return col;
@@ -53,7 +59,6 @@ const NoteBook = (function() {
         return null;
     }
 
-    // Find notebook by ID recursively
     function findNotebook(id, collections = data.collections) {
         for (let col of collections) {
             if (col.items) {
@@ -70,7 +75,6 @@ const NoteBook = (function() {
         return null;
     }
 
-    // Find the parent collection of a notebook or collection
     function findParentCollection(itemId, collections = data.collections, parent = null) {
         for (let col of collections) {
             if (col.items) {
@@ -93,7 +97,6 @@ const NoteBook = (function() {
         return nb.notes.find(n => n.id === nId);
     }
 
-    // Get all collections (helper for flat list)
     function getAllCollections(collections = data.collections, result = []) {
         for (let col of collections) {
             result.push(col);
@@ -108,7 +111,6 @@ const NoteBook = (function() {
         return result;
     }
 
-    // Get all notebooks (helper for flat list)
     function getAllNotebooks(collections = data.collections, result = []) {
         for (let col of collections) {
             if (col.items) {
@@ -124,7 +126,6 @@ const NoteBook = (function() {
         return result;
     }
 
-    // Build complete path from root to a collection
     function buildCollectionPath(collectionId, collections = data.collections, currentPath = []) {
         for (let col of collections) {
             if (col.id === collectionId) {
@@ -142,6 +143,83 @@ const NoteBook = (function() {
         return null;
     }
 
+    function resolvePathToNoteEntities(pathInput) {
+        if (typeof pathInput !== 'string') return null;
+
+        const parts = pathInput.split('/').map(p => p.trim()).filter(p => p.length > 0);
+        if (parts.length < 3) return null; // Expect at least collection/notebook/note
+
+        const noteTitle = parts.pop();
+        const notebookName = parts.pop();
+
+        let currentCollections = data.collections;
+        let collection = null;
+
+        for (const part of parts) {
+            const match = currentCollections.find(item => item.type === 'collection' && item.name === part);
+            if (!match) return null;
+            collection = match;
+            currentCollections = match.items ? match.items.filter(item => item.type === 'collection') : [];
+        }
+
+        if (!collection || !collection.items) return null;
+
+        const notebook = collection.items.find(item => item.type === 'notebook' && item.name === notebookName);
+        if (!notebook) return null;
+
+        const note = Array.isArray(notebook.notes) ? notebook.notes.find(n => n.title === noteTitle) : null;
+
+        return { collection, notebook, note, noteTitle };
+    }
+
+    function ensureCellObject(cell) {
+        const text = typeof cell === 'string'
+            ? cell
+            : (cell && typeof cell.text === 'string')
+                ? cell.text
+                : '';
+
+        return {
+            id: (cell && cell.id) ? cell.id : generateId(),
+            text,
+            highlighted: !!(cell && cell.highlighted),
+            codeMode: !!(cell && cell.codeMode)
+        };
+    }
+
+    function normalizeCells(cells = []) {
+        if (!Array.isArray(cells)) return null;
+        return cells.map(ensureCellObject);
+    }
+
+    function ensureNoteCells(note) {
+        if (!note) return note;
+
+        if (!Array.isArray(note.cells)) {
+            if (Array.isArray(note.content)) {
+                note.cells = note.content;
+            } else if (typeof note.content === 'string') {
+                note.cells = note.content ? [{ id: generateId(), text: note.content }] : [];
+            } else {
+                note.cells = [];
+            }
+        }
+
+        note.cells = normalizeCells(note.cells) || [];
+        note.content = note.cells;
+        return note;
+    }
+
+    function normalizeAllNotes() {
+        const notebooks = getAllNotebooks();
+        notebooks.forEach(nb => {
+            if (!Array.isArray(nb.notes)) {
+                nb.notes = [];
+            }
+            nb.notes = nb.notes.map(note => ensureNoteCells(note));
+        });
+    }
+
     return {
         init: function() {
             loadData();
@@ -152,14 +230,13 @@ const NoteBook = (function() {
             return data;
         },
 
-        // Collection methods
         createCollection: function(name, parentCollectionId = null) {
             const col = {
                 id: generateId(),
                 name: name || 'Untitled Collection',
                 type: 'collection',
                 createdAt: new Date().toISOString(),
-                items: [] // Can contain notebooks or other collections
+                items: []
             };
             
             if (parentCollectionId) {
@@ -206,7 +283,6 @@ const NoteBook = (function() {
         },
 
         deleteCollection: function(id) {
-            // Check if it's a root collection
             const idx = data.collections.findIndex(c => c.id === id);
             if (idx !== -1) {
                 data.collections.splice(idx, 1);
@@ -219,7 +295,6 @@ const NoteBook = (function() {
                 return true;
             }
             
-            // Find in nested collections
             const parent = findParentCollection(id);
             if (parent) {
                 const itemIdx = parent.items.findIndex(item => item.id === id);
@@ -238,7 +313,6 @@ const NoteBook = (function() {
             return false;
         },
 
-        // Notebook methods
         createNotebook: function(collectionId, name) {
             const col = findCollection(collectionId);
             if (!col) return null;
@@ -293,40 +367,92 @@ const NoteBook = (function() {
             return true;
         },
 
-        // Note methods (unchanged, notes remain as collection of textareas)
         createNote: function(nbId, title, content) {
             const nb = findNotebook(nbId);
             if (!nb) return null;
             
-            const note = {
+            const cells = normalizeCells(content || []) || [];
+            const note = ensureNoteCells({
                 id: generateId(),
                 title: title || 'Untitled',
-                content: content || [],
+                cells,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
-            };
+            });
             
             nb.notes.push(note);
             saveData();
             return note;
         },
 
+        createNewNote: function(pathInput, cells = []) {
+            const resolved = resolvePathToNoteEntities(pathInput);
+            if (!resolved || !resolved.notebook) return null;
+
+            const normalizedCells = normalizeCells(cells);
+            if (!normalizedCells) return null;
+
+            if (resolved.note) {
+                return this.updateNote(resolved.notebook.id, resolved.note.id, {
+                    title: resolved.noteTitle,
+                    cells: normalizedCells
+                });
+            }
+
+            return this.createNote(resolved.notebook.id, resolved.noteTitle, normalizedCells);
+        },
+
         getNotes: function(nbId) {
             const nb = findNotebook(nbId);
-            return nb ? nb.notes : [];
+            return nb ? nb.notes.map(note => ensureNoteCells(note)) : [];
         },
 
         getNote: function(nbId, nId) {
-            return findNote(nbId, nId);
+            return ensureNoteCells(findNote(nbId, nId));
+        },
+
+        getNewNote: function(pathInput) {
+            const resolved = resolvePathToNoteEntities(pathInput);
+            if (!resolved || !resolved.note) return null;
+            ensureNoteCells(resolved.note);
+            if (!Array.isArray(resolved.note.cells)) return null;
+
+            return resolved.note.cells.map(cell => ({
+                id: cell.id,
+                text: cell.text || '',
+                highlighted: !!cell.highlighted,
+                codeMode: !!cell.codeMode
+            }));
         },
 
         updateNote: function(nbId, nId, updates) {
             const note = findNote(nbId, nId);
             if (!note) return null;
-            
-            Object.assign(note, updates, {
+            ensureNoteCells(note);
+
+            const sanitizedUpdates = Object.assign({}, updates);
+            delete sanitizedUpdates.cells;
+            delete sanitizedUpdates.content;
+
+            let nextCells = null;
+            if (Array.isArray(updates.cells)) {
+                nextCells = normalizeCells(updates.cells);
+            } else if (Array.isArray(updates.content)) {
+                // backward compatibility
+                nextCells = normalizeCells(updates.content);
+            }
+
+            if (nextCells) {
+                note.cells = nextCells;
+                note.content = nextCells;
+            }
+
+            Object.assign(note, sanitizedUpdates, {
                 updatedAt: new Date().toISOString()
             });
+
+            // Keep alias in sync
+            note.content = note.cells;
             
             saveData();
             return note;
@@ -349,7 +475,6 @@ const NoteBook = (function() {
             return true;
         },
 
-        // Current selection methods
         setCurrentCollection: function(id) {
             if (!findCollection(id)) return false;
             data.currentCollectionId = id;
@@ -385,18 +510,15 @@ const NoteBook = (function() {
             return data.currentNoteId;
         },
 
-        // Path methods - get and set complete path from collection to note
         getPath: function() {
             const path = [];
             const currentCollectionId = data.currentCollectionId;
             const currentNotebookId = data.currentNotebookId;
             const currentNoteId = data.currentNoteId;
 
-            // Build collection path
             if (currentCollectionId) {
                 const collectionPath = buildCollectionPath(currentCollectionId);
                 if (collectionPath) {
-                    // Add all collections in the path (skip root if needed)
                     collectionPath.forEach(col => {
                         path.push({
                             id: col.id,
@@ -407,7 +529,6 @@ const NoteBook = (function() {
                 }
             }
 
-            // Add notebook to path
             if (currentNotebookId) {
                 const notebook = findNotebook(currentNotebookId);
                 if (notebook) {
@@ -419,7 +540,6 @@ const NoteBook = (function() {
                 }
             }
 
-            // Add note to path
             if (currentNoteId && currentNotebookId) {
                 const note = findNote(currentNotebookId, currentNoteId);
                 if (note) {
@@ -435,14 +555,11 @@ const NoteBook = (function() {
         },
 
         setPath: function(pathInput) {
-            // Accept either array of path objects or string with '/' separators
             let path = [];
             
             if (typeof pathInput === 'string') {
-                // Parse string path like "Collection1/SubCollection/Notebook1/Note Title"
                 const parts = pathInput.split('/').map(p => p.trim()).filter(p => p.length > 0);
                 
-                // Try to resolve each part by name
                 let currentCollections = data.collections;
                 let collectionId = null;
                 let notebookId = null;
@@ -451,7 +568,6 @@ const NoteBook = (function() {
                 for (let i = 0; i < parts.length; i++) {
                     const partName = parts[i];
                     
-                    // Try to find collection
                     const collection = currentCollections.find(c => c.name === partName);
                     if (collection) {
                         collectionId = collection.id;
@@ -459,7 +575,6 @@ const NoteBook = (function() {
                         continue;
                     }
                     
-                    // Try to find notebook in current collection
                     if (collectionId && !notebookId) {
                         const col = findCollection(collectionId);
                         if (col && col.items) {
@@ -471,7 +586,6 @@ const NoteBook = (function() {
                         }
                     }
                     
-                    // Try to find note in current notebook
                     if (notebookId && !noteId) {
                         const notebook = findNotebook(notebookId);
                         if (notebook && notebook.notes) {
@@ -484,7 +598,6 @@ const NoteBook = (function() {
                     }
                 }
                 
-                // Set the resolved path
                 if (collectionId) {
                     data.currentCollectionId = collectionId;
                 }
@@ -499,7 +612,6 @@ const NoteBook = (function() {
                 return { collectionId, notebookId, noteId };
                 
             } else if (Array.isArray(pathInput)) {
-                // Accept array of path objects with id, name, and type
                 let collectionId = null;
                 let notebookId = null;
                 let noteId = null;
@@ -542,9 +654,10 @@ const NoteBook = (function() {
             
             notebooks.forEach(nb => {
                 nb.notes.forEach(note => {
-                    const contentStr = Array.isArray(note.content) 
-                        ? note.content.map(block => block.text || '').join(' ')
-                        : note.content || '';
+                    ensureNoteCells(note);
+                    const contentStr = Array.isArray(note.cells) 
+                        ? note.cells.map(cell => cell.text || '').join(' ')
+                        : '';
                     
                     if (note.title.toLowerCase().includes(lower) ||
                         contentStr.toLowerCase().includes(lower)) {
@@ -579,7 +692,10 @@ const NoteBook = (function() {
                             nb.type = 'notebook';
                             nb.notes.forEach(note => {
                                 if (typeof note.content === 'string') {
-                                    note.content = note.content ? [{ id: generateId(), text: note.content }] : [];
+                                    note.cells = note.content ? [{ id: generateId(), text: note.content }] : [];
+                                    note.content = note.cells;
+                                } else if (Array.isArray(note.content) && !note.cells) {
+                                    note.cells = note.content;
                                 }
                             });
                             return nb;
@@ -597,7 +713,10 @@ const NoteBook = (function() {
                         if (item.type === 'notebook' && item.notes) {
                             item.notes.forEach(note => {
                                 if (typeof note.content === 'string') {
-                                    note.content = note.content ? [{ id: generateId(), text: note.content }] : [];
+                                    note.cells = note.content ? [{ id: generateId(), text: note.content }] : [];
+                                    note.content = note.cells;
+                                } else if (Array.isArray(note.content) && !note.cells) {
+                                    note.cells = note.content;
                                 }
                             });
                         }
@@ -614,6 +733,7 @@ const NoteBook = (function() {
                         }
                     });
                     data = imp;
+                    normalizeAllNotes();
                     saveData();
                     return true;
                 }
