@@ -2,6 +2,57 @@ const UIController = (function() {
     let elements = {};
     let saveTimeout;
     let expandedCollections = new Set(); // Track which collections are expanded
+    let blockEditors = new Map();
+    let monacoLoaderPromise = null;
+    const THEME_KEY = 'notes_theme';
+    const CLEAN_THEME_PATH = 'themes/clean/theme.css?v=1';
+
+    function loadMonaco() {
+        if (window.monaco) return Promise.resolve(window.monaco);
+        if (!monacoLoaderPromise) {
+            monacoLoaderPromise = new Promise((resolve, reject) => {
+                if (typeof require === 'undefined') {
+                    reject(new Error('Monaco loader not available'));
+                    return;
+                }
+                require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } });
+                require(['vs/editor/editor.main'], function() {
+                    resolve(window.monaco);
+                }, reject);
+            });
+        }
+        return monacoLoaderPromise;
+    }
+
+    function ensureThemeLink() {
+        let link = document.getElementById('notesThemeLink');
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'notesThemeLink';
+            document.head.appendChild(link);
+        }
+        return link;
+    }
+
+    function applyTheme(theme) {
+        const link = ensureThemeLink();
+        if (theme === 'clean') {
+            link.href = CLEAN_THEME_PATH;
+            document.body.classList.add('theme-clean');
+            if (elements.themeClean) elements.themeClean.checked = true;
+        } else {
+            link.href = '';
+            document.body.classList.remove('theme-clean');
+            if (elements.themeClassic) elements.themeClassic.checked = true;
+        }
+        localStorage.setItem(THEME_KEY, theme);
+    }
+
+    function initThemeFromStorage() {
+        const stored = localStorage.getItem(THEME_KEY) || 'classic';
+        applyTheme(stored);
+    }
 
     function initElements() {
         elements = {
@@ -13,7 +64,6 @@ const UIController = (function() {
             addNoteBtn: document.getElementById('addNoteBtn'),
             deleteNoteBtn: document.getElementById('deleteNoteBtn'),
             floatingToolbar: document.getElementById('floatingToolbar'),
-            toolCodeMode: document.getElementById('toolCodeMode'),
             toolSort: document.getElementById('toolSort'),
             toolReplace: document.getElementById('toolReplace'),
             replaceModal: document.getElementById('replaceModal'),
@@ -38,7 +88,9 @@ const UIController = (function() {
             cancelAddItemBtn: document.getElementById('cancelAddItemBtn'),
             localStorageBtn: document.getElementById('localStorageBtn'),
             sessionStorageBtn: document.getElementById('sessionStorageBtn'),
-            currentCollectionPath: document.getElementById('currentCollectionPath')
+            currentCollectionPath: document.getElementById('currentCollectionPath'),
+            themeClassic: document.getElementById('themeClassic'),
+            themeClean: document.getElementById('themeClean')
         };
     }
 
@@ -51,6 +103,7 @@ const UIController = (function() {
         bindFloatingToolbarEvents();
         bindSearchEvents();
         bindImportExportEvents();
+        bindThemeEvents();
     }
 
     function bindStorageEvents() {
@@ -210,17 +263,6 @@ const UIController = (function() {
     }
 
     function bindFloatingToolbarEvents() {
-        elements.toolCodeMode.addEventListener('click', function() {
-            const currentNotebookId = NoteBook.getCurrentNotebook();
-            const currentNoteId = NoteBook.getCurrentNote();
-            if (!currentNotebookId || !currentNoteId) return;
-
-            const note = NoteBook.getNote(currentNotebookId, currentNoteId);
-            const newState = !note.isCodeMode;
-            NoteBook.updateNote(currentNotebookId, currentNoteId, { isCodeMode: newState });
-            renderEditor();
-        });
-
         elements.toolSort.addEventListener('click', function() {
             if (NoteProcessor.sortSubsection()) {
                 renderEditor();
@@ -323,6 +365,24 @@ const UIController = (function() {
             
             input.click();
         });
+    }
+
+    function bindThemeEvents() {
+        if (elements.themeClassic) {
+            elements.themeClassic.addEventListener('change', function() {
+                if (this.checked) {
+                    applyTheme('classic');
+                }
+            });
+        }
+
+        if (elements.themeClean) {
+            elements.themeClean.addEventListener('change', function() {
+                if (this.checked) {
+                    applyTheme('clean');
+                }
+            });
+        }
     }
 
     function renderCollections() {
@@ -546,6 +606,14 @@ const UIController = (function() {
         const currentNotebookId = NoteBook.getCurrentNotebook();
         const currentNoteId = NoteBook.getCurrentNote();
 
+        // Dispose existing Monaco editors before re-rendering blocks
+        blockEditors.forEach(editor => {
+            if (editor && typeof editor.dispose === 'function') {
+                editor.dispose();
+            }
+        });
+        blockEditors.clear();
+
         if (!currentNotebookId || !currentNoteId) {
             elements.editorArea.innerHTML = '<div class="empty-state">Select a note or create a new one</div>';
             elements.floatingToolbar.classList.remove('visible');
@@ -566,19 +634,17 @@ const UIController = (function() {
 
         elements.floatingToolbar.classList.add('visible');
 
-        if (note.isCodeMode) {
-            elements.toolCodeMode.classList.add('active');
-        } else {
-            elements.toolCodeMode.classList.remove('active');
-        }
-
         elements.editorArea.innerHTML = `
-            <div class="editor-header">
-                <input type="text" id="noteTitleInput" value="${note.title}" placeholder="Note title">
+            <div class="note-editor" id="noteEditorCard">
+                <div class="note-editor__header">
+                    <input type="text" class="note-editor__title" id="noteTitleInput" value="${note.title}" placeholder="Note title">
+                </div>
+                <div class="note-editor__body">
+                    <div class="editor-content" id="editorContentContainer"></div>
+                </div>
             </div>
-            <div class="editor-content" id="editorContentContainer"></div>
         `;
-        
+
         elements.editorArea.appendChild(elements.floatingToolbar);
 
         const titleInput = document.getElementById('noteTitleInput');
@@ -602,16 +668,64 @@ const UIController = (function() {
             return 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
-        function createTextBlock(text = '', blockId = null) {
+        function createTextBlock(text = '', blockId = null, isHighlighted = false, isCodeMode = false) {
             const id = blockId || generateBlockId();
             const wrapper = document.createElement('div');
-            wrapper.className = 'text-block-wrapper';
+            wrapper.className = 'text-block-card';
+            if (isHighlighted) {
+                wrapper.classList.add('text-block-card--highlight');
+            }
             wrapper.dataset.blockId = id;
-            
+
+            const header = document.createElement('div');
+            header.className = 'text-block-card__header';
+
+            const handle = document.createElement('div');
+            handle.className = 'text-block-card__handle';
+            handle.title = 'Drag block';
+            handle.textContent = '|||';
+            handle.draggable = true;
+
+            const actions = document.createElement('div');
+            actions.className = 'text-block-card__actions';
+
+            const sortBtn = document.createElement('button');
+            sortBtn.className = 'text-block-card__btn';
+            sortBtn.textContent = 'Sort';
+            sortBtn.title = 'Sort this block';
+
+            const codeBtn = document.createElement('button');
+            codeBtn.className = 'text-block-card__btn';
+            codeBtn.textContent = isCodeMode ? 'Text' : 'Code';
+            codeBtn.title = 'Toggle code mode';
+
+            const highlightBtn = document.createElement('button');
+            highlightBtn.className = 'text-block-card__btn';
+            highlightBtn.textContent = isHighlighted ? 'Unhighlight' : 'Highlight';
+            highlightBtn.title = 'Toggle highlight';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'text-block-card__btn text-block-card__btn--danger';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.title = 'Delete this block';
+
+            actions.appendChild(sortBtn);
+            actions.appendChild(codeBtn);
+            actions.appendChild(highlightBtn);
+            actions.appendChild(deleteBtn);
+
+            header.appendChild(handle);
+            header.appendChild(actions);
+
+            const body = document.createElement('div');
+            body.className = 'text-block-card__body';
+
             const textarea = document.createElement('textarea');
             textarea.className = 'text-block';
             textarea.value = text;
             textarea.placeholder = 'Type ...';
+            textarea.dataset.mode = isCodeMode ? 'code' : 'text';
+            let codeContainer = null;
             
             // Auto-resize function
             function autoResize() {
@@ -624,8 +738,9 @@ const UIController = (function() {
                 const blockIndex = note.content.findIndex(b => b.id === id);
                 if (blockIndex !== -1) {
                     note.content[blockIndex].text = this.value;
+                    note.content[blockIndex].codeMode = note.content[blockIndex].codeMode || false;
                 } else {
-                    note.content.push({ id, text: this.value });
+                    note.content.push({ id, text: this.value, highlighted: false, codeMode: isCodeMode });
                 }
                 triggerSave();
             });
@@ -642,25 +757,180 @@ const UIController = (function() {
                     }
                 }
             });
-            
-            wrapper.appendChild(textarea);
+
+            sortBtn.addEventListener('click', function() {
+                if (NoteProcessor.sortSubsection(id)) {
+                    renderEditor();
+                }
+            });
+
+            function setCodeMode(enable) {
+                const blockIndex = note.content.findIndex(b => b.id === id);
+
+                if (enable) {
+                    loadMonaco().then(monaco => {
+                        if (blockEditors.has(id)) {
+                            return;
+                        }
+
+                        textarea.style.display = 'none';
+                        codeContainer = document.createElement('div');
+                        codeContainer.className = 'text-block-card__code';
+                        body.appendChild(codeContainer);
+
+                        const editor = monaco.editor.create(codeContainer, {
+                            value: textarea.value || '',
+                            language: 'javascript',
+                            theme: 'vs-dark',
+                            automaticLayout: true,
+                            minimap: { enabled: false },
+                            fontSize: 14,
+                            lineNumbers: 'on'
+                        });
+
+                        editor.onDidChangeModelContent(function() {
+                            const value = editor.getValue();
+                            textarea.value = value;
+                            const idx = note.content.findIndex(b => b.id === id);
+                            if (idx !== -1) {
+                                note.content[idx].text = value;
+                                note.content[idx].codeMode = true;
+                            }
+                            triggerSave();
+                        });
+
+                        blockEditors.set(id, editor);
+                        if (blockIndex !== -1) {
+                            note.content[blockIndex].codeMode = true;
+                        }
+                        codeBtn.textContent = 'Text';
+                        textarea.dataset.mode = 'code';
+                        triggerSave();
+                    }).catch(err => {
+                        console.error('Monaco load failed', err);
+                    });
+                } else {
+                    const editor = blockEditors.get(id);
+                    if (editor) {
+                        const value = editor.getValue();
+                        textarea.value = value;
+                        editor.dispose();
+                        blockEditors.delete(id);
+                    }
+                    if (codeContainer) {
+                        codeContainer.remove();
+                        codeContainer = null;
+                    }
+                    textarea.style.display = 'block';
+                    const idx = note.content.findIndex(b => b.id === id);
+                    if (idx !== -1) {
+                        note.content[idx].codeMode = false;
+                        note.content[idx].text = textarea.value;
+                    }
+                    codeBtn.textContent = 'Code';
+                    textarea.dataset.mode = 'text';
+                    triggerSave();
+                }
+            }
+
+            codeBtn.addEventListener('click', function() {
+                const blockIndex = note.content.findIndex(b => b.id === id);
+                const isCurrentlyCode = blockIndex !== -1 ? !!note.content[blockIndex].codeMode : textarea.dataset.mode === 'code';
+                setCodeMode(!isCurrentlyCode);
+            });
+
+            highlightBtn.addEventListener('click', function() {
+                const blockIndex = note.content.findIndex(b => b.id === id);
+                const nextState = !(blockIndex !== -1 ? !!note.content[blockIndex].highlighted : isHighlighted);
+                if (blockIndex !== -1) {
+                    note.content[blockIndex].highlighted = nextState;
+                    note.content[blockIndex].codeMode = note.content[blockIndex].codeMode || false;
+                }
+                wrapper.classList.toggle('text-block-card--highlight', nextState);
+                highlightBtn.textContent = nextState ? 'Unhighlight' : 'Highlight';
+                triggerSave();
+            });
+
+            deleteBtn.addEventListener('click', function() {
+                const blockIndex = note.content.findIndex(b => b.id === id);
+                if (blockIndex !== -1) {
+                    const existingEditor = blockEditors.get(id);
+                    if (existingEditor) {
+                        existingEditor.dispose();
+                        blockEditors.delete(id);
+                    }
+                    note.content.splice(blockIndex, 1);
+                }
+                wrapper.remove();
+                triggerSave();
+            });
+
+            handle.addEventListener('dragstart', function(e) {
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', id);
+                wrapper.classList.add('dragging');
+            });
+
+            handle.addEventListener('dragend', function() {
+                wrapper.classList.remove('dragging');
+            });
+
+            body.appendChild(textarea);
+            wrapper.appendChild(header);
+            wrapper.appendChild(body);
+
+            // Auto-enable code mode if stored
+            if (isCodeMode) {
+                setTimeout(() => setCodeMode(true), 0);
+            }
+
             return wrapper;
         }
 
         note.content.forEach(block => {
-            const blockEl = createTextBlock(block.text, block.id);
+            const blockEl = createTextBlock(
+                block.text,
+                block.id,
+                !!block.highlighted,
+                !!block.codeMode
+            );
             contentContainer.appendChild(blockEl);
         });
 
         contentContainer.addEventListener('click', function(e) {
             if (e.target === contentContainer) {
                 const newBlockId = generateBlockId();
-                note.content.push({ id: newBlockId, text: '' });
-                const newBlock = createTextBlock('', newBlockId);
+                note.content.push({ id: newBlockId, text: '', highlighted: false, codeMode: false });
+                const newBlock = createTextBlock('', newBlockId, false, false);
                 contentContainer.appendChild(newBlock);
                 newBlock.querySelector('textarea').focus();
                 triggerSave();
             }
+        });
+
+        function reorderBlocks(sourceId, targetId) {
+            if (!sourceId || !targetId || sourceId === targetId) return;
+            const sourceIndex = note.content.findIndex(b => b.id === sourceId);
+            const targetIndex = note.content.findIndex(b => b.id === targetId);
+            if (sourceIndex === -1 || targetIndex === -1) return;
+            const [moved] = note.content.splice(sourceIndex, 1);
+            note.content.splice(targetIndex, 0, moved);
+            triggerSave();
+            renderEditor();
+        }
+
+        contentContainer.addEventListener('dragover', function(e) {
+            if (e.dataTransfer.types.includes('text/plain')) {
+                e.preventDefault();
+            }
+        });
+
+        contentContainer.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const sourceId = e.dataTransfer.getData('text/plain');
+            const targetWrapper = e.target.closest('.text-block-card');
+            const targetId = targetWrapper ? targetWrapper.dataset.blockId : null;
+            reorderBlocks(sourceId, targetId || sourceId);
         });
     }
 
@@ -704,6 +974,7 @@ const UIController = (function() {
     function init() {
         initElements();
         NoteBook.init();
+        initThemeFromStorage();
         
         if (elements.currentCollectionPath) {
             elements.currentCollectionPath.textContent = 'No selection';

@@ -106,15 +106,15 @@ function updatePlayground(mode) {
 }
 
 function updateFloatingPlaygroundIcon(mode) {
-    const icon = document.querySelector('#floatingPlaygroundControl .icon');
+    const icon = document.querySelector('#floatingPlaygroundControl .playground-icon');
     if (!icon) return;
-    
+
     const icons = {
-        'normal': '<path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-        'vertical': '<path d="M3 3h8v18H3zM13 3h8v18h-8z" stroke="currentColor" stroke-width="2" fill="none"/>',
-        'horizontal': '<path d="M3 3h18v8H3zM3 13h18v8H3z" stroke="currentColor" stroke-width="2" fill="none"/>'
+        normal: '<rect x="3" y="3" width="18" height="18" rx="2"></rect>',
+        vertical: '<rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="12" y1="3" x2="12" y2="21"></line>',
+        horizontal: '<rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="12" x2="21" y2="12"></line>'
     };
-    
+
     icon.innerHTML = icons[mode] || icons.normal;
 }
 

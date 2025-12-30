@@ -1,5 +1,5 @@
 const NoteProcessor = (function() {
-    function sortSubsection() {
+    function sortSubsection(blockId = null) {
         const currentNotebookId = NoteBook.getCurrentNotebook();
         const currentNoteId = NoteBook.getCurrentNote();
         
@@ -9,6 +9,7 @@ const NoteProcessor = (function() {
         if (!note.content || !Array.isArray(note.content)) return false;
 
         note.content.forEach(block => {
+            if (blockId && block.id !== blockId) return;
             if (!block.text) return;
             
             const delimiter = '----';

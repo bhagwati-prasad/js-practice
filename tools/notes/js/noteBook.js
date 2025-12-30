@@ -302,7 +302,6 @@ const NoteBook = (function() {
                 id: generateId(),
                 title: title || 'Untitled',
                 content: content || [],
-                isCodeMode: false,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             };
