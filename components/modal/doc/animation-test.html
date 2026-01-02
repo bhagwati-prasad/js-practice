@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Animation Test</title>
+    <link rel="stylesheet" href="modal.css">
+    <style>
+        :root {
+            --modal-bg-primary: #ffffff;
+            --modal-bg-secondary: #f8f9fa;
+            --modal-text-primary: #212529;
+            --modal-text-secondary: #6c757d;
+            --modal-border-color: #dee2e6;
+            --modal-hover-bg: rgba(0, 0, 0, 0.05);
+            --modal-primary-color: #007bff;
+            --modal-primary-hover: #0056b3;
+            --modal-secondary-bg: #6c757d;
+            --modal-secondary-hover: #545b62;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .test-button {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .test-button:hover {
+            background: #0056b3;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎬 Modal Animation System Test</h1>
+        <p>Click any button to test the corresponding animation:</p>
+
+        <div class="button-grid">
+            <button class="test-button" id="test-default">Default (From Element)</button>
+            <button class="test-button" id="test-fade">Fade</button>
+            <button class="test-button" id="test-slide-top">Slide from Top</button>
+            <button class="test-button" id="test-slide-bottom">Slide from Bottom</button>
+            <button class="test-button" id="test-zoom">Zoom</button>
+            <button class="test-button" id="test-flip">Flip</button>
+            <button class="test-button" id="test-rotate">Rotate & Scale</button>
+            <button class="test-button" id="test-none">No Animation</button>
+        </div>
+    </div>
+
+    <script src="modal.js"></script>
+    <script>
+        // Test default animation (from element to center)
+        document.getElementById('test-default').addEventListener('click', function(e) {
+            const modal = new Modal({
+                title: 'From Element to Center',
+                body: '<p>This modal opened from the button you clicked!</p><p>Notice how it starts at the button position and moves to center with opacity fade-in.</p>',
+                primaryButton: { text: 'Awesome!' },
+                animation: ModalAnimations.fromElementToCenter,
+                onClose: (m) => m.destroy()
+            });
+            modal.show(e.target);
+        });
+
+        // Test fade animation
+        document.getElementById('test-fade').addEventListener('click', function(e) {
+            const modal = new Modal({
+                title: 'Fade Animation',
+                body: '<p>Simple fade-in effect.</p>',
+                primaryButton: { text: 'OK' },
+                animation: ModalAnimations.fade,
+                onClose: (m) => m.destroy()
+            });
+            modal.show();
+        });
+
+        // Test slide from top
+        document.getElementById('test-slide-top').addEventListener('click', function(e) {
+            const modal = new Modal({
+                title: 'Slide from Top',
+                body: '<p>Modal slides down from the top!</p>',
+                primaryButton: { text: 'OK' },
+                animation: ModalAnimations.slideFromTop,
+                onClose: (m) => m.destroy()
+            });
+            modal.show();
+        });
+
+        // Test slide from bottom
+        document.getElementById('test-slide-bottom').addEventListener('click', function(e) {
+            const modal = new Modal({
+                title: 'Slide from Bottom',
+                body: '<p>Modal slides up from the bottom!</p>',
+                primaryButton: { text: 'OK' },
+                animation: ModalAnimations.slideFromBottom,
+                onClose: (m) => m.destroy()
+            });
+            modal.show();
+        });
+
+        // Test zoom
+        document.getElementById('test-zoom').addEventListener('click', function(e) {
+            const modal = new Modal({
+                title: 'Zoom Animation',
+                body: '<p>Modal zooms in with a bounce!</p>',
+                primaryButton: { text: 'OK' },
+                animation: ModalAnimations.zoom,
+                onClose: (m) => m.destroy()
+            });
+            modal.show();
+        });
+
+        // Test flip
+        document.getElementById('test-flip').addEventListener('click', function(e) {
+            const modal = new Modal({
+                title: 'Flip Animation',
+                body: '<p>3D flip effect!</p>',
+                primaryButton: { text: 'OK' },
+                animation: ModalAnimations.flip,
+                onClose: (m) => m.destroy()
+            });
+            modal.show();
+        });
+
+        // Test rotate scale
+        document.getElementById('test-rotate').addEventListener('click', function(e) {
+            const modal = new Modal({
+                title: 'Rotate & Scale',
+                body: '<p>Spinning entrance!</p>',
+                primaryButton: { text: 'OK' },
+                animation: ModalAnimations.rotateScale,
+                onClose: (m) => m.destroy()
+            });
+            modal.show();
+        });
+
+        // Test no animation
+        document.getElementById('test-none').addEventListener('click', function(e) {
+            const modal = new Modal({
+                title: 'No Animation',
+                body: '<p>Instant appearance!</p>',
+                primaryButton: { text: 'OK' },
+                animation: ModalAnimations.none,
+                onClose: (m) => m.destroy()
+            });
+            modal.show();
+        });
+
+        console.log('✅ Modal Animation System loaded successfully!');
+        console.log('Available animations:', Object.keys(ModalAnimations).filter(k => typeof ModalAnimations[k] === 'object' && ModalAnimations[k].show));
+    </script>
+</body>
+</html>

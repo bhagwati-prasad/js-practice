@@ -57,6 +57,7 @@
     
     --transition-fast: 0.2s;
     --transition-normal: 0.3s;
+    --transition-slow: 0.4s;
     
     --icon-sm: 20px;
     --icon-md: 24px;
@@ -70,6 +71,22 @@
     --z-right-sidebar: 200;
     --z-header: 300;
     --z-resizer: 10;
+    
+    /* Modal variables */
+    --modal-bg-primary: #1e1e1e;
+    --modal-bg-secondary: #252526;
+    --modal-border-color: #3e3e42;
+    --modal-text-primary: #d4d4d4;
+    --modal-text-secondary: #cccccc;
+    --modal-hover-bg: #2a2d2e;
+    --modal-primary-color: #007acc;
+    --modal-btn-primary-bg: #007acc;
+    --modal-btn-primary-text: #ffffff;
+    --modal-btn-primary-hover: #0056b3;
+    --modal-btn-secondary-bg: #252526;
+    --modal-btn-secondary-text: #cccccc;
+    --modal-btn-secondary-hover: #2d2d30;
+    --modal-input-bg: #1e1e1e;
 }
 
 body.light-theme {
@@ -105,4 +122,20 @@ body.light-theme {
     --scrollbar-track: #f3f3f3;
     --scrollbar-thumb: #c4c4c4;
     --scrollbar-thumb-hover: #a6a6a6;
+    
+    /* Modal variables - Light theme */
+    --modal-bg-primary: #ffffff;
+    --modal-bg-secondary: #f3f3f3;
+    --modal-border-color: #d4d4d4;
+    --modal-text-primary: #1e1e1e;
+    --modal-text-secondary: #3b3b3b;
+    --modal-hover-bg: #e5e5e5;
+    --modal-primary-color: #0078d4;
+    --modal-btn-primary-bg: #0078d4;
+    --modal-btn-primary-text: #ffffff;
+    --modal-btn-primary-hover: #005a9e;
+    --modal-btn-secondary-bg: #f3f3f3;
+    --modal-btn-secondary-text: #3b3b3b;
+    --modal-btn-secondary-hover: #e8e8e8;
+    --modal-input-bg: #ffffff;
 }

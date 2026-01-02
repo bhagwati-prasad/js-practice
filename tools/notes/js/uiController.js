@@ -66,26 +66,9 @@ const UIController = (function() {
             floatingToolbar: document.getElementById('floatingToolbar'),
             toolSort: document.getElementById('toolSort'),
             toolReplace: document.getElementById('toolReplace'),
-            replaceModal: document.getElementById('replaceModal'),
-            findInput: document.getElementById('findInput'),
-            replaceInput: document.getElementById('replaceInput'),
-            confirmReplaceBtn: document.getElementById('confirmReplaceBtn'),
-            cancelReplaceBtn: document.getElementById('cancelReplaceBtn'),
             exportBtn: document.getElementById('exportBtn'),
             importBtn: document.getElementById('importBtn'),
             searchInput: document.getElementById('searchInput'),
-            collectionModal: document.getElementById('collectionModal'),
-            collectionNameInput: document.getElementById('collectionNameInput'),
-            createCollectionBtn: document.getElementById('createCollectionBtn'),
-            cancelCollectionBtn: document.getElementById('cancelCollectionBtn'),
-            notebookModal: document.getElementById('notebookModal'),
-            notebookNameInput: document.getElementById('notebookNameInput'),
-            createNotebookBtn: document.getElementById('createNotebookBtn'),
-            cancelNotebookBtn: document.getElementById('cancelNotebookBtn'),
-            addItemModal: document.getElementById('addItemModal'),
-            addItemNameInput: document.getElementById('addItemNameInput'),
-            confirmAddItemBtn: document.getElementById('confirmAddItemBtn'),
-            cancelAddItemBtn: document.getElementById('cancelAddItemBtn'),
             localStorageBtn: document.getElementById('localStorageBtn'),
             sessionStorageBtn: document.getElementById('sessionStorageBtn'),
             currentCollectionPath: document.getElementById('currentCollectionPath'),
@@ -130,33 +113,34 @@ const UIController = (function() {
 
     function bindCollectionEvents() {
         elements.addCollectionBtn.addEventListener('click', function() {
-            elements.collectionModal.classList.add('show');
-            elements.collectionNameInput.value = '';
-            elements.collectionNameInput.focus();
-        });
-
-        elements.createCollectionBtn.addEventListener('click', function() {
-            const name = elements.collectionNameInput.value.trim();
-            if (name) {
-                const currentCollectionId = NoteBook.getCurrentCollection();
-                const collection = NoteBook.createCollection(name, currentCollectionId);
-                if (collection) {
-                    NoteBook.setCurrentCollection(collection.id);
-                    renderCollections();
-                    renderNotes();
-                }
-                elements.collectionModal.classList.remove('show');
-            }
-        });
-
-        elements.cancelCollectionBtn.addEventListener('click', function() {
-            elements.collectionModal.classList.remove('show');
-        });
-
-        elements.collectionNameInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                elements.createCollectionBtn.click();
-            }
+            const modal = new Modal({
+                title: 'New Collection',
+                body: '<input type="text" class="modal-input" id="collectionNameInput" placeholder="Enter collection name">',
+                primaryButton: {
+                    text: 'Create',
+                    onClick: (m) => {
+                        const name = m.getInputValue('#collectionNameInput');
+                        if (name && name.trim()) {
+                            const currentCollectionId = NoteBook.getCurrentCollection();
+                            const collection = NoteBook.createCollection(name.trim(), currentCollectionId);
+                            if (collection) {
+                                NoteBook.setCurrentCollection(collection.id);
+                                renderCollections();
+                                renderNotes();
+                            }
+                            return true;
+                        }
+                        m._shakeModal();
+                        return false;
+                    }
+                },
+                secondaryButton: {
+                    text: 'Cancel'
+                },
+                onClose: () => modal.destroy(),
+                animation: ModalAnimations.fade
+            });
+            modal.show();
         });
     }
 
@@ -164,77 +148,83 @@ const UIController = (function() {
         elements.addNotebookBtn.addEventListener('click', function() {
             const currentCollectionId = NoteBook.getCurrentCollection();
             if (!currentCollectionId) {
-                alert('Please select a collection first.');
+                Modal.alert('No Collection', 'Please select a collection first.');
                 return;
             }
-            elements.notebookModal.classList.add('show');
-            elements.notebookNameInput.value = '';
-            elements.notebookNameInput.focus();
-        });
-
-        elements.createNotebookBtn.addEventListener('click', function() {
-            const name = elements.notebookNameInput.value.trim();
-            const currentCollectionId = NoteBook.getCurrentCollection();
-            if (name && currentCollectionId) {
-                const notebook = NoteBook.createNotebook(currentCollectionId, name);
-                if (notebook) {
-                    NoteBook.setCurrentNotebook(notebook.id);
-                    renderCollections();
-                    renderNotes();
-                }
-                elements.notebookModal.classList.remove('show');
-            }
-        });
-
-        elements.cancelNotebookBtn.addEventListener('click', function() {
-            elements.notebookModal.classList.remove('show');
-        });
-
-        elements.notebookNameInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                elements.createNotebookBtn.click();
-            }
+            
+            const modal = new Modal({
+                title: 'New Notebook',
+                body: '<input type="text" class="modal-input" id="notebookNameInput" placeholder="Enter notebook name">',
+                primaryButton: {
+                    text: 'Create',
+                    onClick: (m) => {
+                        const name = m.getInputValue('#notebookNameInput');
+                        const currentCollectionId = NoteBook.getCurrentCollection();
+                        if (name && name.trim() && currentCollectionId) {
+                            const notebook = NoteBook.createNotebook(currentCollectionId, name.trim());
+                            if (notebook) {
+                                NoteBook.setCurrentNotebook(notebook.id);
+                                renderCollections();
+                                renderNotes();
+                            }
+                            return true;
+                        }
+                        m._shakeModal();
+                        return false;
+                    }
+                },
+                secondaryButton: {
+                    text: 'Cancel'
+                },
+                onClose: () => modal.destroy()
+            });
+            modal.show();
         });
     }
 
     function bindAddItemEvents() {
-        let targetCollectionId = null;
-
         window.addItemToCollection = function(collectionId) {
-            targetCollectionId = collectionId;
-            elements.addItemModal.classList.add('show');
-            elements.addItemNameInput.value = '';
-            elements.addItemNameInput.focus();
-            const collectionRadio = document.querySelector('input[name="itemType"][value="collection"]');
-            if (collectionRadio) {
-                collectionRadio.checked = true;
-            }
+            const modal = new Modal({
+                title: 'Add Item to Collection',
+                body: `
+                    <div class="modal-radio-group">
+                        <label>
+                            <input type="radio" name="itemType" value="collection" checked>
+                            <span>Collection</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="itemType" value="notebook">
+                            <span>Notebook</span>
+                        </label>
+                    </div>
+                    <input type="text" class="modal-input" id="addItemNameInput" placeholder="Enter name">
+                `,
+                primaryButton: {
+                    text: 'Create',
+                    onClick: (m) => {
+                        const name = m.getInputValue('#addItemNameInput');
+                        const itemType = m.elements.body.querySelector('input[name="itemType"]:checked').value;
+                        
+                        if (name && name.trim() && collectionId) {
+                            if (itemType === 'collection') {
+                                NoteBook.createCollection(name.trim(), collectionId);
+                            } else {
+                                NoteBook.createNotebook(collectionId, name.trim());
+                            }
+                            renderCollections();
+                            return true;
+                        }
+                        m._shakeModal();
+                        return false;
+                    }
+                },
+                secondaryButton: {
+                    text: 'Cancel'
+                },
+                onClose: () => modal.destroy()
+            });
+            modal.show();
         };
-
-        elements.confirmAddItemBtn.addEventListener('click', function() {
-            const name = elements.addItemNameInput.value.trim();
-            const itemType = document.querySelector('input[name="itemType"]:checked').value;
-            
-            if (name && targetCollectionId) {
-                if (itemType === 'collection') {
-                    NoteBook.createCollection(name, targetCollectionId);
-                } else {
-                    NoteBook.createNotebook(targetCollectionId, name);
-                }
-                renderCollections();
-                elements.addItemModal.classList.remove('show');
-            }
-        });
-
-        elements.cancelAddItemBtn.addEventListener('click', function() {
-            elements.addItemModal.classList.remove('show');
-        });
-
-        elements.addItemNameInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                elements.confirmAddItemBtn.click();
-            }
-        });
     }
 
     function bindNoteEvents() {
@@ -253,11 +243,15 @@ const UIController = (function() {
             const currentNoteId = NoteBook.getCurrentNote();
             
             if (currentNotebookId && currentNoteId) {
-                if (confirm('Are you sure you want to delete this note?')) {
-                    NoteBook.deleteNote(currentNotebookId, currentNoteId);
-                    renderNotes();
-                    renderEditor();
-                }
+                Modal.confirm(
+                    'Delete Note',
+                    'Are you sure you want to delete this note? This action cannot be undone.',
+                    () => {
+                        NoteBook.deleteNote(currentNotebookId, currentNoteId);
+                        renderNotes();
+                        renderEditor();
+                    }
+                );
             }
         });
     }
@@ -274,46 +268,54 @@ const UIController = (function() {
             const currentNoteId = NoteBook.getCurrentNote();
             
             if (!currentNotebookId || !currentNoteId) {
-                alert('Please select a note first.');
+                Modal.alert('No Note Selected', 'Please select a note first.');
                 return;
             }
             
-            elements.findInput.value = '';
-            elements.replaceInput.value = '';
-            elements.replaceModal.classList.add('show');
-            elements.findInput.focus();
-        });
+            const modal = new Modal({
+                title: 'Find & Replace',
+                body: `
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Find:</label>
+                        <input type="text" class="modal-input" id="findInput" placeholder="Text to find..." style="margin-bottom: 0;">
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Replace with:</label>
+                        <input type="text" class="modal-input" id="replaceInput" placeholder="Replacement text..." style="margin-bottom: 0;">
+                    </div>
+                `,
+                primaryButton: {
+                    text: 'Replace All',
+                    onClick: (m) => {
+                        const findText = m.getInputValue('#findInput');
+                        const replaceText = m.getInputValue('#replaceInput');
+                        
+                        if (!findText) {
+                            Modal.alert('Missing Input', 'Please enter text to find.');
+                            return false;
+                        }
 
-        elements.confirmReplaceBtn.addEventListener('click', function() {
-            const findText = elements.findInput.value;
-            const replaceText = elements.replaceInput.value;
-            
-            if (!findText) {
-                alert('Please enter text to find.');
-                return;
-            }
+                        const note = NoteBook.getNote(currentNotebookId, currentNoteId);
+                        
+                        if (Array.isArray(note.content)) {
+                            note.content.forEach(block => {
+                                if (block.text) {
+                                    block.text = block.text.split(findText).join(replaceText);
+                                }
+                            });
+                        }
 
-            const currentNotebookId = NoteBook.getCurrentNotebook();
-            const currentNoteId = NoteBook.getCurrentNote();
-            if (!currentNotebookId || !currentNoteId) return;
-
-            const note = NoteBook.getNote(currentNotebookId, currentNoteId);
-            
-            if (Array.isArray(note.content)) {
-                note.content.forEach(block => {
-                    if (block.text) {
-                        block.text = block.text.split(findText).join(replaceText);
+                        NoteBook.updateNote(currentNotebookId, currentNoteId, { content: note.content });
+                        renderEditor();
+                        return true;
                     }
-                });
-            }
-
-            NoteBook.updateNote(currentNotebookId, currentNoteId, { content: note.content });
-            renderEditor();
-            elements.replaceModal.classList.remove('show');
-        });
-
-        elements.cancelReplaceBtn.addEventListener('click', function() {
-            elements.replaceModal.classList.remove('show');
+                },
+                secondaryButton: {
+                    text: 'Cancel'
+                },
+                onClose: () => modal.destroy()
+            });
+            modal.show();
         });
     }
 
@@ -354,9 +356,9 @@ const UIController = (function() {
                         if (NoteBook.importData(event.target.result)) {
                             renderCollections();
                             renderNotes();
-                            alert('Data imported successfully!');
+                            Modal.alert('Import Successful', 'Data imported successfully!');
                         } else {
-                            alert('Failed to import data.');
+                            Modal.alert('Import Failed', 'Failed to import data. Please check the file format.');
                         }
                     };
                     reader.readAsText(file);
@@ -394,7 +396,7 @@ const UIController = (function() {
         function renderItemElement(item, level = 0) {
             const div = document.createElement('div');
             div.className = 'tree-item';
-            div.style.paddingLeft = (level * 20 + 10) + 'px';
+            div.style.paddingLeft = (level * 20 + 15) + 'px';
             
             const isCollection = item.type === 'collection';
             const isNotebook = item.type === 'notebook';
@@ -409,12 +411,10 @@ const UIController = (function() {
             const icon = isCollection ? '📁' : '📒';
             const hasChildren = isCollection && item.items && item.items.length > 0;
             const isExpanded = expandedCollections.has(item.id);
-            const expandBtn = hasChildren 
-                ? `<span class="expand-btn${isExpanded ? ' expanded' : ''}">➢</span>` 
-                : '<span class="expand-btn invisible">➢</span>';
-            
+            div.classList.toggle('has-children', hasChildren);
+            div.classList.toggle('expanded', hasChildren && isExpanded);
+
             div.innerHTML = `
-                ${expandBtn}
                 <span class="tree-item-icon">${icon}</span>
                 <span class="tree-item-name">${item.name}</span>
                 <div class="tree-item-actions">
@@ -426,14 +426,12 @@ const UIController = (function() {
             
             const nameSpan = div.querySelector('.tree-item-name');
             const iconSpan = div.querySelector('.tree-item-icon');
-            const expandBtnEl = div.querySelector('.expand-btn');
             
-            // Click on name or icon to select (and expand if collection)
-            const selectHandler = function(e) {
+            // Click on name to select
+            nameSpan.addEventListener('click', function(e) {
                 e.stopPropagation();
                 if (isCollection) {
                     NoteBook.setCurrentCollection(item.id);
-                    // Auto-expand when selecting a collection
                     if (hasChildren && !expandedCollections.has(item.id)) {
                         expandedCollections.add(item.id);
                     }
@@ -443,27 +441,30 @@ const UIController = (function() {
                 renderCollections();
                 renderNotes();
                 renderEditor();
-            };
-            
-            nameSpan.addEventListener('click', selectHandler);
-            iconSpan.addEventListener('click', selectHandler);
-            
-            // Expand/collapse functionality - only for collections with children
-            if (hasChildren) {
-                expandBtnEl.classList.remove('invisible');
-                const childrenContainer = document.createElement('div');
-                childrenContainer.className = 'tree-children';
-                childrenContainer.style.display = isExpanded ? 'block' : 'none';
-                
-                expandBtnEl.addEventListener('click', function(e) {
-                    e.stopPropagation();
+            });
+
+            // Icon click toggles expand for collections; selects notebooks
+            iconSpan.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (isCollection && hasChildren) {
                     if (expandedCollections.has(item.id)) {
                         expandedCollections.delete(item.id);
                     } else {
                         expandedCollections.add(item.id);
                     }
                     renderCollections();
-                });
+                } else if (isNotebook) {
+                    NoteBook.setCurrentNotebook(item.id);
+                    renderCollections();
+                    renderNotes();
+                    renderEditor();
+                }
+            });
+
+            if (hasChildren) {
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'tree-children';
+                childrenContainer.style.display = isExpanded ? 'block' : 'none';
                 
                 // Recursively render children
                 item.items.forEach(child => {
@@ -1007,16 +1008,20 @@ const UIController = (function() {
                 : NoteBook.getNotebook(itemId);
             if (!item) return;
             
-            if (confirm(`Are you sure you want to delete "${item.name}"${itemType === 'collection' ? ' and all its contents' : ' and all its notes'}?`)) {
-                if (itemType === 'collection') {
-                    NoteBook.deleteCollection(itemId);
-                } else {
-                    NoteBook.deleteNotebook(itemId);
+            Modal.confirm(
+                `Delete ${itemType === 'collection' ? 'Collection' : 'Notebook'}`,
+                `Are you sure you want to delete "${item.name}"${itemType === 'collection' ? ' and all its contents' : ' and all its notes'}? This action cannot be undone.`,
+                () => {
+                    if (itemType === 'collection') {
+                        NoteBook.deleteCollection(itemId);
+                    } else {
+                        NoteBook.deleteNotebook(itemId);
+                    }
+                    renderCollections();
+                    renderNotes();
+                    renderEditor();
                 }
-                renderCollections();
-                renderNotes();
-                renderEditor();
-            }
+            );
         };
 
         // Keep old functions for backward compatibility

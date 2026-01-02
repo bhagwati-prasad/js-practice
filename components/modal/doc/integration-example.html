@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes - Modal Integration Example</title>
+    <link rel="stylesheet" href="../../css/theme.css">
+    <link rel="stylesheet" href="../../css/styles.css">
+    <link rel="stylesheet" href="../../css/app.css?v=6">
+    <link rel="stylesheet" href="../../css/utilities.css?v=1">
+    <link rel="stylesheet" href="css/styles.css?v=3">
+    <link rel="stylesheet" href="css/note-editor.css?v=1">
+    <link rel="stylesheet" href="css/text-block.css?v=1">
+    
+    <!-- ADD: Modal Component CSS -->
+    <link rel="stylesheet" href="../../components/modal/modal.css">
+    
+    <link id="notesThemeLink" rel="stylesheet">
+    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
+</head>
+<body>
+    <header>
+        <div id="notesPage" class="header">
+            <div id="currentCollectionPath" class="collection-path flex1"></div>
+            <h1>Notes</h1>
+            <div class="flex1 end-align header-toolbar">
+                <button class="primary-btn" id="addNoteBtn">+ New Note</button>
+                <button class="primary-btn" id="deleteNoteBtn">Delete Note</button>
+                <input type="text" id="searchInput" placeholder="Search notes...">
+            </div>
+        </div>
+    </header>
+    
+    <div class="notes-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Collections</h2>
+            </div>
+            <div class="collection-list" id="collectionList"></div>
+            <div class="add-collection">
+                <button id="addCollectionBtn" class="primary-btn">+ New Collection</button>
+                <button id="addNotebookBtn" class="primary-btn">+ New Notebook</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="notes-area">
+                <div class="notes-list" id="notesList"></div>
+                <div class="editor-area" id="editorArea">
+                    <div class="empty-state">Select a note or create a new one</div>
+                </div>
+                
+                <div id="floatingToolbar" class="floating-toolbar">
+                    <button class="tool-btn" id="toolSort">
+                        <span class="icon">AZ</span> Sort Lines
+                    </button>
+                    <button class="tool-btn" id="toolReplace">
+                        <span class="icon">🔍</span> Find/Replace
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REMOVE: Old modal HTML - No longer needed! -->
+    <!-- The Modal component will generate modals dynamically -->
+
+    <!-- Settings Panel (keep existing) -->
+    <div id="settingsPanel" class="settings-panel">
+        <div class="settings-header">
+            <h3>Settings</h3>
+            <button id="closeSettings" class="icon-btn">×</button>
+        </div>
+        <div class="settings-content">
+            <div class="setting-group">
+                <h4>Theme</h4>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="theme" value="classic" id="themeClassic" checked>
+                        <span>Classic</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="theme" value="clean" id="themeClean">
+                        <span>Clean</span>
+                    </label>
+                </div>
+            </div>
+            <div class="setting-group">
+                <h4>Data Management</h4>
+                <button id="exportDataBtn" class="btn-secondary">Export Data</button>
+                <button id="importDataBtn" class="btn-secondary">Import Data</button>
+                <input type="file" id="importFileInput" accept=".json" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <button id="themeToggle" class="icon-btn" title="Toggle theme">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
+                </svg>
+            </button>
+            <button id="settingsToggle" class="icon-btn" title="Settings">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            </button>
+        </div>
+    </footer>
+
+    <script src="js/storageDriver.js"></script>
+    <script src="js/noteBook.js?v=2"></script>
+    <script src="js/draggable.js"></script>
+    <script src="js/noteProcessor.js"></script>
+    
+    <!-- ADD: Modal Component JavaScript BEFORE uiController -->
+    <script src="../../components/modal/modal.js"></script>
+    
+    <!-- Your existing scripts -->
+    <script src="js/uiController.js?v=3"></script>
+    <script src="/js/app.js?v=2"></script>
+</body>
+</html>

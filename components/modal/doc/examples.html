@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Component Examples</title>
+    <link rel="stylesheet" href="modal.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f5f5f5;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .examples {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .example-btn {
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        
+        .example-btn:hover {
+            background: #0056b3;
+        }
+        
+        .example-btn.secondary {
+            background: #6c757d;
+        }
+        
+        .example-btn.secondary:hover {
+            background: #545b62;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Modal Component Examples</h1>
+    
+    <div class="examples">
+        <button class="example-btn" onclick="example1()">
+            Basic Modal
+        </button>
+        
+        <button class="example-btn" onclick="example2()">
+            Confirm Dialog
+        </button>
+        
+        <button class="example-btn" onclick="example3()">
+            Alert Dialog
+        </button>
+        
+        <button class="example-btn" onclick="example4()">
+            Prompt Dialog
+        </button>
+        
+        <button class="example-btn" onclick="example5()">
+            Input Modal (Create Collection)
+        </button>
+        
+        <button class="example-btn" onclick="example6()">
+            Radio Button Modal
+        </button>
+        
+        <button class="example-btn secondary" onclick="example7()">
+            Modal with Validation
+        </button>
+        
+        <button class="example-btn secondary" onclick="example8()">
+            Loading → Success Modal
+        </button>
+    </div>
+
+    <script src="modal.js"></script>
+    <script>
+        // Example 1: Basic Modal
+        function example1() {
+            const modal = new Modal({
+                title: 'Welcome',
+                body: '<p class="modal-text">This is a basic modal with custom content!</p>',
+                primaryButton: {
+                    text: 'Got it',
+                    onClick: () => {
+                        console.log('User clicked Got it');
+                    }
+                },
+                onClose: () => {
+                    console.log('Modal closed');
+                    modal.destroy();
+                }
+            });
+            modal.show();
+        }
+
+        // Example 2: Confirm Dialog
+        function example2() {
+            Modal.confirm(
+                'Delete Item',
+                'Are you sure you want to delete this item? This action cannot be undone.',
+                () => {
+                    console.log('User confirmed deletion');
+                    alert('Item deleted!');
+                }
+            );
+        }
+
+        // Example 3: Alert Dialog
+        function example3() {
+            Modal.alert(
+                'Success',
+                'Your changes have been saved successfully!',
+                () => console.log('Alert closed')
+            );
+        }
+
+        // Example 4: Prompt Dialog
+        function example4() {
+            Modal.prompt(
+                'Enter Your Name',
+                'Type your name here...',
+                (value) => {
+                    console.log('User entered:', value);
+                    alert(`Hello, ${value}!`);
+                }
+            );
+        }
+
+        // Example 5: Input Modal (Similar to Collection Modal)
+        function example5() {
+            const modal = new Modal({
+                title: 'New Collection',
+                body: '<input type="text" class="modal-input" id="collectionName" placeholder="Enter collection name">',
+                primaryButton: {
+                    text: 'Create',
+                    onClick: (m) => {
+                        const name = m.getInputValue('#collectionName');
+                        if (name && name.trim()) {
+                            console.log('Creating collection:', name);
+                            alert(`Collection "${name}" created!`);
+                            return true;
+                        } else {
+                            m._shakeModal();
+                            return false; // Prevent close
+                        }
+                    }
+                },
+                secondaryButton: {
+                    text: 'Cancel'
+                },
+                onClose: () => modal.destroy()
+            });
+            modal.show();
+        }
+
+        // Example 6: Radio Button Modal (Similar to Add Item Modal)
+        function example6() {
+            const modal = new Modal({
+                title: 'Add Item to Collection',
+                body: `
+                    <div class="modal-radio-group">
+                        <label>
+                            <input type="radio" name="itemType" value="collection" checked>
+                            <span>Collection</span>
+                        </label>
+                        <label>
+                            <input type="radio" name="itemType" value="notebook">
+                            <span>Notebook</span>
+                        </label>
+                    </div>
+                    <input type="text" class="modal-input" id="itemName" placeholder="Enter name">
+                `,
+                primaryButton: {
+                    text: 'Create',
+                    onClick: (m) => {
+                        const type = m.elements.body.querySelector('input[name="itemType"]:checked').value;
+                        const name = m.getInputValue('#itemName');
+                        
+                        if (name && name.trim()) {
+                            console.log('Creating', type, ':', name);
+                            alert(`${type} "${name}" created!`);
+                            return true;
+                        } else {
+                            m._shakeModal();
+                            return false;
+                        }
+                    }
+                },
+                secondaryButton: {
+                    text: 'Cancel'
+                },
+                onClose: () => modal.destroy()
+            });
+            modal.show();
+        }
+
+        // Example 7: Modal with Validation
+        function example7() {
+            const modal = new Modal({
+                title: 'Enter Email',
+                body: `
+                    <input type="email" class="modal-input" id="emailInput" placeholder="your@email.com">
+                    <p class="modal-text" style="color: #dc3545; font-size: 12px; display: none;" id="errorMsg">
+                        Please enter a valid email address
+                    </p>
+                `,
+                primaryButton: {
+                    text: 'Submit',
+                    onClick: (m) => {
+                        const email = m.getInputValue('#emailInput');
+                        const errorMsg = m.elements.body.querySelector('#errorMsg');
+                        
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (emailRegex.test(email)) {
+                            console.log('Valid email:', email);
+                            alert(`Email ${email} submitted!`);
+                            return true;
+                        } else {
+                            errorMsg.style.display = 'block';
+                            m._shakeModal();
+                            return false;
+                        }
+                    }
+                },
+                secondaryButton: {
+                    text: 'Cancel'
+                },
+                onClose: () => modal.destroy()
+            });
+            modal.show();
+        }
+
+        // Example 8: Dynamic Content Update
+        function example8() {
+            const modal = new Modal({
+                title: 'Processing...',
+                body: '<p class="modal-text">Please wait while we process your request...</p>',
+                showCloseButton: false,
+                closeOnOverlay: false,
+                closeOnEscape: false
+            });
+            modal.show();
+
+            // Simulate async operation
+            setTimeout(() => {
+                modal.update({
+                    title: 'Success!',
+                    body: '<p class="modal-text">✅ Your request has been processed successfully!</p>',
+                    primaryButton: {
+                        text: 'OK',
+                        onClick: () => {
+                            console.log('Success acknowledged');
+                        }
+                    },
+                    showCloseButton: true,
+                    closeOnOverlay: true,
+                    closeOnEscape: true,
+                    onClose: () => modal.destroy()
+                });
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

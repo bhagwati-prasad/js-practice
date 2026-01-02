@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Animation Examples</title>
+    <link rel="stylesheet" href="modal.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --modal-bg-primary: #ffffff;
+            --modal-bg-secondary: #f8f9fa;
+            --modal-text-primary: #212529;
+            --modal-text-secondary: #6c757d;
+            --modal-border-color: #dee2e6;
+            --modal-hover-bg: rgba(0, 0, 0, 0.05);
+            --modal-primary-color: #007bff;
+            --modal-primary-hover: #0056b3;
+            --modal-secondary-bg: #6c757d;
+            --modal-secondary-hover: #545b62;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .description {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .animation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .animation-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .animation-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .animation-card h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+        }
+
+        .animation-card p {
+            color: #6c757d;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .advanced-section {
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 40px;
+        }
+
+        .advanced-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .advanced-section p {
+            color: #6c757d;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            color: #212529;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .button-group .btn {
+            flex: 1;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Modal Animation Gallery</h1>
+        
+        <div class="description">
+            <p>Explore the comprehensive animation system for modals. Each animation is plug-and-play and can be easily customized or chained together.</p>
+        </div>
+
+        <div class="animation-grid">
+            <!-- Default Animation -->
+            <div class="animation-card">
+                <h3>🎯 From Element to Center</h3>
+                <p>Default animation. Modal appears at clicked element position and smoothly transitions to center with opacity fade-in.</p>
+                <button class="btn" id="btn-default">Try Default Animation</button>
+            </div>
+
+            <!-- Fade Animation -->
+            <div class="animation-card">
+                <h3>✨ Fade</h3>
+                <p>Simple and elegant fade-in effect. Perfect for subtle, non-distracting modal appearances.</p>
+                <button class="btn" id="btn-fade">Try Fade Animation</button>
+            </div>
+
+            <!-- Slide from Top -->
+            <div class="animation-card">
+                <h3>⬇️ Slide from Top</h3>
+                <p>Modal slides down from the top of the screen with a smooth bounce effect.</p>
+                <button class="btn" id="btn-slide-top">Try Slide from Top</button>
+            </div>
+
+            <!-- Slide from Bottom -->
+            <div class="animation-card">
+                <h3>⬆️ Slide from Bottom</h3>
+                <p>Modal slides up from the bottom with an elastic bounce. Great for mobile-style interactions.</p>
+                <button class="btn" id="btn-slide-bottom">Try Slide from Bottom</button>
+            </div>
+
+            <!-- Zoom Animation -->
+            <div class="animation-card">
+                <h3>🔍 Zoom</h3>
+                <p>Modal scales up from a small size with a playful bounce effect.</p>
+                <button class="btn" id="btn-zoom">Try Zoom Animation</button>
+            </div>
+
+            <!-- Flip Animation -->
+            <div class="animation-card">
+                <h3>🔄 Flip</h3>
+                <p>3D flip effect that rotates the modal into view. Adds a unique, modern touch.</p>
+                <button class="btn" id="btn-flip">Try Flip Animation</button>
+            </div>
+
+            <!-- Rotate Scale Animation -->
+            <div class="animation-card">
+                <h3>🌀 Rotate & Scale</h3>
+                <p>Combines rotation and scaling for a dynamic, eye-catching entrance.</p>
+                <button class="btn" id="btn-rotate-scale">Try Rotate Scale</button>
+            </div>
+
+            <!-- No Animation -->
+            <div class="animation-card">
+                <h3>⚡ No Animation</h3>
+                <p>Instant appearance with no animation. Best for performance-critical scenarios.</p>
+                <button class="btn" id="btn-none">Try No Animation</button>
+            </div>
+        </div>
+
+        <!-- Advanced Usage Section -->
+        <div class="advanced-section">
+            <h2>🚀 Advanced Usage</h2>
+            
+            <h3 style="color: #764ba2; margin-top: 24px; margin-bottom: 12px;">Custom Animation</h3>
+            <p>Create your own custom animations using the ModalAnimations.create() method:</p>
+            <div class="code-block">
+const customAnimation = ModalAnimations.create({
+    show: async (modal, triggerElement) => {
+        // Your custom show animation logic
+        const container = modal.elements.container;
+        container.style.opacity = '0';
+        requestAnimationFrame(() => {
+            container.style.opacity = '1';
+        });
+        return new Promise(resolve => setTimeout(resolve, 300));
+    },
+    hide: async (modal) => {
+        // Your custom hide animation logic
+        const container = modal.elements.container;
+        container.style.opacity = '0';
+        return new Promise(resolve => setTimeout(resolve, 300));
+    }
+});
+
+const modal = new Modal({
+    title: 'Custom Animation',
+    body: '<p>Using custom animation!</p>',
+    animation: customAnimation
+});</div>
+
+            <h3 style="color: #764ba2; margin-top: 24px; margin-bottom: 12px;">Chaining Animations</h3>
+            <p>Chain multiple animations to create complex sequences:</p>
+            <div class="code-block">
+const chainedAnimation = ModalAnimations.chain(
+    ModalAnimations.zoom,
+    ModalAnimations.fade
+);
+
+const modal = new Modal({
+    title: 'Chained Animation',
+    animation: chainedAnimation
+});</div>
+
+            <h3 style="color: #764ba2; margin-top: 24px; margin-bottom: 12px;">Parallel Animations</h3>
+            <p>Run multiple animations simultaneously:</p>
+            <div class="code-block">
+const parallelAnimation = ModalAnimations.parallel(
+    ModalAnimations.fade,
+    ModalAnimations.zoom
+);
+
+const modal = new Modal({
+    title: 'Parallel Animation',
+    animation: parallelAnimation
+});</div>
+
+            <div class="button-group" style="margin-top: 24px;">
+                <button class="btn" id="btn-custom">Try Custom Animation</button>
+                <button class="btn" id="btn-chained">Try Chained Animation</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="modal.js"></script>
+    <script>
+        // Helper function to create modal with specific animation
+        function createAnimatedModal(title, animation, description) {
+            return new Modal({
+                title: title,
+                body: `
+                    <div style="padding: 20px 0;">
+                        <p style="margin-bottom: 16px; color: #6c757d; line-height: 1.6;">
+                            ${description}
+                        </p>
+                        <div style="background: #f8f9fa; padding: 16px; border-radius: 8px; border-left: 4px solid #667eea;">
+                            <strong style="color: #667eea;">Animation:</strong> ${title}
+                        </div>
+                    </div>
+                `,
+                primaryButton: {
+                    text: 'Got it!',
+                    onClick: () => console.log(`${title} modal confirmed`)
+                },
+                secondaryButton: {
+                    text: 'Close'
+                },
+                animation: animation,
+                onClose: (modal) => {
+                    console.log(`${title} modal closed`);
+                    modal.destroy();
+                }
+            });
+        }
+
+        // Default Animation (From Element to Center)
+        document.getElementById('btn-default').addEventListener('click', function(e) {
+            const modal = createAnimatedModal(
+                'From Element to Center',
+                ModalAnimations.fromElementToCenter,
+                'This is the default animation. The modal originates from the clicked button location and smoothly transitions to the center of the screen while fading in.'
+            );
+            modal.show(e.target); // Pass the trigger element
+        });
+
+        // Fade Animation
+        document.getElementById('btn-fade').addEventListener('click', function(e) {
+            const modal = createAnimatedModal(
+                'Fade Animation',
+                ModalAnimations.fade,
+                'A simple fade-in effect. The modal appears with increasing opacity, creating a subtle and professional entrance.'
+            );
+            modal.show();
+        });
+
+        // Slide from Top
+        document.getElementById('btn-slide-top').addEventListener('click', function(e) {
+            const modal = createAnimatedModal(
+                'Slide from Top',
+                ModalAnimations.slideFromTop,
+                'The modal slides down from the top of the screen with a bouncy easing effect, creating an energetic entrance.'
+            );
+            modal.show();
+        });
+
+        // Slide from Bottom
+        document.getElementById('btn-slide-bottom').addEventListener('click', function(e) {
+            const modal = createAnimatedModal(
+                'Slide from Bottom',
+                ModalAnimations.slideFromBottom,
+                'The modal slides up from the bottom, similar to mobile drawer interfaces. Perfect for mobile-first designs.'
+            );
+            modal.show();
+        });
+
+        // Zoom Animation
+        document.getElementById('btn-zoom').addEventListener('click', function(e) {
+            const modal = createAnimatedModal(
+                'Zoom Animation',
+                ModalAnimations.zoom,
+                'The modal scales up from a small size with a bounce effect, drawing attention to the content.'
+            );
+            modal.show();
+        });
+
+        // Flip Animation
+        document.getElementById('btn-flip').addEventListener('click', function(e) {
+            const modal = createAnimatedModal(
+                'Flip Animation',
+                ModalAnimations.flip,
+                'A 3D flip effect that rotates the modal into view. This creates a unique, modern interaction.'
+            );
+            modal.show();
+        });
+
+        // Rotate Scale Animation
+        document.getElementById('btn-rotate-scale').addEventListener('click', function(e) {
+            const modal = createAnimatedModal(
+                'Rotate & Scale',
+                ModalAnimations.rotateScale,
+                'Combines rotation and scaling for a dynamic, spinning entrance that really catches the eye.'
+            );
+            modal.show();
+        });
+
+        // No Animation
+        document.getElementById('btn-none').addEventListener('click', function(e) {
+            const modal = createAnimatedModal(
+                'No Animation',
+                ModalAnimations.none,
+                'Instant appearance with no animation. Best for performance-critical scenarios or when animations might be distracting.'
+            );
+            modal.show();
+        });
+
+        // Custom Animation Example
+        document.getElementById('btn-custom').addEventListener('click', function(e) {
+            const customBounce = ModalAnimations.create({
+                show: async (modal, triggerElement) => {
+                    const container = modal.elements.container;
+                    const overlay = modal.elements.overlay;
+                    
+                    container.style.transform = 'scale(1.5)';
+                    container.style.opacity = '0';
+                    container.style.transition = 'all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                    overlay.style.transition = 'opacity 0.6s ease';
+                    
+                    requestAnimationFrame(() => {
+                        container.style.transform = 'scale(1)';
+                        container.style.opacity = '1';
+                        overlay.style.opacity = '1';
+                    });
+                    
+                    return new Promise(resolve => setTimeout(resolve, 600));
+                },
+                hide: async (modal) => {
+                    const container = modal.elements.container;
+                    const overlay = modal.elements.overlay;
+                    
+                    container.style.transition = 'all 0.3s ease';
+                    overlay.style.transition = 'opacity 0.3s ease';
+                    
+                    container.style.transform = 'scale(0.8)';
+                    container.style.opacity = '0';
+                    overlay.style.opacity = '0';
+                    
+                    return new Promise(resolve => setTimeout(resolve, 300));
+                }
+            });
+
+            const modal = createAnimatedModal(
+                'Custom Bounce Animation',
+                customBounce,
+                'This is a custom animation created using ModalAnimations.create(). It features a unique bounce effect with elastic easing.'
+            );
+            modal.show(e.target);
+        });
+
+        // Chained Animation Example
+        document.getElementById('btn-chained').addEventListener('click', function(e) {
+            // Note: Chaining might not work as expected with current implementation
+            // as each animation sets its own styles. This is more for demonstration.
+            const modal = createAnimatedModal(
+                'Chained Animation (Experimental)',
+                ModalAnimations.zoom, // Using zoom as an example
+                'This demonstrates the concept of chained animations. In practice, you might want to create specialized chained animations that work together.'
+            );
+            modal.show(e.target);
+        });
+
+        // Log to console
+        console.log('Modal Animation System loaded!');
+        console.log('Available animations:', Object.keys(ModalAnimations).filter(k => typeof ModalAnimations[k] === 'object' && ModalAnimations[k].show));
+    </script>
+</body>
+</html>

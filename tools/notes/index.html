@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/styles.css?v=3">
     <link rel="stylesheet" href="css/note-editor.css?v=1">
     <link rel="stylesheet" href="css/text-block.css?v=1">
+    <link rel="stylesheet" href="../../components/modal/modal.css">
     <link id="notesThemeLink" rel="stylesheet">
     <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
 </head>
@@ -58,67 +59,7 @@
     </div>
     </div>
 
-    <div class="modal" id="collectionModal">
-        <div class="modal-content">
-            <h2>New Collection</h2>
-            <input type="text" id="collectionNameInput" placeholder="Enter collection name">
-            <div class="modal-actions">
-                <button class="btn-secondary" id="cancelCollectionBtn">Cancel</button>
-                <button class="btn-primary" id="createCollectionBtn">Create</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="notebookModal">
-        <div class="modal-content">
-            <h2>New Notebook</h2>
-            <input type="text" id="notebookNameInput" placeholder="Enter notebook name">
-            <div class="modal-actions">
-                <button class="btn-secondary" id="cancelNotebookBtn">Cancel</button>
-                <button class="btn-primary" id="createNotebookBtn">Create</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="addItemModal">
-        <div class="modal-content">
-            <h2>Add Item to Collection</h2>
-            <div class="radio-group">
-                <label>
-                    <input type="radio" name="itemType" value="collection" checked>
-                    <span>Collection</span>
-                </label>
-                <label>
-                    <input type="radio" name="itemType" value="notebook">
-                    <span>Notebook</span>
-                </label>
-            </div>
-            <input type="text" id="addItemNameInput" placeholder="Enter name">
-            <div class="modal-actions">
-                <button class="btn-secondary" id="cancelAddItemBtn">Cancel</button>
-                <button class="btn-primary" id="confirmAddItemBtn">Create</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Find Replace Modal -->
-    <div class="modal" id="replaceModal">
-        <div class="modal-content">
-            <h2>Find & Replace</h2>
-            <div class="input-group">
-                <label>Find:</label>
-                <input type="text" id="findInput" placeholder="Text to find...">
-            </div>
-            <div class="input-group">
-                <label>Replace with:</label>
-                <input type="text" id="replaceInput" placeholder="Replacement text...">
-            </div>
-            <div class="modal-actions">
-                <button class="btn-secondary" id="cancelReplaceBtn">Cancel</button>
-                <button class="btn-primary" id="confirmReplaceBtn">Replace All</button>
-            </div>
-        </div>
-    </div>
+    <!-- Old modal HTML removed - now using /components/modal/ -->
 
     <aside id="rightSidebar" class="right-sidebar">
         <div class="sidebar-header">
@@ -200,7 +141,8 @@
     <script src="js/noteBook.js?v=2"></script>
     <script src="js/draggable.js"></script>
     <script src="js/noteProcessor.js"></script>
-    <script src="js/uiController.js?v=3"></script>
+    <script src="../../components/modal/modal.js?v=3"></script>
+    <script src="js/uiController.js?v=4"></script>
     <script src="/js/app.js?v=2"></script>
 </body>
 </html>
