@@ -367,6 +367,44 @@ const NoteBook = (function() {
             return true;
         },
 
+        moveItemToCollection: function(itemId, targetCollectionId, itemType) {
+            const item = itemType === 'collection' 
+                ? findCollection(itemId)
+                : findNotebook(itemId);
+            
+            const targetCollection = findCollection(targetCollectionId);
+            
+            if (!item || !targetCollection) return false;
+            if (itemId === targetCollectionId) return false; // Can't move to itself
+            
+            // Find and remove from current parent
+            const parentCollection = itemType === 'collection'
+                ? findParentCollection(itemId)
+                : findParentCollection(itemId);
+            
+            if (parentCollection) {
+                const idx = parentCollection.items.findIndex(i => i.id === itemId);
+                if (idx !== -1) {
+                    parentCollection.items.splice(idx, 1);
+                }
+            } else if (itemType === 'collection') {
+                // Remove from root collections
+                const idx = data.collections.findIndex(c => c.id === itemId);
+                if (idx !== -1) {
+                    data.collections.splice(idx, 1);
+                }
+            }
+            
+            // Add to target collection
+            if (!targetCollection.items) {
+                targetCollection.items = [];
+            }
+            targetCollection.items.push(item);
+            
+            saveData();
+            return true;
+        },
+
         createNote: function(nbId, title, content) {
             const nb = findNotebook(nbId);
             if (!nb) return null;

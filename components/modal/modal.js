@@ -94,6 +94,7 @@ const ModalAnimations = {
         },
         
         hide: async (modal) => {
+            if (!modal.elements) return Promise.resolve();
             const container = modal.elements.container;
             const overlay = modal.elements.overlay;
             
@@ -129,6 +130,7 @@ const ModalAnimations = {
         },
         
         hide: async (modal) => {
+            if (!modal.elements) return Promise.resolve();
             const container = modal.elements.container;
             const overlay = modal.elements.overlay;
             
@@ -164,6 +166,7 @@ const ModalAnimations = {
         },
         
         hide: async (modal) => {
+            if (!modal.elements) return Promise.resolve();
             const container = modal.elements.container;
             const overlay = modal.elements.overlay;
             
@@ -200,6 +203,7 @@ const ModalAnimations = {
         },
         
         hide: async (modal) => {
+            if (!modal.elements) return Promise.resolve();
             const container = modal.elements.container;
             const overlay = modal.elements.overlay;
             
@@ -237,6 +241,7 @@ const ModalAnimations = {
         },
         
         hide: async (modal) => {
+            if (!modal.elements) return Promise.resolve();
             const container = modal.elements.container;
             const overlay = modal.elements.overlay;
             
@@ -274,6 +279,7 @@ const ModalAnimations = {
         },
         
         hide: async (modal) => {
+            if (!modal.elements) return Promise.resolve();
             const container = modal.elements.container;
             const overlay = modal.elements.overlay;
             
@@ -644,17 +650,17 @@ class Modal {
         
         this.isVisible = false;
         
-        // Run hide animation
-        if (this.options.animation && this.options.animation.hide) {
+        // Run hide animation (check if elements still exist)
+        if (this.options.animation && this.options.animation.hide && this.elements) {
             await this.options.animation.hide(this);
-        } else {
+        } else if (this.elements) {
             // Fallback to default CSS animation
             this.elements.overlay.classList.remove('modal-show');
         }
         
         // Hide overlay after animation
         setTimeout(() => {
-            if (!this.isVisible && this.elements.overlay) {
+            if (!this.isVisible && this.elements && this.elements.overlay) {
                 this.elements.overlay.style.display = 'none';
             }
         }, 50);

@@ -1,4 +1,8 @@
 const Draggable = (function() {
+    let draggedItem = null;
+    let draggedItemType = null;
+    let draggedItemId = null;
+
     function init(selector, handleSelector) {
         const elements = document.querySelectorAll(selector);
         
@@ -48,6 +52,96 @@ const Draggable = (function() {
             }
         });
     }
+
+    /**
+     * Initialize drag-and-drop for collection/notebook items
+     * Allows dragging items to other collections to move them
+     */
+    function initCollectionDragDrop() {
+        document.addEventListener('dragstart', handleDragStart);
+        document.addEventListener('dragover', handleDragOver);
+        document.addEventListener('dragleave', handleDragLeave);
+        document.addEventListener('drop', handleDrop);
+        document.addEventListener('dragend', handleDragEnd);
+    }
+
+    function handleDragStart(e) {
+        // Check if dragging a tree-item (collection or notebook)
+        const treeItem = e.target.closest('.tree-item');
+        if (!treeItem) return;
+
+        draggedItem = treeItem;
+        const nameSpan = treeItem.querySelector('.tree-item-name');
+        const itemType = treeItem.querySelector('.tree-item-icon').textContent === '📁' ? 'collection' : 'notebook';
+        
+        // Extract item ID from the context (we need to enhance this)
+        draggedItemType = itemType;
+        draggedItemId = treeItem.dataset.itemId;
+
+        if (!draggedItemId) return; // No valid item to drag
+
+        treeItem.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', treeItem.innerHTML);
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+
+        const treeItem = e.target.closest('.tree-item');
+        if (!treeItem || treeItem === draggedItem) return;
+
+        // Only allow dropping on collections
+        const icon = treeItem.querySelector('.tree-item-icon');
+        if (icon && icon.textContent === '📁') {
+            treeItem.classList.add('drop-target');
+        }
+    }
+
+    function handleDragLeave(e) {
+        const treeItem = e.target.closest('.tree-item');
+        if (treeItem) {
+            treeItem.classList.remove('drop-target');
+        }
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const treeItem = e.target.closest('.tree-item');
+        if (!treeItem || !draggedItemId) return;
+
+        treeItem.classList.remove('drop-target');
+
+        // Get target collection ID
+        const targetCollectionId = treeItem.dataset.itemId;
+
+        // Check if item is a collection and target is not its own ID
+        if (draggedItemType && targetCollectionId && draggedItemId !== targetCollectionId) {
+            // Move the item to the target collection
+            if (window.moveItemToCollection) {
+                window.moveItemToCollection(draggedItemId, targetCollectionId, draggedItemType);
+            }
+        }
+    }
+
+    function handleDragEnd(e) {
+        if (draggedItem) {
+            draggedItem.classList.remove('dragging');
+        }
+        // Remove all drop-target classes
+        document.querySelectorAll('.drop-target').forEach(el => {
+            el.classList.remove('drop-target');
+        });
+        draggedItem = null;
+        draggedItemType = null;
+        draggedItemId = null;
+    }
     
-    return { init };
+    return { 
+        init,
+        initCollectionDragDrop
+    };
 })();

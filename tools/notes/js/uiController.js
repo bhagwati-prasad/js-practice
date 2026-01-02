@@ -413,6 +413,10 @@ const UIController = (function() {
             const isExpanded = expandedCollections.has(item.id);
             div.classList.toggle('has-children', hasChildren);
             div.classList.toggle('expanded', hasChildren && isExpanded);
+            
+            // Add data-item-id for drag-drop functionality
+            div.dataset.itemId = item.id;
+            div.draggable = true;
 
             div.innerHTML = `
                 <span class="tree-item-icon">${icon}</span>
@@ -983,6 +987,7 @@ const UIController = (function() {
         
         renderCollections();
         Draggable.init('#floatingToolbar');
+        Draggable.initCollectionDragDrop();
         initEventListeners();
 
         window.renameItem = function(itemId, itemType) {
@@ -1031,6 +1036,33 @@ const UIController = (function() {
 
         window.deleteNotebook = function(notebookId) {
             window.deleteItem(notebookId, 'notebook');
+        };
+
+        // Handle moving items to another collection via drag-drop
+        window.moveItemToCollection = function(itemId, targetCollectionId, itemType) {
+            const item = itemType === 'collection' 
+                ? NoteBook.getCollection(itemId) 
+                : NoteBook.getNotebook(itemId);
+            
+            const targetCollection = NoteBook.getCollection(targetCollectionId);
+            
+            if (!item || !targetCollection) {
+                Modal.alert('Error', 'Could not find item or target collection.');
+                return;
+            }
+
+            // Prevent moving to the same location
+            if (itemId === targetCollectionId) return;
+
+            // Move the item
+            NoteBook.moveItemToCollection(itemId, targetCollectionId, itemType);
+            
+            // Show confirmation
+            Modal.alert('Success', `"${item.name}" moved to "${targetCollection.name}".`, () => {
+                renderCollections();
+                renderNotes();
+                renderEditor();
+            });
         };
     }
 
