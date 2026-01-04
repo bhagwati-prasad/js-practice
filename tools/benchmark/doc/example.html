@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BenchmarkJS Example - Performance Testing Playground</title>
+  <link rel="stylesheet" href="lab.css">
+  <link rel="stylesheet" href="example.css">
+</head>
+<body>
+  <div class="example-container">
+    <!-- Header -->
+    <header class="example-header">
+      <h1>🚀 BenchmarkJS Performance Playground</h1>
+      <p>Test JavaScript performance with interactive benchmarking and visualization</p>
+    </header>
+
+    <!-- Main Content -->
+    <div class="example-layout">
+      <!-- Sidebar - Controls -->
+      <aside class="example-sidebar">
+        <div class="control-panel">
+          <!-- Function Selection -->
+          <section class="control-section">
+            <h3>1. Select Function</h3>
+            
+            <div class="form-group">
+              <label for="sample-select">Pre-populated Functions:</label>
+              <select id="sample-select" class="form-control">
+                <option value="">-- Choose a sample --</option>
+                <optgroup label="Array Operations">
+                  <option value="array-map">Array.map() - 1000 items</option>
+                  <option value="array-filter">Array.filter() - 1000 items</option>
+                  <option value="array-sort">Array.sort() - 100 items</option>
+                  <option value="array-reduce">Array.reduce() - 1000 items</option>
+                  <option value="array-some">Array.some() - 1000 items</option>
+                </optgroup>
+                <optgroup label="String Operations">
+                  <option value="string-split">String.split() - 10KB string</option>
+                  <option value="string-replace">String.replace() - Regex replace</option>
+                  <option value="string-match">String.match() - Regex matching</option>
+                  <option value="string-substring">String operations - substring</option>
+                </optgroup>
+                <optgroup label="Object Operations">
+                  <option value="object-keys">Object.keys() - 1000 props</option>
+                  <option value="object-values">Object.values() - 1000 props</option>
+                  <option value="object-entries">Object.entries() - 1000 props</option>
+                  <option value="object-assign">Object.assign() - Shallow copy</option>
+                </optgroup>
+                <optgroup label="Math Operations">
+                  <option value="math-loop">Math loop - 10000 iterations</option>
+                  <option value="math-sqrt">Math.sqrt() - 1000 calls</option>
+                  <option value="math-fibonacci">Fibonacci - 30 iterations</option>
+                </optgroup>
+                <optgroup label="Advanced">
+                  <option value="json-parse">JSON.parse() - 1000 operations</option>
+                  <option value="json-stringify">JSON.stringify() - Deep object</option>
+                  <option value="regex-test">RegExp.test() - Complex pattern</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <button id="load-sample-btn" class="btn btn-secondary">Load Sample</button>
+          </section>
+
+          <!-- Custom Function -->
+          <section class="control-section">
+            <h3>2. Custom Function</h3>
+            <div class="form-group">
+              <label for="custom-function">Or enter your own:</label>
+              <textarea 
+                id="custom-function" 
+                class="form-control textarea" 
+                placeholder="// Enter a function body&#10;let sum = 0;&#10;for (let i = 0; i &lt; 1000; i++) {&#10;  sum += i;&#10;}&#10;return sum;"
+                rows="8"
+              ></textarea>
+              <small class="help-text">Enter the function body. It will be wrapped as: function() { ...your code... }</small>
+            </div>
+            <button id="validate-function-btn" class="btn btn-secondary">Validate Function</button>
+            <div id="validation-message" class="validation-message" style="display: none;"></div>
+          </section>
+
+          <!-- Test Mode Selection -->
+          <section class="control-section">
+            <h3>3. Test Mode</h3>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="test-mode" value="basic" checked>
+                Basic Benchmark
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="test-mode" value="experiment">
+                Experiment (Variables)
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="test-mode" value="regression">
+                Regression Tracking
+              </label>
+            </div>
+          </section>
+
+          <!-- Benchmark Options -->
+          <section class="control-section" id="basic-options">
+            <h3>4. Benchmark Options</h3>
+            
+            <div class="form-group">
+              <label for="warmup-input">Warmup Runs:</label>
+              <input type="number" id="warmup-input" class="form-control" value="10" min="1" max="100">
+            </div>
+
+            <div class="form-group">
+              <label for="iterations-input">Iterations per Run:</label>
+              <input type="number" id="iterations-input" class="form-control" value="100" min="1" max="10000">
+            </div>
+
+            <div class="form-group">
+              <label for="runs-input">Number of Runs:</label>
+              <input type="number" id="runs-input" class="form-control" value="5" min="1" max="50">
+            </div>
+
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="auto-reject-gc" checked>
+                Auto-reject GC polluted runs
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="auto-discard-outliers" checked>
+                Auto-discard outliers
+              </label>
+            </div>
+          </section>
+
+          <!-- Experiment Options -->
+          <section class="control-section" id="experiment-options" style="display: none;">
+            <h3>4. Experiment Options</h3>
+            
+            <div class="form-group">
+              <label for="experiment-name">Experiment Name:</label>
+              <input type="text" id="experiment-name" class="form-control" value="Function Performance Test">
+            </div>
+
+            <div class="form-group">
+              <label>Variables:</label>
+              <p class="help-text">Define variables to test across combinations</p>
+              <div id="variables-container">
+                <div class="variable-input">
+                  <input type="text" class="var-name" placeholder="Variable name" value="size">
+                  <input type="text" class="var-values" placeholder="Values (comma separated)" value="100,1000,10000">
+                  <button class="btn-remove-var" type="button">✕</button>
+                </div>
+              </div>
+              <button id="add-variable-btn" class="btn btn-sm btn-secondary">+ Add Variable</button>
+            </div>
+          </section>
+
+          <!-- Regression Options -->
+          <section class="control-section" id="regression-options" style="display: none;">
+            <h3>4. Regression Tracking</h3>
+            
+            <div class="form-group">
+              <label for="regression-key">Benchmark Key:</label>
+              <input type="text" id="regression-key" class="form-control" placeholder="e.g., array-sort-v1" value="custom-benchmark">
+            </div>
+
+            <div class="form-group">
+              <label for="window-size">Comparison Window:</label>
+              <input type="number" id="window-size" class="form-control" value="5" min="2" max="20">
+            </div>
+
+            <button id="clear-history-btn" class="btn btn-secondary btn-sm">Clear History</button>
+          </section>
+
+          <!-- Action Buttons -->
+          <section class="control-section">
+            <button id="run-benchmark-btn" class="btn btn-primary btn-large">
+              ▶ Run Benchmark
+            </button>
+            <button id="reset-all-btn" class="btn btn-secondary">Reset</button>
+          </section>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="example-main">
+        <!-- Status Panel -->
+        <div id="status-panel" class="status-panel" style="display: none;">
+          <div class="status-message" id="status-message"></div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="results-container" class="results-container">
+          <div class="placeholder-empty">
+            <p>👈 Select a function and click "Run Benchmark" to start testing</p>
+            <p class="subtitle">Choose from pre-populated samples or enter your own custom function</p>
+          </div>
+        </div>
+
+        <!-- Tabs for different views -->
+        <div id="results-tabs" class="results-tabs" style="display: none;">
+          <button class="tab-btn active" data-tab="results">Results</button>
+          <button class="tab-btn" data-tab="timeline">Timeline</button>
+          <button class="tab-btn" data-tab="diagnostics">Diagnostics</button>
+          <button class="tab-btn" data-tab="console">Console</button>
+        </div>
+
+        <div id="results-content" class="results-content">
+          <!-- Results will be inserted here -->
+        </div>
+
+        <!-- Timeline Container -->
+        <div id="timeline-content" class="results-tab-content" style="display: none;">
+          <div id="timeline-container" class="timeline-container"></div>
+        </div>
+
+        <!-- Diagnostics Container -->
+        <div id="diagnostics-content" class="results-tab-content" style="display: none;">
+          <div id="diagnostics-jitter" class="diagnostics-panel"></div>
+          <div id="diagnostics-gc" class="diagnostics-panel"></div>
+        </div>
+
+        <!-- Console Output -->
+        <div id="console-content" class="results-tab-content" style="display: none;">
+          <pre id="console-output" class="console-output"></pre>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/benchmark.js"></script>
+  <script src="../js/runtime-health.js"></script>
+  <script src="../js/research.js"></script>
+  <script src="../js/regression.js"></script>
+  <script src="../js/visualizer.js"></script>
+  <script src="../js/timeline-ui.js"></script>
+  <script src="../js/lab.js"></script>
+  <script src="example.js"></script>
+</body>
+</html>

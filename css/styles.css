@@ -5,13 +5,14 @@
     flex: 1;
 }
 
-.floating-playground-control {
+.floating-control-btn {
     position: fixed;
     bottom: 80px;
     right: 30px;
     width: 50px;
     height: 50px;
     background-color: var(--accent-primary);
+    border: none;
     border-radius: 50%;
     display: none;
     align-items: center;
@@ -22,17 +23,17 @@
     z-index: 9999;
 }
 
-.floating-playground-control.visible {
+.floating-control-btn.visible {
     display: flex;
 }
 
-.floating-playground-control:hover {
+.floating-control-btn:hover {
     background-color: var(--accent-primary-hover);
     transform: scale(1.1);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-.floating-playground-control .playground-icon {
+.floating-control-btn .playground-icon {
     width: 24px;
     height: 24px;
     color: white;

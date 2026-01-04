@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmark Lab - Performance Testing</title>
+    <link rel="stylesheet" href="../../css/theme.css">
+    <link rel="stylesheet" href="../../css/app.css">
+    <link rel="stylesheet" href="../../css/utilities.css?v=2">
+    <link rel="stylesheet" href="../../css/styles.css?ver=5">
+    <link rel="stylesheet" href="css/benchmark.css">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" crossorigin="use-credentials" />
+    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script></head>
+<body>
+    <header>
+        <div id="benchmarkPage" class="header">
+            <div class="flex1 toolbar">
+                <button id="toggleLeftSidebar" class="primary-btn">Sample Functions</button>
+            </div>
+            <h1>🚀 Benchmark Lab</h1>
+            <div class="flex1 end-align toolbar">
+                <button id="runBenchmarkBtn" class="primary-btn">Run Benchmark</button>
+                <button id="resetBtn" class="primary-btn">Reset</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="benchmark-container">
+        <aside id="leftSidebar" class="sidebar collapsed">
+            <div class="sidebar-header">
+                <h2>Functions</h2>
+                <button id="closeLeftSidebar" class="close-btn" title="Close sidebar">×</button>
+            </div>
+            <div class="sidebar-content">
+                <div class="function-category">
+                    <div class="category-header">
+                        <span>Array Operations</span>
+                        <span class="category-toggle expanded"></span>
+                    </div>
+                    <ul class="function-list expanded">
+                        <li class="function-item" data-function="array-map">Array.map() - 1000 items</li>
+                        <li class="function-item" data-function="array-filter">Array.filter() - 1000 items</li>
+                        <li class="function-item" data-function="array-sort">Array.sort() - 100 items</li>
+                        <li class="function-item" data-function="array-reduce">Array.reduce() - 1000 items</li>
+                        <li class="function-item" data-function="array-some">Array.some() - 1000 items</li>
+                    </ul>
+                </div>
+
+                <!-- String Operations -->
+                <div class="function-category">
+                    <div class="category-header">
+                        <span>String Operations</span>
+                        <span class="category-toggle expanded"></span>
+                    </div>
+                    <ul class="function-list expanded">
+                        <li class="function-item" data-function="string-split">String.split() - 10KB string</li>
+                        <li class="function-item" data-function="string-replace">String.replace() - Regex replace</li>
+                        <li class="function-item" data-function="string-match">String.match() - Regex matching</li>
+                        <li class="function-item" data-function="string-substring">String operations - substring</li>
+                    </ul>
+                </div>
+
+                <!-- Object Operations -->
+                <div class="function-category">
+                    <div class="category-header">
+                        <span>Object Operations</span>
+                        <span class="category-toggle expanded"></span>
+                    </div>
+                    <ul class="function-list expanded">
+                        <li class="function-item" data-function="object-keys">Object.keys() - 1000 props</li>
+                        <li class="function-item" data-function="object-values">Object.values() - 1000 props</li>
+                        <li class="function-item" data-function="object-entries">Object.entries() - 1000 props</li>
+                        <li class="function-item" data-function="object-assign">Object.assign() - Shallow copy</li>
+                    </ul>
+                </div>
+
+                <!-- Math Operations -->
+                <div class="function-category">
+                    <div class="category-header">
+                        <span>Math Operations</span>
+                        <span class="category-toggle expanded"></span>
+                    </div>
+                    <ul class="function-list expanded">
+                        <li class="function-item" data-function="math-loop">Math loop - 10000 iterations</li>
+                        <li class="function-item" data-function="math-sqrt">Math.sqrt() - 1000 calls</li>
+                        <li class="function-item" data-function="math-fibonacci">Fibonacci - 30 iterations</li>
+                    </ul>
+                </div>
+
+                <!-- Advanced -->
+                <div class="function-category">
+                    <div class="category-header">
+                        <span>Advanced</span>
+                        <span class="category-toggle expanded"></span>
+                    </div>
+                    <ul class="function-list expanded">
+                        <li class="function-item" data-function="json-parse">JSON.parse() - 1000 operations</li>
+                        <li class="function-item" data-function="json-stringify">JSON.stringify() - Deep object</li>
+                        <li class="function-item" data-function="regex-test">RegExp.test() - Complex pattern</li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="benchmark-layout vertical">
+                <!-- Code Editor Pane -->
+                <div class="code-pane">
+                    <div class="code-header">
+                        <h3>Custom Function</h3>
+                        <button id="validateBtn" class="btn btn-secondary btn-sm">Validate</button>
+                    </div>
+                    <div class="code-editor">
+                        <div id="customFunction" class="editor-container"></div>
+                    </div>
+                </div>
+
+                <!-- Results Pane -->
+                <div class="results-pane">
+                    <div class="results-header">
+                        <h3>Benchmark Results</h3>
+                    </div>
+                    <div class="tab-headers">
+                        <div class="tab-header active" data-tab="results"><span>Results</span></div>
+                        <div class="tab-header" data-tab="timeline"><span>Timeline</span></div>
+                        <div class="tab-header" data-tab="diagnostics"><span>Diagnostics</span></div>
+                        <div class="tab-header" data-tab="console"><span>Console</span></div>
+                        <div class="tab-header" data-tab="factors">
+                            <span>Factors</span>
+                            <svg class="info-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="tab-content">
+                        <div id="results-tab" class="tab-panel active">
+                            <div id="results-content" class="metrics-grid">
+                                <div class="metric-card">
+                                    <div class="metric-label">Mean (ms)</div>
+                                    <div class="metric-value">-</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Min (ms)</div>
+                                    <div class="metric-value">-</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Max (ms)</div>
+                                    <div class="metric-value">-</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-label">Std Dev</div>
+                                    <div class="metric-value">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="timeline-tab" class="tab-panel">
+                            <div class="results-panel">
+                                <h4>Execution Timeline</h4>
+                                <div id="timeline-chart" style="height: 300px;">
+                                    <p class="placeholder">Timeline visualization will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="diagnostics-tab" class="tab-panel">
+                            <div class="results-panel">
+                                <h4>Performance Diagnostics</h4>
+                                <div id="diagnostics-output">
+                                    <p class="placeholder">Diagnostic data will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="console-tab" class="tab-panel">
+                            <div class="results-output" id="console-output">
+                                <p class="placeholder">Console output will appear here</p>
+                            </div>
+                        </div>
+
+                        <div id="factors-tab" class="tab-panel">
+                            <div class="factors-content">
+                                <h4>Factors Affecting Benchmark Results</h4>
+                                <p class="factors-intro">JavaScript performance benchmarks can be influenced by many factors. Understanding these helps interpret results accurately.</p>
+                                
+                                <div class="factor-category">
+                                    <h5>🔄 Runtime & Engine</h5>
+                                    <ul class="factor-list">
+                                        <li><strong>Event Loop Jitter:</strong> Variability in task scheduling and execution timing. Running setTimeout with 0 delay does not guarantee immediate execution. Logging multiples runs can demonstrate this effect.</li>
+                                        <li><strong>Garbage Collection (GC):</strong> Automatic memory cleanup pauses execution</li>
+                                        <li><strong>JIT Optimization:</strong> Just-In-Time compiler optimizes hot code paths</li>
+                                        <li><strong>JIT Deoptimization:</strong> Code may be deoptimized if assumptions fail</li>
+                                    </ul>
+                                </div>
+
+                                <div class="factor-category">
+                                    <h5>⚙️ Hardware & System</h5>
+                                    <ul class="factor-list">
+                                        <li><strong>CPU Scaling:</strong> Dynamic frequency adjustment affects performance</li>
+                                        <li><strong>Thermal Throttling:</strong> CPU reduces frequency when overheating</li>
+                                        <li><strong>OS Scheduling:</strong> Operating system task prioritization and context switching</li>
+                                        <li><strong>Background Processes:</strong> Other applications consuming system resources</li>
+                                    </ul>
+                                </div>
+
+                                <div class="factor-category">
+                                    <h5>🌐 Browser & Tab</h5>
+                                    <ul class="factor-list">
+                                        <li><strong>Tab Inactivity:</strong> Browsers throttle inactive tabs to save resources</li>
+                                        <li><strong>Other Tabs:</strong> Multiple tabs share browser process resources</li>
+                                        <li><strong>Browser Extensions:</strong> Extensions can intercept and slow down operations</li>
+                                        <li><strong>DevTools:</strong> Open developer tools can impact performance</li>
+                                    </ul>
+                                </div>
+
+                                <div class="factor-category">
+                                    <h5>💾 Memory & Cache</h5>
+                                    <ul class="factor-list">
+                                        <li><strong>Memory Pressure:</strong> Available RAM affects GC frequency and swap usage</li>
+                                        <li><strong>CPU Cache:</strong> L1/L2/L3 cache hits vs misses impact speed</li>
+                                        <li><strong>Memory Layout:</strong> Object allocation patterns affect cache efficiency</li>
+                                    </ul>
+                                </div>
+
+                                <div class="factor-category">
+                                    <h5>📊 Benchmark Design</h5>
+                                    <ul class="factor-list">
+                                        <li><strong>Warmup Phase:</strong> Insufficient warmup may not trigger JIT optimization</li>
+                                        <li><strong>Sample Size:</strong> Too few iterations lead to unreliable measurements</li>
+                                        <li><strong>Measurement Overhead:</strong> Timing code itself adds small delays</li>
+                                        <li><strong>Dead Code Elimination:</strong> Compiler may optimize away unused results</li>
+                                    </ul>
+                                </div>
+
+                                <div class="factor-note">
+                                    <strong>💡 Best Practice:</strong> Run benchmarks multiple times, on different occasions, and compare trends rather than absolute values. Use warmup iterations and sufficient sample sizes to minimize variance.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Settings -->
+        <aside id="rightSidebar" class="right-sidebar">
+            <div class="sidebar-header">
+                <h2>Settings</h2>
+                <button id="closeRightSidebar" class="close-btn" title="Close sidebar">×</button>
+            </div>
+            <div class="sidebar-content">
+                <!-- Test Mode Selection -->
+                <div class="settings-section">
+                    <h3>Test Mode</h3>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="test-mode" value="basic" checked>
+                            Basic Benchmark
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="test-mode" value="experiment">
+                            Experiment (Variables)
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="test-mode" value="regression">
+                            Regression Tracking
+                        </label>
+                    </div>
+                </div>
+
+                <hr class="sidebar-divider">
+
+                <!-- Basic Benchmark Options -->
+                <div class="settings-section" id="basic-options">
+                    <h3>Benchmark Options</h3>
+                    
+                    <div class="form-group">
+                        <label for="warmup-input">Warmup Runs:</label>
+                        <input type="number" id="warmup-input" class="form-control" value="10000" min="1" max="100000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="iterations-input">Iterations per Run:</label>
+                        <input type="number" id="iterations-input" class="form-control" value="100" min="1" max="10000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="runs-input">Number of Runs:</label>
+                        <input type="number" id="runs-input" class="form-control" value="5" min="1" max="50">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="auto-reject-gc" checked>
+                            Auto-reject GC runs
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="auto-discard-outliers" checked>
+                            Auto-discard outliers
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Experiment Options -->
+                <div class="settings-section" id="experiment-options" style="display: none;">
+                    <h3>Experiment Options</h3>
+                    
+                    <div class="form-group">
+                        <label for="experiment-name">Experiment Name:</label>
+                        <input type="text" id="experiment-name" class="form-control" value="Function Performance Test">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Variables:</label>
+                        <p class="help-text">Define test variables</p>
+                        <div id="variables-container">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Variable name" value="size">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Values (comma-separated)" value="100,1000,10000">
+                            </div>
+                        </div>
+                        <button id="add-variable-btn" class="btn btn-secondary btn-sm">+ Add Variable</button>
+                    </div>
+                </div>
+
+                <!-- Regression Options -->
+                <div class="settings-section" id="regression-options" style="display: none;">
+                    <h3>Regression Tracking</h3>
+                    
+                    <div class="form-group">
+                        <label for="regression-key">Benchmark Key:</label>
+                        <input type="text" id="regression-key" class="form-control" placeholder="e.g., array-sort-v1" value="custom-benchmark">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="window-size">Comparison Window:</label>
+                        <input type="number" id="window-size" class="form-control" value="5" min="2" max="20">
+                    </div>
+
+                    <button id="clear-history-btn" class="btn btn-secondary btn-sm">Clear History</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Floating Pane Toggle Button -->
+    <button id="paneToggleBtn" class="floating-control-btn visible" title="Toggle layout orientation">
+        <svg class="playground-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+        </svg>
+    </button>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-menu-left">
+            <a href ="/">
+                <svg class="js-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <rect width="24" height="24" fill="#F7DF1E" rx="2"/>
+                    <text x="4" y="18" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#323330">JS</text>
+                </svg>
+            </a>
+            <a href="#learn" class="footer-link">Learn</a>
+            <a href="#practice" class="footer-link">Practice</a>
+            <a href="#execution-flow" class="footer-link">Execution flow</a>
+            <a href="#execution-context" class="footer-link">Execution context</a>
+            <a href="/tools/notes/index.html" class="footer-link">Notes</a>
+            <a href="/tools/benchmark/index.html" class="footer-link">Benchmark</a>
+        </div>
+        <div class="footer-menu-right">
+            <button id="themeToggle" class="icon-btn" title="Toggle dark/light mode">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                </svg>
+            </button>
+            <button class="icon-btn" title="User account">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </button>
+            <button id="settingsToggle" class="icon-btn" title="Settings">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/benchmark.js"></script>
+    <script src="js/runtime-health.js"></script>
+    <script src="js/research.js"></script>
+    <script src="js/regression.js"></script>
+    <script src="js/visualizer.js"></script>
+    <script src="js/timeline-ui.js"></script>
+    <script src="js/lab.js"></script>
+    <script>
+        // Monaco Editor Setup
+        window.editor = null;
+        window.monacoLoaded = false;
+
+        // Sample functions for benchmarking
+        const sampleFunctions = {
+            'array-map': `// Array.map() - 1000 items
+const arr = Array.from({length: 1000}, (_, i) => i);
+return arr.map(x => x * 2);`,
+            'array-filter': `// Array.filter() - 1000 items
+const arr = Array.from({length: 1000}, (_, i) => i);
+return arr.filter(x => x % 2 === 0);`,
+            'array-sort': `// Array.sort() - 100 items
+const arr = Array.from({length: 100}, () => Math.random());
+return arr.sort((a, b) => a - b);`,
+            'array-reduce': `// Array.reduce() - 1000 items
+const arr = Array.from({length: 1000}, (_, i) => i);
+return arr.reduce((sum, x) => sum + x, 0);`,
+            'array-some': `// Array.some() - 1000 items
+const arr = Array.from({length: 1000}, (_, i) => i);
+return arr.some(x => x > 900);`,
+            'string-split': `// String.split() - 10KB string
+const str = 'a,b,c,d,e,f,g,h,i,j,'.repeat(500);
+return str.split(',');`,
+            'string-replace': `// String.replace() - Regex replace
+const str = 'The quick brown fox jumps over the lazy dog. '.repeat(100);
+return str.replace(/the/gi, 'a');`,
+            'string-match': `// String.match() - Regex matching
+const str = 'test123 foo456 bar789 '.repeat(50);
+return str.match(/\\d+/g);`,
+            'string-substring': `// String operations - substring
+const str = 'abcdefghijklmnopqrstuvwxyz'.repeat(50);
+return str.substring(10, 50);`,
+            'object-keys': `// Object.keys() - 1000 props
+const obj = Object.fromEntries(Array.from({length: 1000}, (_, i) => ['key' + i, i]));
+return Object.keys(obj);`,
+            'object-values': `// Object.values() - 1000 props
+const obj = Object.fromEntries(Array.from({length: 1000}, (_, i) => ['key' + i, i]));
+return Object.values(obj);`,
+            'object-entries': `// Object.entries() - 1000 props
+const obj = Object.fromEntries(Array.from({length: 1000}, (_, i) => ['key' + i, i]));
+return Object.entries(obj);`,
+            'object-assign': `// Object.assign() - Shallow copy
+const obj = Object.fromEntries(Array.from({length: 100}, (_, i) => ['key' + i, i]));
+return Object.assign({}, obj);`,
+            'math-loop': `// Math loop - 10000 iterations
+let sum = 0;
+for (let i = 0; i < 10000; i++) {
+  sum += Math.sqrt(i);
+}
+return sum;`,
+            'math-sqrt': `// Math.sqrt() - 1000 calls
+let sum = 0;
+for (let i = 0; i < 1000; i++) {
+  sum += Math.sqrt(i);
+}
+return sum;`,
+            'math-fibonacci': `// Fibonacci - 30 iterations
+function fib(n) {
+  if (n <= 1) return n;
+  return fib(n - 1) + fib(n - 2);
+}
+return fib(30);`,
+            'json-parse': `// JSON.parse() - 1000 operations
+const data = JSON.stringify({name: 'test', value: 123, items: [1,2,3]});
+for (let i = 0; i < 1000; i++) {
+  JSON.parse(data);
+}
+return 'done';`,
+            'json-stringify': `// JSON.stringify() - Deep object
+const obj = {a: 1, b: {c: 2, d: {e: 3, f: {g: 4, h: [1,2,3,4,5]}}}};
+for (let i = 0; i < 1000; i++) {
+  JSON.stringify(obj);
+}
+return 'done';`,
+            'regex-test': `// RegExp.test() - Complex pattern
+const pattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,}$/i;
+const email = 'test@example.com';
+for (let i = 0; i < 1000; i++) {
+  pattern.test(email);
+}
+return 'done';`
+        };
+
+        function createMonacoEditor() {
+            window.monacoLoaded = true;
+            const editorConfig = {
+                value: '// Select a function from the left sidebar or write your own\n// Example:\nlet sum = 0;\nfor (let i = 0; i < 1000; i++) {\n  sum += i;\n}\nreturn sum;',
+                language: 'javascript',
+                theme: localStorage.getItem('theme') === 'light' ? 'vs' : 'vs-dark',
+                fontSize: 14,
+                minimap: { enabled: false },
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                wordWrap: 'on',
+                lineNumbers: 'on'
+            };
+            
+            window.editor = monaco.editor.create(document.getElementById('customFunction'), editorConfig);
+        }
+
+        function initMonaco() {
+            if (typeof require !== 'undefined' && typeof monaco === 'undefined') {
+                require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } });
+                require(['vs/editor/editor.main'], createMonacoEditor);
+            } else if (typeof monaco !== 'undefined') {
+                createMonacoEditor();
+            }
+        }
+
+        // Initialize Monaco editor on page load
+        window.addEventListener('load', function() {
+            setTimeout(initMonaco, 100);
+        });
+
+        // Sidebar Toggle Logic
+        const leftSidebar = document.getElementById('leftSidebar');
+        const rightSidebar = document.getElementById('rightSidebar');
+        const toggleLeftBtn = document.getElementById('toggleLeftSidebar');
+        const toggleRightBtn = document.getElementById('settingsToggle');
+        const closeLeftBtn = document.getElementById('closeLeftSidebar');
+        const closeRightBtn = document.getElementById('closeRightSidebar');
+
+        toggleLeftBtn.addEventListener('click', () => {
+            leftSidebar.classList.toggle('collapsed');
+        });
+
+        toggleRightBtn.addEventListener('click', () => {
+            rightSidebar.classList.toggle('open');
+        });
+
+        closeLeftBtn.addEventListener('click', () => {
+            leftSidebar.classList.add('collapsed');
+        });
+
+        closeRightBtn.addEventListener('click', () => {
+            rightSidebar.classList.remove('open');
+        });
+
+        const paneToggleBtn = document.getElementById('paneToggleBtn');
+        const benchmarkLayout = document.querySelector('.benchmark-layout');
+        let isVertical = true;
+
+        paneToggleBtn.addEventListener('click', () => {
+            isVertical = !isVertical;
+            benchmarkLayout.classList.toggle('vertical');
+            benchmarkLayout.classList.toggle('horizontal');
+            
+            // Toggle icon between horizontal and vertical split
+            const icon = paneToggleBtn.querySelector('.playground-icon');
+            if (isVertical) {
+                // Vertical split (side by side) - horizontal line
+                icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="12" x2="21" y2="12"/>';
+            } else {
+                // Horizontal split (stacked) - vertical line
+                icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/>';
+            }
+        });
+
+        // Tab Navigation
+        const tabHeaders = document.querySelectorAll('.tab-header');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+
+        tabHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const tabName = header.dataset.tab;
+                
+                tabHeaders.forEach(h => h.classList.remove('active'));
+                tabPanels.forEach(panel => panel.classList.remove('active'));
+                
+                header.classList.add('active');
+                const tabPanel = document.querySelector(`#${tabName}-tab`);
+                if (tabPanel) {
+                    tabPanel.classList.add('active');
+                }
+            });
+        });
+
+        // Category Collapse/Expand
+        const categoryHeaders = document.querySelectorAll('.category-header');
+        categoryHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const toggle = header.querySelector('.category-toggle');
+                const list = header.nextElementSibling;
+                
+                toggle.classList.toggle('collapsed');
+                toggle.classList.toggle('expanded');
+                list.classList.toggle('expanded');
+            });
+        });
+
+        // Function Selection
+        const functionItems = document.querySelectorAll('.function-item');
+        functionItems.forEach(item => {
+            item.addEventListener('click', () => {
+                functionItems.forEach(fi => fi.classList.remove('active'));
+                item.classList.add('active');
+                
+                const functionName = item.dataset.function;
+                if (sampleFunctions[functionName] && window.editor) {
+                    window.editor.setValue(sampleFunctions[functionName]);
+                }
+            });
+        });
+
+        // Test Mode Toggle
+        const testModeInputs = document.querySelectorAll('input[name="test-mode"]');
+        testModeInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                const basicOpts = document.getElementById('basic-options');
+                const expOpts = document.getElementById('experiment-options');
+                const regOpts = document.getElementById('regression-options');
+                
+                basicOpts.style.display = input.value === 'basic' ? 'block' : 'none';
+                expOpts.style.display = input.value === 'experiment' ? 'block' : 'none';
+                regOpts.style.display = input.value === 'regression' ? 'block' : 'none';
+            });
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLightTheme = document.body.classList.contains('light-theme');
+            
+            // Update Monaco editor theme if loaded
+            if (window.monacoLoaded && window.editor && typeof monaco !== 'undefined') {
+                monaco.editor.setTheme(isLightTheme ? 'vs' : 'vs-dark');
+            }
+            
+            localStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+        }
+
+        // Placeholder Button Handlers
+        document.getElementById('runBenchmarkBtn').addEventListener('click', async () => {
+            if (!window.editor) {
+                appendConsole('Editor not ready. Please wait...');
+                return;
+            }
+
+            const code = window.editor.getValue().trim();
+            if (!code) {
+                appendConsole('No code to benchmark. Please enter or select a function.');
+                return;
+            }
+
+            // Clear previous results
+            document.getElementById('console-output').innerHTML = '';
+            document.getElementById('results-content').innerHTML = '<p class="placeholder">Running benchmark...</p>';
+            
+            appendConsole('Starting benchmark...');
+
+            try {
+                // Get test mode
+                const testMode = document.querySelector('input[name="test-mode"]:checked').value;
+                
+                // Get options based on test mode
+                let options = {};
+                if (testMode === 'basic') {
+                    options = {
+                        warmup: parseInt(document.getElementById('warmup-iterations')?.value || 10),
+                        iterations: parseInt(document.getElementById('benchmark-iterations')?.value || 100),
+                        runs: parseInt(document.getElementById('runs')?.value || 5)
+                    };
+                } else if (testMode === 'experiment') {
+                    options = {
+                        warmup: 50,
+                        iterations: 500,
+                        runs: 10
+                    };
+                } else if (testMode === 'regression') {
+                    options = {
+                        warmup: 20,
+                        iterations: 200,
+                        runs: 8
+                    };
+                }
+
+                appendConsole(`Mode: ${testMode}, Options: ${JSON.stringify(options)}`);
+
+                // Create function from code
+                const benchmarkFn = new Function(code);
+                
+                // Run benchmark using BenchmarkJS
+                const result = await window.BenchmarkJS.benchmark(benchmarkFn, options);
+                
+                // Display results
+                displayResults(result);
+                appendConsole('Benchmark completed successfully!');
+                
+            } catch (error) {
+                appendConsole(`Error: ${error.message}`, 'error');
+                console.error('Benchmark error:', error);
+            }
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            if (window.editor && window.editor.setValue) {
+                window.editor.setValue('// Select a function from the left sidebar or write your own\n// Example:\nlet sum = 0;\nfor (let i = 0; i < 1000; i++) {\n  sum += i;\n}\nreturn sum;');
+            }
+            
+            // Clear results
+            document.getElementById('results-content').innerHTML = '<p class="placeholder">Run a benchmark to see results...</p>';
+            document.getElementById('diagnostics-output').innerHTML = '<p class="placeholder">Diagnostic data will appear here</p>';
+            document.getElementById('console-output').innerHTML = '';
+            
+            // Remove active selection
+            document.querySelectorAll('.function-item').forEach(item => item.classList.remove('active'));
+            
+            appendConsole('Reset completed.');
+        });
+
+        document.getElementById('validateBtn').addEventListener('click', () => {
+            if (!window.editor) {
+                appendConsole('Editor not ready. Please wait...');
+                return;
+            }
+
+            const code = window.editor.getValue().trim();
+            if (!code) {
+                appendConsole('No code to validate.');
+                return;
+            }
+
+            try {
+                // Try to create function
+                const testFn = new Function(code);
+                
+                // Try to execute once
+                const result = testFn();
+                
+                appendConsole('✓ Validation passed!', 'success');
+                appendConsole(`Return value: ${JSON.stringify(result)}`);
+            } catch (error) {
+                appendConsole(`✗ Validation failed: ${error.message}`, 'error');
+            }
+        });
+
+        // Helper functions
+        function appendConsole(message, type = 'info') {
+            const consoleOutput = document.getElementById('console-output');
+            const p = document.createElement('p');
+            p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            p.className = type;
+            consoleOutput.appendChild(p);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        function displayResults(result) {
+            const resultsContent = document.getElementById('results-content');
+            const diagnosticsOutput = document.getElementById('diagnostics-output');
+            const timelineChart = document.getElementById('timeline-chart');
+            const consoleOutput = document.getElementById('console-output');
+            
+            // Display main results
+            resultsContent.innerHTML = `
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Average Time</div>
+                        <div class="metric-value">${result.avg?.toFixed(4) || '0.0000'} ms</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Min Time</div>
+                        <div class="metric-value">${result.min?.toFixed(4) || '0.0000'} ms</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Max Time</div>
+                        <div class="metric-value">${result.max?.toFixed(4) || '0.0000'} ms</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Std Deviation</div>
+                        <div class="metric-value">${result.std?.toFixed(4) || '0.0000'} ms</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Ops/Second</div>
+                        <div class="metric-value">${result.avg ? (1000 / result.avg).toFixed(0) : '0'}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Jitter Score</div>
+                        <div class="metric-value">${result.jitter?.jitterScore ? (result.jitter.jitterScore * 100).toFixed(2) : '0.00'}%</div>
+                    </div>
+                </div>
+            `;
+            
+            // Display Timeline
+            if (timelineChart && result.rawSamples) {
+                const maxSample = Math.max(...result.rawSamples);
+                const gcIndices = new Set(result.gc?.pauses?.map(p => p.index) || []);
+                
+                let timelineHTML = '<div class="timeline-visualization">';
+                result.rawSamples.forEach((sample, index) => {
+                    const percentage = (sample / maxSample) * 100;
+                    const isGC = gcIndices.has(index);
+                    timelineHTML += `
+                        <div class="timeline-run ${isGC ? 'gc-affected' : ''}">
+                            <span class="timeline-label">Run ${index + 1}</span>
+                            <div class="timeline-bar-container">
+                                <div class="timeline-bar" style="width: ${percentage}%"></div>
+                            </div>
+                            <span class="timeline-value">${sample.toFixed(3)} ms</span>
+                            ${isGC ? '<span class="gc-indicator">⚠️ GC</span>' : ''}
+                        </div>
+                    `;
+                });
+                timelineHTML += '</div>';
+                timelineChart.innerHTML = timelineHTML;
+            }
+            
+            // Display diagnostics
+            diagnosticsOutput.innerHTML = `
+                <div class="diagnostic-section">
+                    <h5>Jitter Analysis</h5>
+                    <p><strong>Classification:</strong> ${result.jitter?.classification || 'N/A'}</p>
+                    <p><strong>Coefficient of Variation:</strong> ${result.jitter?.coefficientOfVariation?.toFixed(4) || 'N/A'}</p>
+                    ${result.jitter?.outliers?.length > 0 ? 
+                        `<p><strong>Outliers detected:</strong> ${result.jitter.outliers.length}</p>` : 
+                        '<p>No significant outliers detected</p>'
+                    }
+                </div>
+                
+                <div class="diagnostic-section">
+                    <h5>GC Pause Detection</h5>
+                    <p><strong>Status:</strong> ${result.gc?.detected ? 'Detected' : 'None detected'}</p>
+                    ${result.gc?.detected && result.gc?.pauses?.length > 0 ? 
+                        `<p><strong>Pauses:</strong> ${result.gc.pauses.length} potential GC pauses</p>` : 
+                        ''
+                    }
+                </div>
+                
+                <div class="diagnostic-section">
+                    <h5>Sample Quality</h5>
+                    <p><strong>Clean samples:</strong> ${result.samples?.length || 0}</p>
+                    <p><strong>Total samples:</strong> ${result.rawSamples?.length || 0}</p>
+                </div>
+            `;
+            
+            // Log to console output
+            if (consoleOutput) {
+                const timestamp = new Date().toLocaleTimeString();
+                consoleOutput.innerHTML += `[${timestamp}] Benchmark completed\n`;
+                consoleOutput.innerHTML += `Average: ${result.avg?.toFixed(4)} ms\n`;
+                consoleOutput.innerHTML += `Min: ${result.min?.toFixed(4)} ms, Max: ${result.max?.toFixed(4)} ms\n`;
+                consoleOutput.innerHTML += `Std Dev: ${result.std?.toFixed(4)} ms\n`;
+                consoleOutput.innerHTML += `Ops/sec: ${result.avg ? (1000 / result.avg).toFixed(0) : '0'}\n`;
+                consoleOutput.innerHTML += `Jitter: ${result.jitter?.classification || 'N/A'}\n`;
+                consoleOutput.innerHTML += `\n`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<template id="lab-template">
+  <div class="lab-container">
+    <div class="lab-header">
+      <h1 class="lab-title">🧪 Performance Lab</h1>
+      <p class="lab-subtitle">Browser-native performance research & diagnostics</p>
+    </div>
+
+    <div class="lab-controls">
+      <button class="lab-btn lab-btn-primary" id="run-experiment-btn">
+        Run Experiment
+      </button>
+      <button class="lab-btn lab-btn-secondary" id="reset-btn">
+        Reset
+      </button>
+    </div>
+
+    <div class="lab-tabs">
+      <button class="lab-tab-btn active" data-tab="results">Results</button>
+      <button class="lab-tab-btn" data-tab="timeline">Timeline</button>
+      <button class="lab-tab-btn" data-tab="diagnostics">Diagnostics</button>
+    </div>
+
+    <div id="lab-output" class="lab-output">
+      <p class="placeholder">Ready to run experiments...</p>
+    </div>
+
+    <div id="timeline-container" class="lab-tab-content" style="display: none;">
+      <!-- Timeline UI will be mounted here -->
+    </div>
+
+    <div id="diagnostics-container" class="lab-tab-content" style="display: none;">
+      <div id="jitter-display"></div>
+      <div id="gc-display"></div>
+    </div>
+  </div>
+</template>
