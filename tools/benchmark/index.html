@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../../css/app.css">
     <link rel="stylesheet" href="../../css/utilities.css?v=2">
     <link rel="stylesheet" href="../../css/styles.css?ver=5">
+    <link rel="stylesheet" href="../../components/leftSidebar/leftSidebar.css">
     <link rel="stylesheet" href="css/benchmark.css">
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -36,71 +37,56 @@
                 <button id="closeLeftSidebar" class="close-btn" title="Close sidebar">×</button>
             </div>
             <div class="sidebar-content">
-                <div class="function-category">
-                    <div class="category-header">
-                        <span>Array Operations</span>
-                        <span class="category-toggle expanded"></span>
-                    </div>
-                    <ul class="function-list expanded">
-                        <li class="function-item" data-function="array-map">Array.map() - 1000 items</li>
-                        <li class="function-item" data-function="array-filter">Array.filter() - 1000 items</li>
-                        <li class="function-item" data-function="array-sort">Array.sort() - 100 items</li>
-                        <li class="function-item" data-function="array-reduce">Array.reduce() - 1000 items</li>
-                        <li class="function-item" data-function="array-some">Array.some() - 1000 items</li>
+                <div class="topic">
+                    <h3 class="topic-header">Array Operations</h3>
+                    <ul class="topic-item-list">
+                        <li class="function-item topic-item" data-function="array-map">Array.map() - 1000 items</li>
+                        <li class="function-item topic-item" data-function="array-filter">Array.filter() - 1000 items</li>
+                        <li class="function-item topic-item" data-function="array-sort">Array.sort() - 100 items</li>
+                        <li class="function-item topic-item" data-function="array-reduce">Array.reduce() - 1000 items</li>
+                        <li class="function-item topic-item" data-function="array-some">Array.some() - 1000 items</li>
                     </ul>
                 </div>
 
                 <!-- String Operations -->
-                <div class="function-category">
-                    <div class="category-header">
-                        <span>String Operations</span>
-                        <span class="category-toggle expanded"></span>
-                    </div>
-                    <ul class="function-list expanded">
-                        <li class="function-item" data-function="string-split">String.split() - 10KB string</li>
-                        <li class="function-item" data-function="string-replace">String.replace() - Regex replace</li>
-                        <li class="function-item" data-function="string-match">String.match() - Regex matching</li>
-                        <li class="function-item" data-function="string-substring">String operations - substring</li>
+                <div class="topic">
+                    <h3 class="topic-header">String Operations</h3>
+                    <ul class="topic-item-list">
+                        <li class="function-item topic-item" data-function="string-split">String.split() - 10KB string</li>
+                        <li class="function-item topic-item" data-function="string-replace">String.replace() - Regex replace</li>
+                        <li class="function-item topic-item" data-function="string-match">String.match() - Regex matching</li>
+                        <li class="function-item topic-item" data-function="string-substring">String operations - substring</li>
                     </ul>
                 </div>
 
                 <!-- Object Operations -->
-                <div class="function-category">
-                    <div class="category-header">
-                        <span>Object Operations</span>
-                        <span class="category-toggle expanded"></span>
-                    </div>
-                    <ul class="function-list expanded">
-                        <li class="function-item" data-function="object-keys">Object.keys() - 1000 props</li>
-                        <li class="function-item" data-function="object-values">Object.values() - 1000 props</li>
-                        <li class="function-item" data-function="object-entries">Object.entries() - 1000 props</li>
-                        <li class="function-item" data-function="object-assign">Object.assign() - Shallow copy</li>
+                <div class="topic">
+                    <h3 class="topic-header">Object Operations</h3>
+                    <ul class="topic-item-list">
+                        <li class="function-item topic-item" data-function="object-keys">Object.keys() - 1000 props</li>
+                        <li class="function-item topic-item" data-function="object-values">Object.values() - 1000 props</li>
+                        <li class="function-item topic-item" data-function="object-entries">Object.entries() - 1000 props</li>
+                        <li class="function-item topic-item" data-function="object-assign">Object.assign() - Shallow copy</li>
                     </ul>
                 </div>
 
                 <!-- Math Operations -->
-                <div class="function-category">
-                    <div class="category-header">
-                        <span>Math Operations</span>
-                        <span class="category-toggle expanded"></span>
-                    </div>
-                    <ul class="function-list expanded">
-                        <li class="function-item" data-function="math-loop">Math loop - 10000 iterations</li>
-                        <li class="function-item" data-function="math-sqrt">Math.sqrt() - 1000 calls</li>
-                        <li class="function-item" data-function="math-fibonacci">Fibonacci - 30 iterations</li>
+                <div class="topic">
+                    <h3 class="topic-header">Math Operations</h3>
+                    <ul class="topic-item-list">
+                        <li class="function-item topic-item" data-function="math-loop">Math loop - 10000 iterations</li>
+                        <li class="function-item topic-item" data-function="math-sqrt">Math.sqrt() - 1000 calls</li>
+                        <li class="function-item topic-item" data-function="math-fibonacci">Fibonacci - 30 iterations</li>
                     </ul>
                 </div>
 
                 <!-- Advanced -->
-                <div class="function-category">
-                    <div class="category-header">
-                        <span>Advanced</span>
-                        <span class="category-toggle expanded"></span>
-                    </div>
-                    <ul class="function-list expanded">
-                        <li class="function-item" data-function="json-parse">JSON.parse() - 1000 operations</li>
-                        <li class="function-item" data-function="json-stringify">JSON.stringify() - Deep object</li>
-                        <li class="function-item" data-function="regex-test">RegExp.test() - Complex pattern</li>
+                <div class="topic">
+                    <h3 class="topic-header">Advanced</h3>
+                    <ul class="topic-item-list">
+                        <li class="function-item topic-item" data-function="json-parse">JSON.parse() - 1000 operations</li>
+                        <li class="function-item topic-item" data-function="json-stringify">JSON.stringify() - Deep object</li>
+                        <li class="function-item topic-item" data-function="regex-test">RegExp.test() - Complex pattern</li>
                     </ul>
                 </div>
             </div>
@@ -400,8 +386,7 @@
     <script src="js/regression.js"></script>
     <script src="js/visualizer.js"></script>
     <script src="js/timeline-ui.js"></script>
-    <script src="js/lab.js"></script>
-    <script>
+    <script src="js/lab.js"></script>    <script src="../../components/leftSidebar/leftSidebar.js"></script>    <script>
         // Monaco Editor Setup
         window.editor = null;
         window.monacoLoaded = false;
@@ -520,21 +505,20 @@ return 'done';`
         // Sidebar Toggle Logic
         const leftSidebar = document.getElementById('leftSidebar');
         const rightSidebar = document.getElementById('rightSidebar');
-        const toggleLeftBtn = document.getElementById('toggleLeftSidebar');
         const toggleRightBtn = document.getElementById('settingsToggle');
-        const closeLeftBtn = document.getElementById('closeLeftSidebar');
         const closeRightBtn = document.getElementById('closeRightSidebar');
 
-        toggleLeftBtn.addEventListener('click', () => {
-            leftSidebar.classList.toggle('collapsed');
-        });
+        // Initialize Left Sidebar Component
+        if (leftSidebar) {
+            window.leftSidebarInstance = new LeftSidebar('leftSidebar', {
+                toggleButtonId: 'toggleLeftSidebar',
+                closeButtonId: 'closeLeftSidebar',
+                enableTopicToggle: true
+            });
+        }
 
         toggleRightBtn.addEventListener('click', () => {
             rightSidebar.classList.toggle('open');
-        });
-
-        closeLeftBtn.addEventListener('click', () => {
-            leftSidebar.classList.add('collapsed');
         });
 
         closeRightBtn.addEventListener('click', () => {

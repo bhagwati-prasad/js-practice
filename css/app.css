@@ -64,29 +64,4 @@ body {
     color: var(--text-primary);
 }
 
-.icon-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: var(--spacing-xs);
-    width: var(--btn-height-md);
-    height: var(--btn-height-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-md);
-    transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-.icon-btn:hover {
-    background-color: var(--border-primary);
-    color: var(--text-white);
-}
-
-.icon {
-    width: var(--icon-sm);
-    height: var(--icon-sm);
-    display: inline-block;
-    text-align: center;
-}
+/* .icon-btn and .icon now in css/utilities.css */

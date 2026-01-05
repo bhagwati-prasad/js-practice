@@ -1,35 +1,4 @@
-.flex1 {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-}
-
-.end-align {
-    justify-content: flex-end;
-}
-
-.header-toolbar {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    flex-wrap: wrap;
-}
-
-.header-toolbar .collection-path {
-    margin-right: auto;
-    min-width: 150px;
-}
-
-.header-toolbar input[type="text"] {
-    padding: var(--spacing-sm);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-md);
-    max-width: 200px;
-    background: var(--bg-input);
-    color: var(--text-primary);
-    font-size: var(--font-sm);
-}
+/* .flex1 and .end-align now in css/utilities.css */
 
 .notes-container {
     display: flex;
@@ -37,25 +6,7 @@
     overflow: hidden;
 }
 
-.sidebar {
-    width: var(--sidebar-width);
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid var(--border-primary);
-    z-index: var(--z-sidebar);
-}
-
-.sidebar-header {
-    padding: var(--spacing-xl);
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--border-primary);
-}
-
-.sidebar-header h2 {
-    font-size: var(--font-lg);
-}
+/* .sidebar and .sidebar-header now in components/leftSidebar/leftSidebar.css */
 
 .notebook-list {
     flex: 1;
@@ -251,26 +202,6 @@
     overflow: hidden;
 }
 
-.toolbar {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--border-primary);
-    display: flex;
-    gap: var(--spacing-md);
-    align-items: center;
-}
-
-.toolbar input {
-    padding: var(--spacing-sm);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-md);
-    flex: 1;
-    max-width: 300px;
-    background: var(--bg-input);
-    color: var(--text-primary);
-    font-size: var(--font-sm);
-}
-
 .notes-area {
     flex: 1;
     display: flex;
@@ -390,26 +321,6 @@
 
 .text-block::placeholder {
     color: var(--text-muted);
-}
-
-.floating-toolbar {
-    position: absolute;
-    top: 100px;
-    right: 40px;
-    background: var(--bg-primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    border-radius: var(--radius-lg);
-    display: flex;
-    flex-direction: column;
-    z-index: 500;
-    border: 1px solid var(--border-primary);
-    overflow: hidden;
-    display: none;
-    width: 150px;
-}
-
-.floating-toolbar.visible {
-    display: flex;
 }
 
 .drag-handle {

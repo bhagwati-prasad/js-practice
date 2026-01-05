@@ -1,6 +1,8 @@
 .flex1 {
     flex: 1;
     display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
 }
 
 .end-align {
@@ -25,9 +27,23 @@
     color: var(--text-primary);
 }
 
+/* Footer-specific icon button variant */
+.footer .icon-btn {
+    width: var(--btn-height-md);
+    height: var(--btn-height-md);
+    border-radius: var(--radius-md);
+}
+
+.footer .icon-btn:hover {
+    background-color: var(--border-primary);
+    color: var(--text-white);
+}
+
 .icon {
     width: var(--icon-sm);
     height: var(--icon-sm);
+    display: inline-block;
+    text-align: center;
 }
 
 .primary-btn {
@@ -48,32 +64,66 @@
 }
 
 .toolbar {
+    display: flex;
     gap: var(--spacing-md);
+    align-items: center;
+}
+
+.toolbar input {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    flex: 1;
+    max-width: 300px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: var(--font-sm);
+}
+
+.header-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.header-toolbar .collection-path {
+    margin-right: auto;
+    min-width: 150px;
+}
+
+.header-toolbar input[type="text"] {
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    max-width: 200px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: var(--font-sm);
+}
+
+.floating-toolbar {
+    position: absolute;
+    top: 100px;
+    right: 40px;
+    background: var(--bg-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    z-index: 500;
+    border: 1px solid var(--border-primary);
+    overflow: hidden;
+    display: none;
+    width: 150px;
+}
+
+.floating-toolbar.visible {
+    display: flex;
 }
 
 .primary-btn:hover {
     background-color: var(--accent-primary-hover);
-}
-
-.sidebar {
-    width: var(--sidebar-width);
-    background-color: var(--bg-tertiary);
-    color: var(--text-primary);
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid var(--border-primary);
-    z-index: var(--z-sidebar);
-}
-
-.sidebar-header {
-    padding: var(--spacing-xl);
-    background-color: var(--bg-primary);
-    border-bottom: 1px solid var(--border-primary);
-}
-
-.sidebar-header h2 {
-    font-size: var(--font-lg);
-    color: var(--text-primary);
 }
 
 .close-btn {

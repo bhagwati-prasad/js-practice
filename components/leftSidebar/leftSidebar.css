@@ -1,0 +1,110 @@
+/* Left Sidebar Component Styles */
+
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-primary);
+    z-index: var(--z-sidebar);
+    transition: margin-left var(--transition-medium), width var(--transition-medium);
+}
+
+.sidebar.collapsed {
+    margin-left: calc(-1 * var(--sidebar-width));
+}
+
+.sidebar-header {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    background-color: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h2 {
+    font-size: var(--font-lg);
+    color: var(--text-secondary);
+}
+
+.sidebar-content {
+    overflow-y: auto;
+    padding: var(--spacing-md) 0;
+    flex: 1;
+}
+
+/* Topic/Category Section */
+.topic {
+    margin-bottom: var(--spacing-md);
+}
+
+.topic-header {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: var(--font-sm);
+    color: var(--text-accent);
+    cursor: pointer;
+    user-select: none;
+    background-color: var(--bg-tertiary);
+    transition: background-color var(--transition-fast);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.topic-header:hover {
+    background-color: var(--bg-active);
+}
+
+/* Collapsed/Expanded Icon using ::after pseudo-element */
+.topic-header::after {
+    content: '▼';
+    font-size: 10px;
+    color: var(--text-secondary);
+    transition: transform var(--transition-fast);
+}
+
+.topic-header.collapsed::after {
+    transform: rotate(-90deg);
+}
+
+/* Topic Item List */
+.topic-item-list {
+    list-style: none;
+    padding: 5px 0;
+    display: block;
+    transition: max-height var(--transition-medium), opacity var(--transition-fast);
+}
+
+.topic-header.collapsed + .topic-item-list {
+    display: none;
+}
+
+.topic-item {
+    padding: var(--spacing-sm) var(--spacing-xl) var(--spacing-sm) 40px;
+    cursor: pointer;
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    transition: background-color var(--transition-fast);
+}
+
+.topic-item a {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}
+
+.topic-item:hover {
+    background-color: var(--bg-hover);
+}
+
+.topic-item.active {
+    background-color: var(--bg-active);
+    color: var(--text-white);
+}
+
+.topic-item.active a {
+    color: var(--text-white);
+}

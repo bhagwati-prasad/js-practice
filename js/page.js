@@ -56,6 +56,15 @@ const sidebar = document.getElementById('sidebar');
 const toggleBtn = document.getElementById('toggleSidebar');
 const closeBtn = document.getElementById('closeSidebar');
 
+// Initialize Left Sidebar Component
+if (sidebar) {
+    window.leftSidebarInstance = new LeftSidebar('sidebar', {
+        toggleButtonId: 'toggleSidebar',
+        closeButtonId: 'closeSidebar',
+        enableTopicToggle: true
+    });
+}
+
 function resetPlaygroundMode() {
     const mainContent = document.querySelector('.main-content');
     const floatingPlaygroundControl = document.getElementById('floatingPlaygroundControl');
@@ -118,14 +127,7 @@ function updateFloatingPlaygroundIcon(mode) {
     icon.innerHTML = icons[mode] || icons.normal;
 }
 
-toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-    resetPlaygroundMode();
-});
-
-closeBtn.addEventListener('click', () => {
-    sidebar.classList.add('collapsed');
-});
+// Old toggle listeners removed - now handled by LeftSidebar component
 
 window.addEventListener('load', function() {
     setTimeout(initMonaco, 100);
@@ -148,7 +150,9 @@ window.addEventListener('load', function() {
         } else {
             updatePlayground('horizontal');
         }
-    });
+    });if (window.leftSidebarInstance) {
+                window.leftSidebarInstance.close();
+            }
 
     floatingPlaygroundControl.addEventListener('click', () => {
         if (playgroundMode === 'horizontal') {
