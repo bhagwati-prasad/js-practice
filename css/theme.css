@@ -27,6 +27,7 @@
     --accent-secondary: #4ec9b0;
     
     --shadow-panel: -2px 0 8px rgba(0, 0, 0, 0.3);
+    --shadow-component: 0 8px 24px rgba(0, 0, 0, 0.2);
     
     --scrollbar-track: #1e1e1e;
     --scrollbar-thumb: #424242;

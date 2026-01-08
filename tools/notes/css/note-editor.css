@@ -4,9 +4,6 @@
     flex-direction: column;
     gap: var(--spacing-md);
     height: 100%;
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     padding: var(--spacing-md) var(--spacing-lg) var(--spacing-lg);
     overflow: hidden;
 }
@@ -93,9 +90,6 @@
     display: flex;
     flex-direction: column;
     background: var(--bg-primary);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    border: 1px solid var(--border-primary);
     overflow-y: auto;
 }
 

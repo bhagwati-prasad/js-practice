@@ -89,6 +89,13 @@ const Draggable = (function() {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
 
+        // Check if dropping on collection-list (root container)
+        const collectionList = e.target.closest('.collection-list');
+        if (collectionList && !e.target.closest('.tree-item')) {
+            collectionList.classList.add('drop-target');
+            return;
+        }
+
         const treeItem = e.target.closest('.tree-item');
         if (!treeItem || treeItem === draggedItem) return;
 
@@ -100,6 +107,11 @@ const Draggable = (function() {
     }
 
     function handleDragLeave(e) {
+        const collectionList = e.target.closest('.collection-list');
+        if (collectionList && !e.target.closest('.tree-item')) {
+            collectionList.classList.remove('drop-target');
+        }
+
         const treeItem = e.target.closest('.tree-item');
         if (treeItem) {
             treeItem.classList.remove('drop-target');
@@ -109,6 +121,18 @@ const Draggable = (function() {
     function handleDrop(e) {
         e.preventDefault();
         e.stopPropagation();
+
+        // Check if dropping on collection-list (root container)
+        const collectionList = e.target.closest('.collection-list');
+        if (collectionList && !e.target.closest('.tree-item') && draggedItemId) {
+            collectionList.classList.remove('drop-target');
+            
+            // Move item to first root collection
+            if (window.moveItemToCollection) {
+                window.moveItemToCollection(draggedItemId, 'ROOT', draggedItemType);
+            }
+            return;
+        }
 
         const treeItem = e.target.closest('.tree-item');
         if (!treeItem || !draggedItemId) return;
@@ -135,6 +159,11 @@ const Draggable = (function() {
         document.querySelectorAll('.drop-target').forEach(el => {
             el.classList.remove('drop-target');
         });
+        // Also remove from collection-list if present
+        const collectionList = document.querySelector('.collection-list');
+        if (collectionList) {
+            collectionList.classList.remove('drop-target');
+        }
         draggedItem = null;
         draggedItemType = null;
         draggedItemId = null;

@@ -1,12 +1,8 @@
-/* .flex1 and .end-align now in css/utilities.css */
-
 .notes-container {
     display: flex;
     flex: 1;
     overflow: hidden;
 }
-
-/* .sidebar and .sidebar-header now in components/leftSidebar/leftSidebar.css */
 
 .notebook-list {
     flex: 1;
@@ -125,9 +121,8 @@
     background: var(--bg-secondary);
 }
 
-.tree-item.drop-target {
+.tree-item.drop-target, .collection-list.drop-target {
     background: rgba(0, 120, 212, 0.15);
-    border: 2px solid var(--accent-primary);
     border-radius: var(--radius-sm);
     box-shadow: inset 0 0 0 1px rgba(0, 120, 212, 0.3);
 }
