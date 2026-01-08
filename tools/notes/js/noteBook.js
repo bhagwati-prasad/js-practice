@@ -5,7 +5,7 @@ const NoteBook = (function() {
     Note = Cells
     Cell = { id, text, highlighted, codeMode }
     */
-    const STORAGE_KEY = 'onenote_data';
+    const STORAGE_KEY = 'note_data';
     let data = {
         collections: [],
         currentCollectionId: null,
@@ -239,6 +239,11 @@ const NoteBook = (function() {
                 items: []
             };
             
+            // If no parent specified and collections exist, use first root collection
+            if (!parentCollectionId && data.collections.length > 0) {
+                parentCollectionId = data.collections[0].id;
+            }
+            
             if (parentCollectionId) {
                 const parent = findCollection(parentCollectionId);
                 if (parent) {
@@ -247,6 +252,7 @@ const NoteBook = (function() {
                     return null;
                 }
             } else {
+                // Only allow root-level creation during initialization (when no collections exist)
                 data.collections.push(col);
             }
             
@@ -377,11 +383,29 @@ const NoteBook = (function() {
             if (!item || !targetCollection) return false;
             if (itemId === targetCollectionId) return false; // Can't move to itself
             
-            // Find and remove from current parent
+            // Find current parent
             const parentCollection = itemType === 'collection'
                 ? findParentCollection(itemId)
                 : findParentCollection(itemId);
             
+            // If already in target collection, no need to move
+            if (parentCollection && parentCollection.id === targetCollectionId) {
+                // Already in the right place, but return true to indicate success
+                saveData();
+                return true;
+            }
+            
+            // Check if item already exists in target to prevent duplicates
+            const existsInTarget = targetCollection.items && 
+                targetCollection.items.some(i => i.id === itemId);
+            
+            if (existsInTarget) {
+                // Already in target, don't add again
+                saveData();
+                return true;
+            }
+            
+            // Remove from current parent
             if (parentCollection) {
                 const idx = parentCollection.items.findIndex(i => i.id === itemId);
                 if (idx !== -1) {
@@ -514,7 +538,8 @@ const NoteBook = (function() {
         },
 
         setCurrentCollection: function(id) {
-            if (!findCollection(id)) return false;
+            // Allow null to deselect
+            if (id !== null && !findCollection(id)) return false;
             data.currentCollectionId = id;
             data.currentNotebookId = null;
             data.currentNoteId = null;
@@ -527,7 +552,8 @@ const NoteBook = (function() {
         },
 
         setCurrentNotebook: function(id) {
-            if (!findNotebook(id)) return false;
+            // Allow null to deselect
+            if (id !== null && !findNotebook(id)) return false;
             data.currentNotebookId = id;
             data.currentNoteId = null;
             saveData();

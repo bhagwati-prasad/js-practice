@@ -112,6 +112,18 @@ const UIController = (function() {
     }
 
     function bindCollectionEvents() {
+        // Click on collection list background to deselect
+        elements.collectionList.addEventListener('click', function(e) {
+            // Only deselect if clicking directly on the collection list (not on children)
+            if (e.target === elements.collectionList) {
+                NoteBook.setCurrentCollection(null);
+                NoteBook.setCurrentNotebook(null);
+                renderCollections();
+                renderNotes();
+                renderEditor();
+            }
+        });
+        
         elements.addCollectionBtn.addEventListener('click', function() {
             const modal = new Modal({
                 title: 'New Collection',
@@ -121,7 +133,14 @@ const UIController = (function() {
                     onClick: (m) => {
                         const name = m.getInputValue('#collectionNameInput');
                         if (name && name.trim()) {
-                            const currentCollectionId = NoteBook.getCurrentCollection();
+                            let currentCollectionId = NoteBook.getCurrentCollection();
+                            // If no collection selected, use first root collection
+                            if (!currentCollectionId) {
+                                const collections = NoteBook.getCollections();
+                                if (collections && collections.length > 0) {
+                                    currentCollectionId = collections[0].id;
+                                }
+                            }
                             const collection = NoteBook.createCollection(name.trim(), currentCollectionId);
                             if (collection) {
                                 NoteBook.setCurrentCollection(collection.id);
@@ -141,15 +160,34 @@ const UIController = (function() {
                 animation: ModalAnimations.fade
             });
             modal.show();
+            // Add Enter key listener
+            setTimeout(() => {
+                const input = document.getElementById('collectionNameInput');
+                if (input) {
+                    input.focus();
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            modal.elements.primaryButton.click();
+                        }
+                    });
+                }
+            }, 0);
         });
     }
 
     function bindNotebookEvents() {
         elements.addNotebookBtn.addEventListener('click', function() {
-            const currentCollectionId = NoteBook.getCurrentCollection();
+            let currentCollectionId = NoteBook.getCurrentCollection();
+            // If no collection selected, use first root collection
             if (!currentCollectionId) {
-                Modal.alert('No Collection', 'Please select a collection first.');
-                return;
+                const collections = NoteBook.getCollections();
+                if (collections && collections.length > 0) {
+                    currentCollectionId = collections[0].id;
+                } else {
+                    Modal.alert('No Collection', 'No collection available.');
+                    return;
+                }
             }
             
             const modal = new Modal({
@@ -159,7 +197,6 @@ const UIController = (function() {
                     text: 'Create',
                     onClick: (m) => {
                         const name = m.getInputValue('#notebookNameInput');
-                        const currentCollectionId = NoteBook.getCurrentCollection();
                         if (name && name.trim() && currentCollectionId) {
                             const notebook = NoteBook.createNotebook(currentCollectionId, name.trim());
                             if (notebook) {
@@ -338,7 +375,7 @@ const UIController = (function() {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'onenote_export_' + new Date().getTime() + '.json';
+            a.download = 'note_export_' + new Date().getTime() + '.json';
             a.click();
             URL.revokeObjectURL(url);
         });
@@ -1044,10 +1081,27 @@ const UIController = (function() {
                 ? NoteBook.getCollection(itemId) 
                 : NoteBook.getNotebook(itemId);
             
-            const targetCollection = NoteBook.getCollection(targetCollectionId);
+            if (!item) {
+                Modal.alert('Error', 'Could not find item.');
+                return;
+            }
             
-            if (!item || !targetCollection) {
-                Modal.alert('Error', 'Could not find item or target collection.');
+            // Handle moving to root collection
+            let targetCollection;
+            if (targetCollectionId === 'ROOT') {
+                const collections = NoteBook.getCollections();
+                if (!collections || collections.length === 0) {
+                    Modal.alert('Error', 'No root collection found.');
+                    return;
+                }
+                targetCollection = collections[0];
+                targetCollectionId = targetCollection.id;
+            } else {
+                targetCollection = NoteBook.getCollection(targetCollectionId);
+            }
+            
+            if (!targetCollection) {
+                Modal.alert('Error', 'Could not find target collection.');
                 return;
             }
 
