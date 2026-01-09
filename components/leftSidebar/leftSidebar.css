@@ -8,11 +8,19 @@
     flex-direction: column;
     border-right: 1px solid var(--border-primary);
     z-index: var(--z-sidebar);
-    transition: margin-left var(--transition-medium), width var(--transition-medium);
+    transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease-in-out;
+    transform: translateX(0);
+    opacity: 1;
 }
 
 .sidebar.collapsed {
     margin-left: calc(-1 * var(--sidebar-width));
+    transform: translateX(-20px);
+    opacity: 0;
+    pointer-events: none;
 }
 
 .sidebar-header {
@@ -22,11 +30,33 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    animation: slideInFromLeft 0.3s ease-out;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .sidebar-header h2 {
     font-size: var(--font-lg);
     color: var(--text-secondary);
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .sidebar-content {
@@ -37,7 +67,25 @@
 
 /* Topic/Category Section */
 .topic {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 2px;
+    animation: fadeInUp 0.4s ease-out backwards;
+}
+
+.topic:nth-child(1) { animation-delay: 0.05s; }
+.topic:nth-child(2) { animation-delay: 0.1s; }
+.topic:nth-child(3) { animation-delay: 0.15s; }
+.topic:nth-child(4) { animation-delay: 0.2s; }
+.topic:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .topic-header {
@@ -47,7 +95,9 @@
     cursor: pointer;
     user-select: none;
     background-color: var(--bg-tertiary);
-    transition: background-color var(--transition-fast);
+    transition: background-color 0.2s ease, 
+                transform 0.15s ease,
+                box-shadow 0.2s ease;
     position: relative;
     display: flex;
     align-items: center;
@@ -56,30 +106,38 @@
 
 .topic-header:hover {
     background-color: var(--bg-active);
+    transform: translateX(4px);
+    box-shadow: -4px 0 0 0 var(--text-accent);
 }
 
-/* Collapsed/Expanded Icon using ::after pseudo-element */
+.topic-header:active {
+    transform: translateX(2px);
+}
+
 .topic-header::after {
     content: '▼';
     font-size: 10px;
     color: var(--text-secondary);
-    transition: transform var(--transition-fast);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: rotate(-90deg);
 }
 
-.topic-header.collapsed::after {
-    transform: rotate(-90deg);
+.topic-header.expanded::after {
+    transform: rotate(0deg);
 }
 
 /* Topic Item List */
 .topic-item-list {
     list-style: none;
-    padding: 5px 0;
+    padding: 0;
     display: block;
-    transition: max-height var(--transition-medium), opacity var(--transition-fast);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.topic-header.collapsed + .topic-item-list {
-    display: none;
+.topic-header.expanded + .topic-item-list {
+    max-height: 2000px;
 }
 
 .topic-item {
@@ -87,7 +145,31 @@
     cursor: pointer;
     font-size: var(--font-sm);
     color: var(--text-secondary);
-    transition: background-color var(--transition-fast);
+    transition: background-color 0.2s ease,
+                transform 0.15s ease,
+                padding-left 0.2s ease;
+    position: relative;
+}
+
+.topic-item::before {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--text-secondary);
+    opacity: 0.5;
+    transition: all 0.2s ease;
+}
+
+.topic-item:hover::before {
+    width: 6px;
+    height: 6px;
+    opacity: 1;
+    background-color: var(--text-accent);
 }
 
 .topic-item a {
@@ -98,6 +180,8 @@
 
 .topic-item:hover {
     background-color: var(--bg-hover);
+    transform: translateX(4px);
+    padding-left: 44px;
 }
 
 .topic-item.active {

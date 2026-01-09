@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Practice - Data Structures & Algorithms</title>
+    <link rel="stylesheet" href="../../css/theme.css">
+    <link rel="stylesheet" href="../../css/app.css">
+    <link rel="stylesheet" href="../../css/utilities.css?v=1">
+    <link rel="stylesheet" href="../../css/styles.css?ver=6">
+    <link rel="stylesheet" href="../../components/leftSidebar/leftSidebar.css">
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" crossorigin="use-credentials" />
+</head>
+<body>
+    <header>
+        <div id="practicePage" class="header">
+            <div class="flex1 toolbar">
+                <button id="toggleSidebar" class="primary-btn">Practice Problems</button>
+                <button id="playgroundToggle" class="primary-btn">Playground</button>
+            </div>
+            <h1>JS Practice Platform</h1>
+            <div class="flex1 end-align toolbar">
+                <button id="runButton" class="primary-btn">Run</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside id="sidebar" class="sidebar collapsed">
+            <div class="sidebar-header">
+                <h2>Problems</h2>
+                <button id="closeSidebar" class="close-btn" title="Close sidebar">×</button>
+            </div>
+            <div class="sidebar-content">
+                <div class="topic">
+                    <h3 class="topic-header">Arrays</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="two-sum"><a href="/practice/two-sum">Two Sum</a></li>
+                        <li class="problem-item topic-item" data-problem="reverse-array"><a href="/practice/reverse-array">Reverse Array</a></li>
+                        <li class="problem-item topic-item" data-problem="find-duplicate"><a href="/practice/find-duplicate">Find Duplicate</a></li>
+                        <li class="problem-item topic-item" data-problem="max-subarray"><a href="/practice/max-subarray">Maximum Subarray</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Strings</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="reverse-string"><a href="/practice/reverse-string">Reverse String</a></li>
+                        <li class="problem-item topic-item" data-problem="palindrome"><a href="/practice/palindrome">Check Palindrome</a></li>
+                        <li class="problem-item topic-item" data-problem="anagram"><a href="/practice/anagram">Valid Anagram</a></li>
+                        <li class="problem-item topic-item" data-problem="longest-substring"><a href="/practice/longest-substring">Longest Substring Without Repeating Characters</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Linked Lists</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="reverse-linked-list"><a href="/practice/reverse-linked-list">Reverse Linked List</a></li>
+                        <li class="problem-item topic-item" data-problem="detect-cycle"><a href="/practice/detect-cycle">Detect Cycle</a></li>
+                        <li class="problem-item topic-item" data-problem="merge-lists"><a href="/practice/merge-lists">Merge Two Sorted Lists</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Stack & Queue</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="valid-parentheses"><a href="/practice/valid-parentheses">Valid Parentheses</a></li>
+                        <li class="problem-item topic-item" data-problem="min-stack"><a href="/practice/min-stack">Min Stack</a></li>
+                        <li class="problem-item topic-item" data-problem="implement-queue"><a href="/practice/implement-queue">Implement Queue using Stacks</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Trees</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="max-depth"><a href="/practice/max-depth">Maximum Depth of Binary Tree</a></li>
+                        <li class="problem-item topic-item" data-problem="invert-tree"><a href="/practice/invert-tree">Invert Binary Tree</a></li>
+                        <li class="problem-item topic-item" data-problem="validate-bst"><a href="/practice/validate-bst">Validate Binary Search Tree</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Graphs</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="dfs"><a href="/practice/dfs">Depth First Search</a></li>
+                        <li class="problem-item topic-item" data-problem="bfs"><a href="/practice/bfs">Breadth First Search</a></li>
+                        <li class="problem-item topic-item" data-problem="number-of-islands"><a href="/practice/number-of-islands">Number of Islands</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Dynamic Programming</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="fibonacci"><a href="/practice/fibonacci">Fibonacci Number</a></li>
+                        <li class="problem-item topic-item" data-problem="climbing-stairs"><a href="/practice/climbing-stairs">Climbing Stairs</a></li>
+                        <li class="problem-item topic-item" data-problem="coin-change"><a href="/practice/coin-change">Coin Change</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Math: Fundamentals</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="fibonacci-number"><a href="/practice/fibonacci-number">Fibonacci Number</a></li>
+                        <li class="problem-item topic-item" data-problem="check-prime"><a href="/practice/check-prime">Check Prime Number</a></li>
+                        <li class="problem-item topic-item" data-problem="factorial"><a href="/practice/factorial">Factorial</a></li>
+                        <li class="problem-item topic-item" data-problem="gcd"><a href="/practice/gcd">Greatest Common Divisor</a></li>
+                        <li class="problem-item topic-item" data-problem="lcm"><a href="/practice/lcm">Least Common Multiple</a></li>
+                        <li class="problem-item topic-item" data-problem="power-of-two"><a href="/practice/power-of-two">Power of Two</a></li>
+                        <li class="problem-item topic-item" data-problem="power-x-n"><a href="/practice/power-x-n">Power(x, n)</a></li>
+                        <li class="problem-item topic-item" data-problem="sqrt-int"><a href="/practice/sqrt-int">Integer Square Root</a></li>
+                        <li class="problem-item topic-item" data-problem="sqrt-newton"><a href="/practice/sqrt-newton">Square Root (Newton's Method)</a></li>
+                        <li class="problem-item topic-item" data-problem="sum-natural"><a href="/practice/sum-natural">Sum of Natural Numbers</a></li>
+                        <li class="problem-item topic-item" data-problem="sum-digits"><a href="/practice/sum-digits">Sum of Digits</a></li>
+                        <li class="problem-item topic-item" data-problem="product-digits"><a href="/practice/product-digits">Product of Digits</a></li>
+                        <li class="problem-item topic-item" data-problem="count-digits"><a href="/practice/count-digits">Count Digits</a></li>
+                        <li class="problem-item topic-item" data-problem="digital-root"><a href="/practice/digital-root">Digital Root</a></li>
+                        <li class="problem-item topic-item" data-problem="reverse-integer"><a href="/practice/reverse-integer">Reverse Integer</a></li>
+                        <li class="problem-item topic-item" data-problem="fizz-buzz"><a href="/practice/fizz-buzz">FizzBuzz</a></li>
+                        <li class="problem-item topic-item" data-problem="leap-year"><a href="/practice/leap-year">Leap Year</a></li>
+                        <li class="problem-item topic-item" data-problem="celsius-fahrenheit"><a href="/practice/celsius-fahrenheit">Celsius to Fahrenheit</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Math: Number Theory</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="count-primes"><a href="/practice/count-primes">Count Primes</a></li>
+                        <li class="problem-item topic-item" data-problem="sieve-eratosthenes"><a href="/practice/sieve-eratosthenes">Sieve of Eratosthenes</a></li>
+                        <li class="problem-item topic-item" data-problem="nth-prime"><a href="/practice/nth-prime">Nth Prime Number</a></li>
+                        <li class="problem-item topic-item" data-problem="prime-factors"><a href="/practice/prime-factors">Prime Factors</a></li>
+                        <li class="problem-item topic-item" data-problem="armstrong-number"><a href="/practice/armstrong-number">Armstrong Number</a></li>
+                        <li class="problem-item topic-item" data-problem="perfect-number"><a href="/practice/perfect-number">Perfect Number</a></li>
+                        <li class="problem-item topic-item" data-problem="abundant-number"><a href="/practice/abundant-number">Abundant Number</a></li>
+                        <li class="problem-item topic-item" data-problem="deficient-number"><a href="/practice/deficient-number">Deficient Number</a></li>
+                        <li class="problem-item topic-item" data-problem="amicable-numbers"><a href="/practice/amicable-numbers">Amicable Numbers</a></li>
+                        <li class="problem-item topic-item" data-problem="harshad-number"><a href="/practice/harshad-number">Harshad Number</a></li>
+                        <li class="problem-item topic-item" data-problem="ugly-number"><a href="/practice/ugly-number">Ugly Number</a></li>
+                        <li class="problem-item topic-item" data-problem="strong-number"><a href="/practice/strong-number">Strong Number</a></li>
+                        <li class="problem-item topic-item" data-problem="automorphic-number"><a href="/practice/automorphic-number">Automorphic Number</a></li>
+                        <li class="problem-item topic-item" data-problem="collatz-conjecture"><a href="/practice/collatz-conjecture">Collatz Conjecture</a></li>
+                        <li class="problem-item topic-item" data-problem="kaprekar-constant"><a href="/practice/kaprekar-constant">Kaprekar's Constant</a></li>
+                        <li class="problem-item topic-item" data-problem="josephus-problem"><a href="/practice/josephus-problem">Josephus Problem</a></li>
+                        <li class="problem-item topic-item" data-problem="extended-gcd"><a href="/practice/extended-gcd">Extended GCD</a></li>
+                        <li class="problem-item topic-item" data-problem="modular-exponentiation"><a href="/practice/modular-exponentiation">Modular Exponentiation</a></li>
+                        <li class="problem-item topic-item" data-problem="count-primes-set-bits"><a href="/practice/count-primes-set-bits">Count Primes in Set Bits</a></li>
+                        <li class="problem-item topic-item" data-problem="hamming-distance"><a href="/practice/hamming-distance">Hamming Distance</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Math: Sequences & Combinatorics</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="pascals-triangle"><a href="/practice/pascals-triangle">Pascal's Triangle</a></li>
+                        <li class="problem-item topic-item" data-problem="catalan-number"><a href="/practice/catalan-number">Catalan Number</a></li>
+                        <li class="problem-item topic-item" data-problem="ncr-combination"><a href="/practice/ncr-combination">nCr (Combinations)</a></li>
+                        <li class="problem-item topic-item" data-problem="npr-permutation"><a href="/practice/npr-permutation">nPr (Permutations)</a></li>
+                        <li class="problem-item topic-item" data-problem="next-permutation"><a href="/practice/next-permutation">Next Permutation</a></li>
+                        <li class="problem-item topic-item" data-problem="check-arithmetic-progression"><a href="/practice/check-arithmetic-progression">Check Arithmetic Progression</a></li>
+                        <li class="problem-item topic-item" data-problem="geometric-series-sum"><a href="/practice/geometric-series-sum">Geometric Series Sum</a></li>
+                        <li class="problem-item topic-item" data-problem="sum-squares"><a href="/practice/sum-squares">Sum of Squares</a></li>
+                        <li class="problem-item topic-item" data-problem="sum-cubes"><a href="/practice/sum-cubes">Sum of Cubes</a></li>
+                        <li class="problem-item topic-item" data-problem="quadratic-roots"><a href="/practice/quadratic-roots">Quadratic Equation Roots</a></li>
+                        <li class="problem-item topic-item" data-problem="trailing-zeros"><a href="/practice/trailing-zeros">Trailing Zeros in Factorial</a></li>
+                        <li class="problem-item topic-item" data-problem="gray-code"><a href="/practice/gray-code">Gray Code</a></li>
+                        <li class="problem-item topic-item" data-problem="integer-break"><a href="/practice/integer-break">Integer Break</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Math: Geometry</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="valid-triangle"><a href="/practice/valid-triangle">Valid Triangle</a></li>
+                        <li class="problem-item topic-item" data-problem="area-circle"><a href="/practice/area-circle">Area of Circle</a></li>
+                        <li class="problem-item topic-item" data-problem="shoelace-formula"><a href="/practice/shoelace-formula">Shoelace Formula (Polygon Area)</a></li>
+                        <li class="problem-item topic-item" data-problem="rectangle-overlap"><a href="/practice/rectangle-overlap">Rectangle Overlap</a></li>
+                        <li class="problem-item topic-item" data-problem="point-in-polygon"><a href="/practice/point-in-polygon">Point in Polygon</a></li>
+                        <li class="problem-item topic-item" data-problem="max-points-line"><a href="/practice/max-points-line">Max Points on a Line</a></li>
+                        <li class="problem-item topic-item" data-problem="clock-angle"><a href="/practice/clock-angle">Clock Angle Problem</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Math: Conversions & Representations</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="binary-to-decimal"><a href="/practice/binary-to-decimal">Binary to Decimal</a></li>
+                        <li class="problem-item topic-item" data-problem="decimal-to-binary"><a href="/practice/decimal-to-binary">Decimal to Binary</a></li>
+                        <li class="problem-item topic-item" data-problem="base-7"><a href="/practice/base-7">Base 7</a></li>
+                        <li class="problem-item topic-item" data-problem="add-binary"><a href="/practice/add-binary">Add Binary</a></li>
+                        <li class="problem-item topic-item" data-problem="multiply-strings"><a href="/practice/multiply-strings">Multiply Strings</a></li>
+                        <li class="problem-item topic-item" data-problem="roman-to-int"><a href="/practice/roman-to-int">Roman to Integer</a></li>
+                        <li class="problem-item topic-item" data-problem="int-to-roman"><a href="/practice/int-to-roman">Integer to Roman</a></li>
+                        <li class="problem-item topic-item" data-problem="excel-column-number"><a href="/practice/excel-column-number">Excel Column Number</a></li>
+                        <li class="problem-item topic-item" data-problem="fraction-to-decimal"><a href="/practice/fraction-to-decimal">Fraction to Decimal</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Math: Advanced Algorithms</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="matrix-multiplication"><a href="/practice/matrix-multiplication">Matrix Multiplication</a></li>
+                        <li class="problem-item topic-item" data-problem="rotate-image"><a href="/practice/rotate-image">Rotate Image</a></li>
+                        <li class="problem-item topic-item" data-problem="shuffle-array"><a href="/practice/shuffle-array">Shuffle Array</a></li>
+                        <li class="problem-item topic-item" data-problem="reservoir-sampling"><a href="/practice/reservoir-sampling">Reservoir Sampling</a></li>
+                        <li class="problem-item topic-item" data-problem="basic-calculator"><a href="/practice/basic-calculator">Basic Calculator</a></li>
+                        <li class="problem-item topic-item" data-problem="magic-square"><a href="/practice/magic-square">Magic Square</a></li>
+                        <li class="problem-item topic-item" data-problem="single-number"><a href="/practice/single-number">Single Number</a></li>
+                        <li class="problem-item topic-item" data-problem="complex-number-mult"><a href="/practice/complex-number-mult">Complex Number Multiplication</a></li>
+                        <li class="problem-item topic-item" data-problem="super-egg-drop"><a href="/practice/super-egg-drop">Super Egg Drop</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Two Pointer: Converging</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="two-sum-ii"><a href="/practice/two-sum-ii">Two Sum II - Input Array Is Sorted</a></li>
+                        <li class="problem-item topic-item" data-problem="valid-palindrome"><a href="/practice/valid-palindrome">Valid Palindrome</a></li>
+                        <li class="problem-item topic-item" data-problem="container-with-most-water"><a href="/practice/container-with-most-water">Container With Most Water</a></li>
+                        <li class="problem-item topic-item" data-problem="three-sum"><a href="/practice/three-sum">3Sum</a></li>
+                        <li class="problem-item topic-item" data-problem="reverse-string"><a href="/practice/reverse-string">Reverse String</a></li>
+                        <li class="problem-item topic-item" data-problem="four-sum"><a href="/practice/four-sum">4Sum</a></li>
+                        <li class="problem-item topic-item" data-problem="k-diff-pairs"><a href="/practice/k-diff-pairs">K-diff Pairs in an Array</a></li>
+                        <li class="problem-item topic-item" data-problem="palindrome-number"><a href="/practice/palindrome-number">Palindrome Number</a></li>
+                        <li class="problem-item topic-item" data-problem="trapping-rain-water-converging"><a href="/practice/trapping-rain-water-converging">Trapping Rain Water (Two Pointer)</a></li>
+                        <li class="problem-item topic-item" data-problem="sorted-squares"><a href="/practice/sorted-squares">Squares of a Sorted Array</a></li>
+                        <li class="problem-item topic-item" data-problem="longest-palindromic-substring"><a href="/practice/longest-palindromic-substring">Longest Palindromic Substring</a></li>
+                        <li class="problem-item topic-item" data-problem="palindromic-substrings-count"><a href="/practice/palindromic-substrings-count">Palindromic Substrings</a></li>
+                        <li class="problem-item topic-item" data-problem="shortest-palindrome"><a href="/practice/shortest-palindrome">Shortest Palindrome</a></li>
+                        <li class="problem-item topic-item" data-problem="symmetric-tree"><a href="/practice/symmetric-tree">Symmetric Tree</a></li>
+                        <li class="problem-item topic-item" data-problem="strobogrammatic-number"><a href="/practice/strobogrammatic-number">Strobogrammatic Number</a></li>
+                        <li class="problem-item topic-item" data-problem="valid-palindrome-ii"><a href="/practice/valid-palindrome-ii">Valid Palindrome II</a></li>
+                        <li class="problem-item topic-item" data-problem="isomorphic-strings"><a href="/practice/isomorphic-strings">Isomorphic Strings</a></li>
+                        <li class="problem-item topic-item" data-problem="longest-happy-string"><a href="/practice/longest-happy-string">Longest Happy String</a></li>
+                        <li class="problem-item topic-item" data-problem="mirror-reflection"><a href="/practice/mirror-reflection">Mirror Reflection</a></li>
+                        <li class="problem-item topic-item" data-problem="find-mirror-index"><a href="/practice/find-mirror-index">Find Mirror Index in String</a></li>
+                        <li class="problem-item topic-item" data-problem="merge-sorted-array"><a href="/practice/merge-sorted-array">Merge Sorted Array</a></li>
+                        <li class="problem-item topic-item" data-problem="intersection-of-two-arrays-ii"><a href="/practice/intersection-of-two-arrays-ii">Intersection of Two Arrays II</a></li>
+                        <li class="problem-item topic-item" data-problem="is-subsequence"><a href="/practice/is-subsequence">Is Subsequence</a></li>
+                        <li class="problem-item topic-item" data-problem="compare-version-numbers"><a href="/practice/compare-version-numbers">Compare Version Numbers</a></li>
+                        <li class="problem-item topic-item" data-problem="backspace-string-compare"><a href="/practice/backspace-string-compare">Backspace String Compare</a></li>
+                        <li class="problem-item topic-item" data-problem="longest-word-in-dictionary"><a href="/practice/longest-word-in-dictionary">Longest Word in Dictionary through Deleting</a></li>
+                        <li class="problem-item topic-item" data-problem="intersection-of-two-arrays"><a href="/practice/intersection-of-two-arrays">Intersection of Two Arrays</a></li>
+                        <li class="problem-item topic-item" data-problem="remove-duplicates-from-sorted-array"><a href="/practice/remove-duplicates-from-sorted-array">Remove Duplicates from Sorted Array</a></li>
+                        <li class="problem-item topic-item" data-problem="remove-element"><a href="/practice/remove-element">Remove Element</a></li>
+                        <li class="problem-item topic-item" data-problem="move-zeroes"><a href="/practice/move-zeroes">Move Zeroes</a></li>
+                        <li class="problem-item topic-item" data-problem="string-compression"><a href="/practice/string-compression">String Compression</a></li>
+                        <li class="problem-item topic-item" data-problem="summary-ranges"><a href="/practice/summary-ranges">Summary Ranges</a></li>
+                        <li class="problem-item topic-item" data-problem="sort-array-by-parity"><a href="/practice/sort-array-by-parity">Sort Array By Parity</a></li>
+                        <li class="problem-item topic-item" data-problem="reverse-words-in-a-string-iii"><a href="/practice/reverse-words-in-a-string-iii">Reverse Words in a String III</a></li>
+                        <li class="problem-item topic-item" data-problem="duplicate-zeros"><a href="/practice/duplicate-zeros">Duplicate Zeros</a></li>
+                        <li class="problem-item topic-item" data-problem="remove-duplicates-from-sorted-array-ii"><a href="/practice/remove-duplicates-from-sorted-array-ii">Remove Duplicates from Sorted Array II</a></li>
+                        <li class="problem-item topic-item" data-problem="apply-operations-to-an-array"><a href="/practice/apply-operations-to-an-array">Apply Operations to an Array</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Two Pointer: Fast & Slow</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="linked-list-cycle"><a href="/practice/linked-list-cycle">Linked List Cycle</a></li>
+                        <li class="problem-item topic-item" data-problem="middle-of-linked-list"><a href="/practice/middle-of-linked-list">Middle of the Linked List</a></li>
+                        <li class="problem-item topic-item" data-problem="happy-number"><a href="/practice/happy-number">Happy Number</a></li>
+                        <li class="problem-item topic-item" data-problem="find-the-duplicate-number"><a href="/practice/find-the-duplicate-number">Find the Duplicate Number</a></li>
+                        <li class="problem-item topic-item" data-problem="linked-list-cycle-ii"><a href="/practice/linked-list-cycle-ii">Linked List Cycle II</a></li>
+                        <li class="problem-item topic-item" data-problem="palindrome-linked-list"><a href="/practice/palindrome-linked-list">Palindrome Linked List</a></li>
+                        <li class="problem-item topic-item" data-problem="remove-nth-node-from-end"><a href="/practice/remove-nth-node-from-end">Remove Nth Node From End of List</a></li>
+                        <li class="problem-item topic-item" data-problem="reorder-list"><a href="/practice/reorder-list">Reorder List</a></li>
+                        <li class="problem-item topic-item" data-problem="circular-array-loop"><a href="/practice/circular-array-loop">Circular Array Loop</a></li>
+                        <li class="problem-item topic-item" data-problem="delete-middle-node"><a href="/practice/delete-middle-node">Delete the Middle Node of a Linked List</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Two Pointer: Sliding Window</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="longest-substring-without-repeating"><a href="/practice/longest-substring-without-repeating">Longest Substring Without Repeating Characters</a></li>
+                        <li class="problem-item topic-item" data-problem="minimum-size-subarray-sum"><a href="/practice/minimum-size-subarray-sum">Minimum Size Subarray Sum</a></li>
+                        <li class="problem-item topic-item" data-problem="sliding-window-maximum"><a href="/practice/sliding-window-maximum">Sliding Window Maximum</a></li>
+                        <li class="problem-item topic-item" data-problem="permutation-in-string"><a href="/practice/permutation-in-string">Permutation in String</a></li>
+                        <li class="problem-item topic-item" data-problem="maximum-average-subarray-i"><a href="/practice/maximum-average-subarray-i">Maximum Average Subarray I</a></li>
+                        <li class="problem-item topic-item" data-problem="find-all-anagrams-in-a-string"><a href="/practice/find-all-anagrams-in-a-string">Find All Anagrams in a String</a></li>
+                        <li class="problem-item topic-item" data-problem="subarrays-with-k-different-integers"><a href="/practice/subarrays-with-k-different-integers">Subarrays with K Different Integers</a></li>
+                        <li class="problem-item topic-item" data-problem="fruit-into-baskets"><a href="/practice/fruit-into-baskets">Fruit Into Baskets</a></li>
+                        <li class="problem-item topic-item" data-problem="max-consecutive-ones-iii"><a href="/practice/max-consecutive-ones-iii">Max Consecutive Ones III</a></li>
+                        <li class="problem-item topic-item" data-problem="subarray-product-less-than-k"><a href="/practice/subarray-product-less-than-k">Subarray Product Less Than K</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Two Pointer: Partitioning</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="sort-colors"><a href="/practice/sort-colors">Sort Colors (Dutch National Flag)</a></li>
+                        <li class="problem-item topic-item" data-problem="sort-array-by-parity-ii"><a href="/practice/sort-array-by-parity-ii">Sort Array By Parity II</a></li>
+                        <li class="problem-item topic-item" data-problem="quick-sort-3-way-partition"><a href="/practice/quick-sort-3-way-partition">3-Way QuickSort Partition</a></li>
+                        <li class="problem-item topic-item" data-problem="move-even-odd-zero"><a href="/practice/move-even-odd-zero">Move Even, Odd, and Zero</a></li>
+                        <li class="problem-item topic-item" data-problem="wiggle-sort"><a href="/practice/wiggle-sort">Wiggle Sort</a></li>
+                        <li class="problem-item topic-item" data-problem="kth-largest-element-in-an-array"><a href="/practice/kth-largest-element-in-an-array">Kth Largest Element in an Array</a></li>
+                        <li class="problem-item topic-item" data-problem="partition-array-into-three-parts-with-equal-sum"><a href="/practice/partition-array-into-three-parts-with-equal-sum">Partition Array Into Three Parts With Equal Sum</a></li>
+                        <li class="problem-item topic-item" data-problem="rearrange-array-elements-by-sign"><a href="/practice/rearrange-array-elements-by-sign">Rearrange Array Elements by Sign</a></li>
+                        <li class="problem-item topic-item" data-problem="sort-transformed-array"><a href="/practice/sort-transformed-array">Sort Transformed Array</a></li>
+                        <li class="problem-item topic-item" data-problem="three-way-split"><a href="/practice/three-way-split">Three Way Split</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Two Pointer: Cyclic Sort</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="find-the-duplicate-number-cyclic"><a href="/practice/find-the-duplicate-number-cyclic">Find the Duplicate Number (Cyclic Method)</a></li>
+                        <li class="problem-item topic-item" data-problem="first-missing-positive"><a href="/practice/first-missing-positive">First Missing Positive</a></li>
+                        <li class="problem-item topic-item" data-problem="find-all-numbers-disappeared-in-an-array"><a href="/practice/find-all-numbers-disappeared-in-an-array">Find All Numbers Disappeared in an Array</a></li>
+                        <li class="problem-item topic-item" data-problem="find-all-duplicates-in-an-array"><a href="/practice/find-all-duplicates-in-an-array">Find All Duplicates in an Array</a></li>
+                        <li class="problem-item topic-item" data-problem="set-mismatch"><a href="/practice/set-mismatch">Set Mismatch</a></li>
+                        <li class="problem-item topic-item" data-problem="array-nesting"><a href="/practice/array-nesting">Array Nesting</a></li>
+                        <li class="problem-item topic-item" data-problem="couples-holding-hands"><a href="/practice/couples-holding-hands">Couples Holding Hands</a></li>
+                        <li class="problem-item topic-item" data-problem="missing-number"><a href="/practice/missing-number">Missing Number</a></li>
+                        <li class="problem-item topic-item" data-problem="cycle-sort-implementation"><a href="/practice/cycle-sort-implementation">Cycle Sort Implementation</a></li>
+                        <li class="problem-item topic-item" data-problem="kth-missing-positive-number"><a href="/practice/kth-missing-positive-number">Kth Missing Positive Number</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Two Pointer: Multiple Passes</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="trapping-rain-water-two-pass"><a href="/practice/trapping-rain-water-two-pass">Trapping Rain Water (Two Pass)</a></li>
+                        <li class="problem-item topic-item" data-problem="candy"><a href="/practice/candy">Candy</a></li>
+                        <li class="problem-item topic-item" data-problem="product-of-array-except-self"><a href="/practice/product-of-array-except-self">Product of Array Except Self</a></li>
+                        <li class="problem-item topic-item" data-problem="longest-valid-parentheses-two-pass"><a href="/practice/longest-valid-parentheses-two-pass">Longest Valid Parentheses (Two Pass)</a></li>
+                        <li class="problem-item topic-item" data-problem="gas-station"><a href="/practice/gas-station">Gas Station</a></li>
+                        <li class="problem-item topic-item" data-problem="daily-temperatures"><a href="/practice/daily-temperatures">Daily Temperatures</a></li>
+                        <li class="problem-item topic-item" data-problem="maximum-product-subarray"><a href="/practice/maximum-product-subarray">Maximum Product Subarray</a></li>
+                        <li class="problem-item topic-item" data-problem="jump-game"><a href="/practice/jump-game">Jump Game</a></li>
+                        <li class="problem-item topic-item" data-problem="largest-rectangle-in-histogram"><a href="/practice/largest-rectangle-in-histogram">Largest Rectangle in Histogram</a></li>
+                        <li class="problem-item topic-item" data-problem="max-water-trapped-logic"><a href="/practice/max-water-trapped-logic">Max Water Trapped Logic</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Two Pointer: Intervals & Merging</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="interval-list-intersections"><a href="/practice/interval-list-intersections">Interval List Intersections</a></li>
+                        <li class="problem-item topic-item" data-problem="find-k-closest-elements"><a href="/practice/find-k-closest-elements">Find K Closest Elements</a></li>
+                        <li class="problem-item topic-item" data-problem="merge-two-sorted-lists"><a href="/practice/merge-two-sorted-lists">Merge Two Sorted Lists</a></li>
+                        <li class="problem-item topic-item" data-problem="meeting-rooms-ii"><a href="/practice/meeting-rooms-ii">Meeting Rooms II</a></li>
+                        <li class="problem-item topic-item" data-problem="merge-intervals"><a href="/practice/merge-intervals">Merge Intervals</a></li>
+                        <li class="problem-item topic-item" data-problem="insert-interval"><a href="/practice/insert-interval">Insert Interval</a></li>
+                        <li class="problem-item topic-item" data-problem="employee-free-time"><a href="/practice/employee-free-time">Employee Free Time</a></li>
+                        <li class="problem-item topic-item" data-problem="non-overlapping-intervals"><a href="/practice/non-overlapping-intervals">Non-overlapping Intervals</a></li>
+                        <li class="problem-item topic-item" data-problem="partition-labels"><a href="/practice/partition-labels">Partition Labels</a></li>
+                        <li class="problem-item topic-item" data-problem="minimum-number-of-arrows-to-burst-balloons"><a href="/practice/minimum-number-of-arrows-to-burst-balloons">Minimum Number of Arrows to Burst Balloons</a></li>
+                        <li class="problem-item topic-item" data-problem="video-stitching"><a href="/practice/video-stitching">Video Stitching</a></li>
+                        <li class="problem-item topic-item" data-problem="teemo-attacking"><a href="/practice/teemo-attacking">Teemo Attacking</a></li>
+                        <li class="problem-item topic-item" data-problem="car-pooling"><a href="/practice/car-pooling">Car Pooling</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Two Pointer: Matrix & 2D</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="search-a-2d-matrix-ii"><a href="/practice/search-a-2d-matrix-ii">Search a 2D Matrix II</a></li>
+                        <li class="problem-item topic-item" data-problem="count-negative-numbers-in-a-sorted-matrix"><a href="/practice/count-negative-numbers-in-a-sorted-matrix">Count Negative Numbers in a Sorted Matrix</a></li>
+                        <li class="problem-item topic-item" data-problem="find-saddle-point"><a href="/practice/find-saddle-point">Find Saddle Point</a></li>
+                        <li class="problem-item topic-item" data-problem="kth-smallest-element-in-a-sorted-matrix"><a href="/practice/kth-smallest-element-in-a-sorted-matrix">Kth Smallest Element in a Sorted Matrix</a></li>
+                        <li class="problem-item topic-item" data-problem="diagonal-traverse"><a href="/practice/diagonal-traverse">Diagonal Traverse</a></li>
+                        <li class="problem-item topic-item" data-problem="spiral-matrix"><a href="/practice/spiral-matrix">Spiral Matrix</a></li>
+                        <li class="problem-item topic-item" data-problem="young-tableau-search"><a href="/practice/young-tableau-search">Young Tableau Search</a></li>
+                        <li class="problem-item topic-item" data-problem="matrix-boundary-sum"><a href="/practice/matrix-boundary-sum">Matrix Boundary Sum</a></li>
+                        <li class="problem-item topic-item" data-problem="reshape-the-matrix"><a href="/practice/reshape-the-matrix">Reshape the Matrix</a></li>
+                        <li class="problem-item topic-item" data-problem="row-with-maximum-ones"><a href="/practice/row-with-maximum-ones">Row with Maximum Ones</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Two Pointer: Binary Search Applications</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="binary-search"><a href="/practice/binary-search">Binary Search</a></li>
+                        <li class="problem-item topic-item" data-problem="search-in-rotated-sorted-array"><a href="/practice/search-in-rotated-sorted-array">Search in Rotated Sorted Array</a></li>
+                        <li class="problem-item topic-item" data-problem="find-peak-element-two-pointer"><a href="/practice/find-peak-element-two-pointer">Find Peak Element (Binary Search on Two Pointer)</a></li>
+                        <li class="problem-item topic-item" data-problem="find-first-and-last-position-of-element"><a href="/practice/find-first-and-last-position-of-element">Find First and Last Position of Element in Sorted Array</a></li>
+                        <li class="problem-item topic-item" data-problem="search-insert-position"><a href="/practice/search-insert-position">Search Insert Position</a></li>
+                        <li class="problem-item topic-item" data-problem="koko-eating-bananas"><a href="/practice/koko-eating-bananas">Koko Eating Bananas</a></li>
+                        <li class="problem-item topic-item" data-problem="find-minimum-in-rotated-sorted-array"><a href="/practice/find-minimum-in-rotated-sorted-array">Find Minimum in Rotated Sorted Array</a></li>
+                        <li class="problem-item topic-item" data-problem="sqrt-x"><a href="/practice/sqrt-x">Sqrt(x)</a></li>
+                        <li class="problem-item topic-item" data-problem="h-index-ii"><a href="/practice/h-index-ii">H-Index II</a></li>
+                        <li class="problem-item topic-item" data-problem="capacity-to-ship-packages-within-d-days"><a href="/practice/capacity-to-ship-packages-within-d-days">Capacity To Ship Packages Within D Days</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Binary Search</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="standard-binary-search"><a href="/practice/standard-binary-search">Binary Search</a></li>
+                        <li class="problem-item topic-item" data-problem="lower-bound-search"><a href="/practice/lower-bound-search">Binary Search: Lower Bound</a></li>
+                        <li class="problem-item topic-item" data-problem="upper-bound-search"><a href="/practice/upper-bound-search">Binary Search: Upper Bound</a></li>
+                        <li class="problem-item topic-item" data-problem="search-in-rotated-array"><a href="/practice/search-in-rotated-array">Search in Rotated Sorted Array</a></li>
+                        <li class="problem-item topic-item" data-problem="find-peak-element"><a href="/practice/find-peak-element">Find Peak Element</a></li>
+                        <li class="problem-item topic-item" data-problem="sqrt-binary-search"><a href="/practice/sqrt-binary-search">Integer Square Root</a></li>
+                        <li class="problem-item topic-item" data-problem="search-2d-matrix"><a href="/practice/search-2d-matrix">Binary Search 2D Matrix</a></li>
+                        <li class="problem-item topic-item" data-problem="find-min-rotated"><a href="/practice/find-min-rotated">Find Minimum in Rotated Sorted Array</a></li>
+                        <li class="problem-item topic-item" data-problem="h-index-ii"><a href="/practice/h-index-ii">H-Index II</a></li>
+                        <li class="problem-item topic-item" data-problem="split-array-largest-sum"><a href="/practice/split-array-largest-sum">Split Array Largest Sum</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Linear Search</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="standard-linear-search"><a href="/practice/standard-linear-search">Standard Linear Search</a></li>
+                        <li class="problem-item topic-item" data-problem="sentinel-linear-search"><a href="/practice/sentinel-linear-search">Sentinel Linear Search</a></li>
+                        <li class="problem-item topic-item" data-problem="recursive-linear-search"><a href="/practice/recursive-linear-search">Recursive Linear Search</a></li>
+                        <li class="problem-item topic-item" data-problem="global-linear-search"><a href="/practice/global-linear-search">Global Linear Search</a></li>
+                        <li class="problem-item topic-item" data-problem="linear-search-last-occurrence"><a href="/practice/linear-search-last-occurrence">Search Last Occurrence</a></li>
+                        <li class="problem-item topic-item" data-problem="search-in-2d-array-linear"><a href="/practice/search-in-2d-array-linear">Linear Search in 2D Array</a></li>
+                        <li class="problem-item topic-item" data-problem="search-in-string"><a href="/practice/search-in-string">Linear Search in String</a></li>
+                        <li class="problem-item topic-item" data-problem="search-min-max"><a href="/practice/search-min-max">Find Minimum and Maximum</a></li>
+                        <li class="problem-item topic-item" data-problem="linear-search-transposition"><a href="/practice/linear-search-transposition">Search with Transposition</a></li>
+                        <li class="problem-item topic-item" data-problem="linear-search-move-to-front"><a href="/practice/linear-search-move-to-front">Move-to-Front Search</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Jump & Step</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="jump-search"><a href="/practice/jump-search">Jump Search</a></li>
+                        <li class="problem-item topic-item" data-problem="exponential-search"><a href="/practice/exponential-search">Exponential Search</a></li>
+                        <li class="problem-item topic-item" data-problem="fibonacci-search"><a href="/practice/fibonacci-search">Fibonacci Search</a></li>
+                        <li class="problem-item topic-item" data-problem="meta-binary-search"><a href="/practice/meta-binary-search">Meta Binary Search (One-Sided)</a></li>
+                        <li class="problem-item topic-item" data-problem="block-search-variable"><a href="/practice/block-search-variable">Variable Block Search</a></li>
+                        <li class="problem-item topic-item" data-problem="linear-skip-search"><a href="/practice/linear-skip-search">Linear Skip Search</a></li>
+                        <li class="problem-item topic-item" data-problem="two-step-search"><a href="/practice/two-step-search">Two-Step Linear Search</a></li>
+                        <li class="problem-item topic-item" data-problem="fixed-step-unbounded"><a href="/practice/fixed-step-unbounded">Fixed-Step Unbounded Search</a></li>
+                        <li class="problem-item topic-item" data-problem="binary-step-search"><a href="/practice/binary-step-search">Binary Step Search</a></li>
+                        <li class="problem-item topic-item" data-problem="square-root-decomposition-search"><a href="/practice/square-root-decomposition-search">Sqrt Decomposition Search</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Mathematical</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="interpolation-search"><a href="/practice/interpolation-search">Interpolation Search</a></li>
+                        <li class="problem-item topic-item" data-problem="ternary-search"><a href="/practice/ternary-search">Ternary Search</a></li>
+                        <li class="problem-item topic-item" data-problem="golden-section-search"><a href="/practice/golden-section-search">Golden Section Search</a></li>
+                        <li class="problem-item topic-item" data-problem="unimodal-peak-search"><a href="/practice/unimodal-peak-search">Search in Unimodal Array</a></li>
+                        <li class="problem-item topic-item" data-problem="bisection-method-search"><a href="/practice/bisection-method-search">Bisection Method (Root Finding)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: String Matching (Primary)</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="naive-string-search"><a href="/practice/naive-string-search">Naive String Search</a></li>
+                        <li class="problem-item topic-item" data-problem="kmp-search"><a href="/practice/kmp-search">Knuth-Morris-Pratt (KMP)</a></li>
+                        <li class="problem-item topic-item" data-problem="rabin-karp"><a href="/practice/rabin-karp">Rabin-Karp Search</a></li>
+                        <li class="problem-item topic-item" data-problem="boyer-moore-bad-char"><a href="/practice/boyer-moore-bad-char">Boyer-Moore (Bad Character)</a></li>
+                        <li class="problem-item topic-item" data-problem="horspool-algorithm"><a href="/practice/horspool-algorithm">Boyer-Moore-Horspool</a></li>
+                        <li class="problem-item topic-item" data-problem="sunday-algorithm"><a href="/practice/sunday-algorithm">Sunday Algorithm</a></li>
+                        <li class="problem-item topic-item" data-problem="bitap-search"><a href="/practice/bitap-search">Bitap (Baeza-Yates–Gonnet)</a></li>
+                        <li class="problem-item topic-item" data-problem="finite-automata-search"><a href="/practice/finite-automata-search">Finite Automata Matching</a></li>
+                        <li class="problem-item topic-item" data-problem="two-way-string-search"><a href="/practice/two-way-string-search">Two-Way Algorithm</a></li>
+                        <li class="problem-item topic-item" data-problem="not-so-naive-search"><a href="/practice/not-so-naive-search">Not So Naive Search</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: String Matching (Advanced)</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="z-algorithm"><a href="/practice/z-algorithm">Z-Algorithm</a></li>
+                        <li class="problem-item topic-item" data-problem="aho-corasick"><a href="/practice/aho-corasick">Aho-Corasick</a></li>
+                        <li class="problem-item topic-item" data-problem="manachers-algorithm"><a href="/practice/manachers-algorithm">Manacher's Algorithm</a></li>
+                        <li class="problem-item topic-item" data-problem="suffix-array-search"><a href="/practice/suffix-array-search">Suffix Array Search</a></li>
+                        <li class="problem-item topic-item" data-problem="levenshtein-search"><a href="/practice/levenshtein-search">Fuzzy Search (Edit Distance)</a></li>
+                        <li class="problem-item topic-item" data-problem="soundex-search"><a href="/practice/soundex-search">Soundex (Phonetic Search)</a></li>
+                        <li class="problem-item topic-item" data-problem="wildcard-matching"><a href="/practice/wildcard-matching">Wildcard Matching Search</a></li>
+                        <li class="problem-item topic-item" data-problem="regular-expression-search"><a href="/practice/regular-expression-search">Regex Search (Basic)</a></li>
+                        <li class="problem-item topic-item" data-problem="suffix-automaton-search"><a href="/practice/suffix-automaton-search">Suffix Automaton Search</a></li>
+                        <li class="problem-item topic-item" data-problem="commentz-walter-search"><a href="/practice/commentz-walter-search">Commentz-Walter Algorithm</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Tree-Based</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="bst-search"><a href="/practice/bst-search">BST Search</a></li>
+                        <li class="problem-item topic-item" data-problem="bst-range-search"><a href="/practice/bst-range-search">BST Range Search</a></li>
+                        <li class="problem-item topic-item" data-problem="lca-bst-search"><a href="/practice/lca-bst-search">Lowest Common Ancestor (BST)</a></li>
+                        <li class="problem-item topic-item" data-problem="trie-search"><a href="/practice/trie-search">Trie Word Search</a></li>
+                        <li class="problem-item topic-item" data-problem="trie-prefix-search"><a href="/practice/trie-prefix-search">Trie Prefix Search</a></li>
+                        <li class="problem-item topic-item" data-problem="avl-search"><a href="/practice/avl-search">AVL Tree Search</a></li>
+                        <li class="problem-item topic-item" data-problem="b-tree-search"><a href="/practice/b-tree-search">B-Tree Search</a></li>
+                        <li class="problem-item topic-item" data-problem="red-black-tree-search"><a href="/practice/red-black-tree-search">Red-Black Tree Search</a></li>
+                        <li class="problem-item topic-item" data-problem="segment-tree-point-search"><a href="/practice/segment-tree-point-search">Segment Tree Point Query</a></li>
+                        <li class="problem-item topic-item" data-problem="fenwick-tree-search"><a href="/practice/fenwick-tree-search">Fenwick Tree (BIT) Prefix Search</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Hashing & Probabilistic</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="hash-table-search"><a href="/practice/hash-table-search">Hash Table Search</a></li>
+                        <li class="problem-item topic-item" data-problem="bloom-filter-search"><a href="/practice/bloom-filter-search">Bloom Filter Search</a></li>
+                        <li class="problem-item topic-item" data-problem="cuckoo-hash-search"><a href="/practice/cuckoo-hash-search">Cuckoo Hashing Search</a></li>
+                        <li class="problem-item topic-item" data-problem="linear-probing-search"><a href="/practice/linear-probing-search">Linear Probing Search</a></li>
+                        <li class="problem-item topic-item" data-problem="quadratic-probing-search"><a href="/practice/quadratic-probing-search">Quadratic Probing Search</a></li>
+                        <li class="problem-item topic-item" data-problem="double-hashing-search"><a href="/practice/double-hashing-search">Double Hashing Search</a></li>
+                        <li class="problem-item topic-item" data-problem="perfect-hashing-search"><a href="/practice/perfect-hashing-search">Perfect Hashing Search</a></li>
+                        <li class="problem-item topic-item" data-problem="distributed-hash-search"><a href="/practice/distributed-hash-search">DHT (Distributed Hash Table) Search</a></li>
+                        <li class="problem-item topic-item" data-problem="quotient-filter-search"><a href="/practice/quotient-filter-search">Quotient Filter Search</a></li>
+                        <li class="problem-item topic-item" data-problem="count-min-sketch-search"><a href="/practice/count-min-sketch-search">Count-Min Sketch (Frequency Search)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Graph (Uninformed)</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="breadth-first-search"><a href="/practice/breadth-first-search">Breadth-First Search (BFS)</a></li>
+                        <li class="problem-item topic-item" data-problem="depth-first-search"><a href="/practice/depth-first-search">Depth-First Search (DFS)</a></li>
+                        <li class="problem-item topic-item" data-problem="id-dfs"><a href="/practice/id-dfs">Iterative Deepening DFS</a></li>
+                        <li class="problem-item topic-item" data-problem="bidirectional-search"><a href="/practice/bidirectional-search">Bidirectional Search</a></li>
+                        <li class="problem-item topic-item" data-problem="uniform-cost-search"><a href="/practice/uniform-cost-search">Uniform Cost Search (Dijkstra logic)</a></li>
+                        <li class="problem-item topic-item" data-problem="dijkstra-search"><a href="/practice/dijkstra-search">Dijkstra's Algorithm</a></li>
+                        <li class="problem-item topic-item" data-problem="limited-depth-dfs"><a href="/practice/limited-depth-dfs">Depth-Limited Search</a></li>
+                        <li class="problem-item topic-item" data-problem="level-order-tree-search"><a href="/practice/level-order-tree-search">Tree Level Order Search</a></li>
+                        <li class="problem-item topic-item" data-problem="topological-search"><a href="/practice/topological-search">Topological Sort Search</a></li>
+                        <li class="problem-item topic-item" data-problem="flood-fill-search"><a href="/practice/flood-fill-search">Flood Fill Search</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Graph (Heuristic)</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="greedy-best-first-search"><a href="/practice/greedy-best-first-search">Greedy Best-First Search</a></li>
+                        <li class="problem-item topic-item" data-problem="a-star-search"><a href="/practice/a-star-search">A* Search</a></li>
+                        <li class="problem-item topic-item" data-problem="ida-star"><a href="/practice/ida-star">Iterative Deepening A*</a></li>
+                        <li class="problem-item topic-item" data-problem="beam-search"><a href="/practice/beam-search">Beam Search</a></li>
+                        <li class="problem-item topic-item" data-problem="hill-climbing-search"><a href="/practice/hill-climbing-search">Hill Climbing</a></li>
+                        <li class="problem-item topic-item" data-problem="simulated-annealing-search"><a href="/practice/simulated-annealing-search">Simulated Annealing</a></li>
+                        <li class="problem-item topic-item" data-problem="sma-star"><a href="/practice/sma-star">SMA* (Simplified Memory-bounded A*)</a></li>
+                        <li class="problem-item topic-item" data-problem="recursive-best-first-search"><a href="/practice/recursive-best-first-search">Recursive Best-First Search (RBFS)</a></li>
+                        <li class="problem-item topic-item" data-problem="weighted-a-star"><a href="/practice/weighted-a-star">Weighted A*</a></li>
+                        <li class="problem-item topic-item" data-problem="fringe-search"><a href="/practice/fringe-search">Fringe Search</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Bit Manipulation</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="find-first-set-bit"><a href="/practice/find-first-set-bit">Find First Set Bit</a></li>
+                        <li class="problem-item topic-item" data-problem="count-set-bits"><a href="/practice/count-set-bits">Count Set Bits (Popcount)</a></li>
+                        <li class="problem-item topic-item" data-problem="find-single-number"><a href="/practice/find-single-number">Find Unique Element (XOR Search)</a></li>
+                        <li class="problem-item topic-item" data-problem="power-of-two-search"><a href="/practice/power-of-two-search">Search: Power of Two</a></li>
+                        <li class="problem-item topic-item" data-problem="find-msb"><a href="/practice/find-msb">Find Most Significant Bit</a></li>
+                        <li class="problem-item topic-item" data-problem="bit-mask-subset-search"><a href="/practice/bit-mask-subset-search">Bitmask Subset Search</a></li>
+                        <li class="problem-item topic-item" data-problem="missing-number-bitwise"><a href="/practice/missing-number-bitwise">Missing Number (Bitwise)</a></li>
+                        <li class="problem-item topic-item" data-problem="hamming-distance-search"><a href="/practice/hamming-distance-search">Hamming Distance</a></li>
+                        <li class="problem-item topic-item" data-problem="reverse-bits-search"><a href="/practice/reverse-bits-search">Reverse Bits</a></li>
+                        <li class="problem-item topic-item" data-problem="bit-position-search"><a href="/practice/bit-position-search">Is N-th Bit Set?</a></li>
+                    </ul>
+                </div>
+                
+                <div class="topic">
+                    <h3 class="topic-header">Search: Specialized</h3>
+                    <ul class="topic-item-list">
+                        <li class="problem-item topic-item" data-problem="unbounded-binary-search"><a href="/practice/unbounded-binary-search">Unbounded Binary Search</a></li>
+                        <li class="problem-item topic-item" data-problem="parallel-linear-search"><a href="/practice/parallel-linear-search">Parallel Linear Search</a></li>
+                        <li class="problem-item topic-item" data-problem="quantum-grover-simulation"><a href="/practice/quantum-grover-simulation">Grover's Algorithm Simulation</a></li>
+                        <li class="problem-item topic-item" data-problem="spatial-quadtree-search"><a href="/practice/spatial-quadtree-search">Spatial Search (QuadTree)</a></li>
+                        <li class="problem-item topic-item" data-problem="cache-oblivious-search"><a href="/practice/cache-oblivious-search">Cache-Oblivious Van Emde Boas Search</a></li>
+                        <li class="problem-item topic-item" data-problem="simd-vector-search"><a href="/practice/simd-vector-search">SIMD Vector Search</a></li>
+                        <li class="problem-item topic-item" data-problem="external-search-btree"><a href="/practice/external-search-btree">External Memory Search</a></li>
+                        <li class="problem-item topic-item" data-problem="suffix-array-lcp-search"><a href="/practice/suffix-array-lcp-search">Longest Common Prefix Search</a></li>
+                        <li class="problem-item topic-item" data-problem="ball-tree-nearest-neighbor"><a href="/practice/ball-tree-nearest-neighbor">Ball Tree Search</a></li>
+                        <li class="problem-item topic-item" data-problem="locality-sensitive-hashing-search"><a href="/practice/locality-sensitive-hashing-search">LSH (Locality Sensitive Hashing)</a></li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section class="problem-description">
+                <div id="problemContent" class="problem-content">
+                    <!-- Content populated by JavaScript -->
+                </div>
+            </section>
+
+            <hr class="resizer vertical-resizer">
+
+            <section class="editor-section">
+                <div id="editor" class="editor-container"></div>
+                
+                <hr class="resizer horizontal-resizer">
+                
+                <div class="input-output-section">
+                    <div class="tab-headers">
+                        <div class="tab-header active" data-tab="console">
+                            <span>Console</span>
+                        </div>
+                        <div class="tab-header" data-tab="input">
+                            <span>Sample Input</span>
+                        </div>
+                    </div>
+                    <div class="tab-content">
+                        <div class="tab-panel active" id="consoleTab">
+                            <pre id="console"></pre>
+                        </div>
+                        <div class="tab-panel" id="inputTab">
+                            <textarea id="sampleInput" placeholder="Enter your sample input here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <aside id="rightSidebar" class="right-sidebar">
+        <div class="sidebar-header">
+            <h2>Settings</h2>
+            <button id="closeRightSidebar" class="close-btn" title="Close settings">×</button>
+        </div>
+        <div class="sidebar-content">
+            <div class="settings-section">
+                <h3>Editor Settings</h3>
+                <label>
+                    <input type="checkbox" id="minimapToggle" checked>
+                    Show Minimap
+                </label>
+                <label>
+                    <input type="checkbox" id="wordWrapToggle" checked>
+                    Word Wrap
+                </label>
+            </div>
+            <div class="settings-section">
+                <h3>Display</h3>
+                <label>
+                    Font Size: <input type="number" id="fontSizeInput" min="10" max="24" value="14">
+                </label>
+            </div>
+        </div>
+    </aside>
+
+    <div id="floatingPlaygroundControl" class="floating-control-btn" title="Toggle playground">
+        <svg class="playground-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+        </svg>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-menu-left">
+            <a href ="/">
+                <svg class="js-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <rect width="24" height="24" fill="#F7DF1E" rx="2"/>
+                    <text x="4" y="18" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#323330">JS</text>
+                </svg>
+            </a>
+            <a href="../learn/index.html" class="footer-link">Learn</a>
+            <a href="../practice/index.html" class="footer-link">Practice</a>
+            <a href="../execution-flow/index.html" class="footer-link">Execution flow</a>
+            <a href="../execution-context/index.html" class="footer-link">Execution context</a>
+            <a href="../notes/index.html" class="footer-link">Notes</a>
+            <a href="../benchmark/index.html" class="footer-link">Benchmark</a>
+        </div>
+        <div class="footer-menu-right">
+            <button id="themeToggle" class="icon-btn" title="Toggle dark/light mode">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                </svg>
+            </button>
+            <button class="icon-btn" title="User account">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </button>
+            <button id="settingsToggle" class="icon-btn" title="Settings">
+                <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            </button>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    
+    <script src="../../js/resizer.js"></script>
+
+    <script src="../../js/lib/router.js"></script>
+    
+    <script src="../../js/pages/practice/problems/arrays.js"></script>
+    <script src="../../js/pages/practice/problems/strings.js"></script>
+    <script src="../../js/pages/practice/problems/linked-lists.js"></script>
+    <script src="../../js/pages/practice/problems/stack-queue.js"></script>
+    <script src="../../js/pages/practice/problems/trees.js"></script>
+    <script src="../../js/pages/practice/problems/graphs.js"></script>
+    <script src="../../js/pages/practice/problems/dynamic-programming.js"></script>
+    <script src="../../js/pages/practice/problems/two-pointer.js"></script>
+    <script src="../../js/pages/practice/problems/math-1.js"></script>
+    <script src="../../js/pages/practice/problems/math-2.js"></script>
+    <script src="../../js/pages/practice/problems/math-3.js"></script>
+    <script src="../../js/pages/practice/problems/search-binary-classic.js"></script>
+    <script src="../../js/pages/practice/problems/search-linear-basic.js"></script>
+    <script src="../../js/pages/practice/problems/search-jump-and-step.js"></script>
+    <script src="../../js/pages/practice/problems/search-mathematical.js"></script>
+    <script src="../../js/pages/practice/problems/search-string-matching-primary.js"></script>
+    <script src="../../js/pages/practice/problems/search-string-matching-secondary.js"></script>
+    <script src="../../js/pages/practice/problems/search-tree-based.js"></script>
+    <script src="../../js/pages/practice/problems/search-probabilistic-and-hashing.js"></script>
+    <script src="../../js/pages/practice/problems/search-graph-uninformed.js"></script>
+    <script src="../../js/pages/practice/problems/search-graph-informed_heuristic.js"></script>
+    <script src="../../js/pages/practice/problems/search-bit-level.js"></script>
+    <script src="../../js/pages/practice/problems/search-specialized.js"></script>
+    <script src="../../js/pages/practice/problems/search-sort-variants-1.js"></script>
+    <script src="../../js/pages/practice/problems/search-sort-variants-2.js"></script>
+    <script src="../../js/pages/practice/problems/index.js"></script>
+    
+    <!-- Template for default welcome content -->
+    <template id="welcomeTemplate">
+        <h1 id="problemTitle">Welcome to JS Practice</h1>
+        <p>Select a problem from the sidebar to get started.</p>
+        <p>This platform allows you to practice Data Structures and Algorithms in JavaScript.</p>
+        <h3>How to use:</h3>
+        <ol>
+            <li>Click the "Practice Problems" button to open the problem list</li>
+            <li>Select a problem from the topic-wise organized list</li>
+            <li>Read the problem description on the left</li>
+            <li>Write your solution in the Monaco editor on the right</li>
+            <li>Add sample input in the input area</li>
+            <li>Click "Run" to test your solution</li>
+        </ol>
+    </template>
+
+    <script src="../../components/leftSidebar/leftSidebar.js"></script>
+    <script src="../../js/pages/practice/page.js?v=2"></script>
+    <script src="../../js/app.js?v=2"></script>
+</body>
+</html>

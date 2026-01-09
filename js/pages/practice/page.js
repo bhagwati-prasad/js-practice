@@ -1,7 +1,7 @@
 const MOBILE_BREAKPOINT = 1200;
 
 const EDITOR_CONFIG = {
-    value: '// Welcome to JS Practice!\n// Select a problem from the sidebar to begin.\n\nconsole.log("Hello, World!");',
+    value: '',
     language: 'javascript',
     theme: localStorage.getItem('theme') === 'light' ? 'vs' : 'vs-dark',
     fontSize: 14,
@@ -126,8 +126,6 @@ function updateFloatingPlaygroundIcon(mode) {
 
     icon.innerHTML = icons[mode] || icons.normal;
 }
-
-// Old toggle listeners removed - now handled by LeftSidebar component
 
 window.addEventListener('load', function() {
     setTimeout(initMonaco, 100);

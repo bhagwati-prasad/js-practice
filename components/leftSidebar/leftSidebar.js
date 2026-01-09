@@ -66,24 +66,26 @@ class LeftSidebar {
     }
 
     toggleTopic(header) {
-        header.classList.toggle('collapsed');
-        const list = header.nextElementSibling;
-        
-        if (list && list.classList.contains('topic-item-list')) {
-            if (header.classList.contains('collapsed')) {
-                list.style.display = 'none';
-            } else {
-                list.style.display = 'block';
-            }
-        }
+        header.classList.toggle('expanded');
     }
 
     toggle() {
+        const isCurrentlyClosed = this.sidebar.classList.contains('collapsed');
         this.sidebar.classList.toggle('collapsed');
+        
+        // If opening the sidebar, exit playground mode
+        if (isCurrentlyClosed && typeof resetPlaygroundMode === 'function') {
+            resetPlaygroundMode();
+        }
     }
 
     open() {
         this.sidebar.classList.remove('collapsed');
+        
+        // Exit playground mode when opening sidebar
+        if (typeof resetPlaygroundMode === 'function') {
+            resetPlaygroundMode();
+        }
     }
 
     close() {
@@ -98,9 +100,7 @@ class LeftSidebar {
     collapseAllTopics() {
         const topicHeaders = this.sidebar.querySelectorAll('.topic-header');
         topicHeaders.forEach(header => {
-            if (!header.classList.contains('collapsed')) {
-                this.toggleTopic(header);
-            }
+            header.classList.remove('expanded');
         });
     }
 
@@ -108,9 +108,7 @@ class LeftSidebar {
     expandAllTopics() {
         const topicHeaders = this.sidebar.querySelectorAll('.topic-header');
         topicHeaders.forEach(header => {
-            if (header.classList.contains('collapsed')) {
-                this.toggleTopic(header);
-            }
+            header.classList.add('expanded');
         });
     }
 

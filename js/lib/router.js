@@ -88,29 +88,20 @@ router.register('/practice/:problemId', (params) => {
     loadProblem(problemId);
 });
 
+router.register('/pages/practice/index.html', () => {
+    loadWelcomeContent();
+});
+
+router.register('/pages/practice/', () => {
+    loadWelcomeContent();
+});
+
+router.register('/pages/practice', () => {
+    loadWelcomeContent();
+});
+
 router.register('/', () => {
-    const problemContent = document.getElementById('problemContent');
-    const problemTitle = document.getElementById('problemTitle');
-    
-    if (problemTitle) {
-        problemTitle.textContent = 'Welcome to JS Practice';
-    }
-    
-    if (problemContent) {
-        problemContent.innerHTML = `
-            <p>Select a problem from the sidebar to get started.</p>
-            <p>This platform allows you to practice Data Structures and Algorithms in JavaScript.</p>
-            <h3>How to use:</h3>
-            <ol>
-                <li>Click the "Practice Problems" button to open the problem list</li>
-                <li>Select a problem from the topic-wise organized list</li>
-                <li>Read the problem description on the left</li>
-                <li>Write your solution in the Monaco editor on the right</li>
-                <li>Add sample input in the input area</li>
-                <li>Click "Run" to test your solution</li>
-            </ol>
-        `;
-    }
+    loadWelcomeContent();
 });
 
 router.register('*', () => {
@@ -122,7 +113,18 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = router;
 }
 
-// Problem loading and UI management
+// Utility function to load welcome content from template
+function loadWelcomeContent() {
+    const problemContent = document.getElementById('problemContent');
+    const template = document.getElementById('welcomeTemplate');
+    
+    if (problemContent && template) {
+        const content = template.content.cloneNode(true);
+        problemContent.innerHTML = '';
+        problemContent.appendChild(content);
+    }
+}
+
 function loadProblem(problemId) {
     const problem = typeof problems !== 'undefined' ? problems[problemId] : null;
     
@@ -133,7 +135,6 @@ function loadProblem(problemId) {
     
     const MOBILE_BREAKPOINT = 1200;
     
-    // Update active state
     const problemItems = document.querySelectorAll('.problem-item');
     const currentItem = document.querySelector(`.problem-item a[href="/practice/${problemId}"]`)?.parentElement;
     
@@ -143,7 +144,6 @@ function loadProblem(problemId) {
         currentItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
     
-    // Update problem content
     const problemTitle = document.getElementById('problemTitle');
     const problemContent = document.getElementById('problemContent');
     
@@ -160,7 +160,6 @@ function loadProblem(problemId) {
         window.editor.setValue(problem.starterCode);
     }
     
-    // Clear console and input
     const consoleElement = document.getElementById('console');
     const sampleInputElement = document.getElementById('sampleInput');
     
@@ -173,7 +172,6 @@ function loadProblem(problemId) {
         sampleInputElement.value = '';
     }
     
-    // Close sidebar on mobile
     if (window.innerWidth < MOBILE_BREAKPOINT) {
         const sidebar = document.getElementById('sidebar');
         if (sidebar) {
