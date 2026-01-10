@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Notes Architecture Prototype</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome (for Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom Styles & Overrides */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Warm neutral background */
+            color: #1f2937;
+        }
+
+        /* Chart Container Styling - Mandatory per requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Cell Animation */
+        .cell-enter {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .active-nav-item {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            border-right: 3px solid #4338ca;
+        }
+    </style>
+
+    <!-- Chosen Palette: Indigo & Slate (Professional, clean, calm) -->
+    <!-- Application Structure Plan: 
+         1. Layout: Sidebar (Navigation tree) + Main Content Area.
+         2. Dashboard: High-level metrics of the DB (Schema visualization via data).
+         3. Tree View: Recursive display of Collections > Notebooks to demonstrate the entity relationships.
+         4. Note Editor: Cell-based editing interface to demonstrate the 'Note composed of Cells' entity.
+         5. Logic: Direct IndexedDB interactions for all CRUD operations.
+    -->
+    <!-- Visualization & Content Choices:
+         1. Entity Counts (Bar Chart): Shows distribution of data types (Goal: Inform).
+         2. Cell Type Distribution (Doughnut Chart): Shows composition of notes (Goal: Analyze).
+         3. Recursive Tree UI: Demonstrates the Collection hierarchy (Goal: Organize).
+         4. Block Editor: Demonstrates the Note-Cell relationship (Goal: Interaction).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used directly (using FontAwesome). NO Mermaid JS used. -->
+
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-10 hidden md:flex">
+        <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+            <h1 class="text-xl font-bold text-indigo-700 flex items-center gap-2">
+                <i class="fa-solid fa-layer-group"></i> NexusNote
+            </h1>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="p-4 border-b border-gray-100 bg-gray-50">
+            <div class="flex gap-2">
+                <button onclick="app.handlers.openModal('collection')" class="flex-1 text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-800 py-2 px-2 rounded transition-colors" title="New Collection">
+                    <i class="fa-solid fa-folder-plus"></i> Col
+                </button>
+                <button onclick="app.handlers.openModal('notebook')" class="flex-1 text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 py-2 px-2 rounded transition-colors" title="New Notebook">
+                    <i class="fa-solid fa-book"></i> NB
+                </button>
+            </div>
+        </div>
+
+        <!-- Tree View Container -->
+        <div id="sidebar-tree" class="flex-1 overflow-y-auto p-4 space-y-1">
+            <!-- Dynamic Tree Content -->
+            <div class="text-center text-gray-400 text-sm mt-10">Loading Structure...</div>
+        </div>
+
+        <!-- Dashboard Link -->
+        <div class="p-4 border-t border-gray-200">
+            <button onclick="app.ui.renderDashboard()" class="w-full text-left px-4 py-2 rounded text-gray-600 hover:bg-gray-100 hover:text-indigo-600 transition-colors flex items-center gap-3">
+                <i class="fa-solid fa-chart-pie"></i> Database Stats
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        
+        <!-- Mobile Header -->
+        <header class="md:hidden bg-white border-b border-gray-200 p-4 flex justify-between items-center shadow-sm">
+            <h1 class="font-bold text-indigo-700">NexusNote</h1>
+            <button class="text-gray-600 focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </header>
+
+        <!-- Dynamic View Container -->
+        <div id="main-view" class="flex-1 overflow-y-auto p-4 md:p-8 relative">
+            <!-- Content injected via JS -->
+        </div>
+
+    </main>
+
+    <!-- Simple Modal -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6 transform transition-all scale-100">
+            <h3 id="modal-title" class="text-lg font-bold mb-4 text-gray-800">Create Item</h3>
+            <input type="hidden" id="modal-type">
+            <input type="hidden" id="modal-parent-id">
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Name / Title</label>
+                <input type="text" id="modal-input" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button onclick="app.ui.closeModal()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancel</button>
+                <button onclick="app.handlers.submitModal()" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 shadow-sm">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        /**
+         * IndexedDB Schema & Logic
+         * * Schema Definition:
+         * 1. Collections: id, parentId (nullable for root), name, created
+         * 2. Notebooks: id, collectionId, name, color, created
+         * 3. Notes: id, notebookId, title, created, updated
+         * 4. Cells: id, noteId, type (text/code/check), content, order
+         */
+
+        const DB_CONFIG = {
+            name: 'OfflineNotesDB',
+            version: 1,
+            stores: {
+                collections: { keyPath: 'id', autoIncrement: true, indexes: ['parentId'] },
+                notebooks: { keyPath: 'id', autoIncrement: true, indexes: ['collectionId'] },
+                notes: { keyPath: 'id', autoIncrement: true, indexes: ['notebookId'] },
+                cells: { keyPath: 'id', autoIncrement: true, indexes: ['noteId'] }
+            }
+        };
+
+        const dbService = {
+            db: null,
+
+            async init() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        this.db = db; // FIX: Ensure this.db is available for seedData
+
+                        // Create Collections Store
+                        if (!db.objectStoreNames.contains('collections')) {
+                            const store = db.createObjectStore('collections', DB_CONFIG.stores.collections);
+                            store.createIndex('parentId', 'parentId', { unique: false });
+                        }
+                        // Create Notebooks Store
+                        if (!db.objectStoreNames.contains('notebooks')) {
+                            const store = db.createObjectStore('notebooks', DB_CONFIG.stores.notebooks);
+                            store.createIndex('collectionId', 'collectionId', { unique: false });
+                        }
+                        // Create Notes Store
+                        if (!db.objectStoreNames.contains('notes')) {
+                            const store = db.createObjectStore('notes', DB_CONFIG.stores.notes);
+                            store.createIndex('notebookId', 'notebookId', { unique: false });
+                        }
+                        // Create Cells Store
+                        if (!db.objectStoreNames.contains('cells')) {
+                            const store = db.createObjectStore('cells', DB_CONFIG.stores.cells);
+                            store.createIndex('noteId', 'noteId', { unique: false });
+                        }
+                        
+                        // Seed Initial Data if new
+                        event.target.transaction.oncomplete = () => {
+                            this.seedData();
+                        };
+                    };
+
+                    request.onsuccess = (event) => {
+                        this.db = event.target.result;
+                        resolve(this.db);
+                    };
+
+                    request.onerror = (event) => reject('DB Error: ' + event.target.error);
+                });
+            },
+
+            async seedData() {
+                if (!this.db) {
+                    console.error("Database not initialized during seed.");
+                    return;
+                }
+                
+                // Helper to quickly add data
+                const tx = this.db.transaction(['collections', 'notebooks', 'notes', 'cells'], 'readwrite');
+                
+                // Add Root Collection
+                const colStore = tx.objectStore('collections');
+                const colReq = colStore.add({ name: 'Personal', parentId: null, created: Date.now() });
+                
+                colReq.onsuccess = (e) => {
+                    const colId = e.target.result;
+                    
+                    // Add Notebook
+                    const nbStore = tx.objectStore('notebooks');
+                    const nbReq = nbStore.add({ name: 'Journal', collectionId: colId, created: Date.now() });
+                    
+                    nbReq.onsuccess = (e2) => {
+                        const nbId = e2.target.result;
+                        
+                        // Add Note
+                        const noteStore = tx.objectStore('notes');
+                        const noteReq = noteStore.add({ title: 'Welcome to IndexedDB', notebookId: nbId, created: Date.now() });
+                        
+                        noteReq.onsuccess = (e3) => {
+                            const noteId = e3.target.result;
+                            
+                            // Add Cells
+                            const cellStore = tx.objectStore('cells');
+                            cellStore.add({ noteId, type: 'text', content: 'This is a cell-based note taking app.', order: 0 });
+                            cellStore.add({ noteId, type: 'code', content: 'console.log("Hello World");', order: 1 });
+                            cellStore.add({ noteId, type: 'check', content: 'Explore the architecture', order: 2, checked: false });
+                        };
+                    }
+                };
+                
+                tx.oncomplete = () => {
+                    // Refresh UI once seeding is done
+                    if(window.app) window.app.refresh();
+                };
+            },
+
+            // Generic Get All
+            async getAll(storeName) {
+                return new Promise((resolve) => {
+                    const tx = this.db.transaction(storeName, 'readonly');
+                    const store = tx.objectStore(storeName);
+                    const req = store.getAll();
+                    req.onsuccess = () => resolve(req.result);
+                });
+            },
+
+            // Generic Add
+            async add(storeName, data) {
+                return new Promise((resolve) => {
+                    const tx = this.db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    const req = store.add(data);
+                    req.onsuccess = (e) => resolve(e.target.result);
+                    tx.oncomplete = () => app.refresh(); // Trigger UI refresh
+                });
+            },
+
+            // Generic Update
+            async put(storeName, data) {
+                return new Promise((resolve) => {
+                    const tx = this.db.transaction(storeName, 'readwrite');
+                    const store = tx.objectStore(storeName);
+                    const req = store.put(data);
+                    req.onsuccess = (e) => resolve(e.target.result);
+                });
+            },
+
+            // Get Children
+            async getChildren(parentId) {
+                // This is a naive implementation. In a real app we might use a cursor or separate index query
+                // For this demo, we fetch all and filter JS side for simplicity given small dataset
+                const allCols = await this.getAll('collections');
+                const allNbs = await this.getAll('notebooks');
+                
+                return {
+                    collections: allCols.filter(c => c.parentId === parentId),
+                    notebooks: allNbs.filter(n => n.collectionId === parentId)
+                };
+            },
+
+            async getNotes(notebookId) {
+                const allNotes = await this.getAll('notes');
+                return allNotes.filter(n => n.notebookId === notebookId);
+            },
+
+            async getCells(noteId) {
+                const allCells = await this.getAll('cells');
+                return allCells.filter(c => c.noteId === noteId).sort((a,b) => a.order - b.order);
+            },
+            
+            async deleteCell(cellId) {
+                return new Promise(resolve => {
+                   const tx = this.db.transaction('cells', 'readwrite');
+                   tx.objectStore('cells').delete(cellId);
+                   tx.oncomplete = () => resolve();
+                });
+            }
+        };
+
+        const app = {
+            state: {
+                activeNotebook: null,
+                activeNote: null,
+                expandedCollections: new Set()
+            },
+
+            async init() {
+                try {
+                    await dbService.init();
+                    this.ui.renderSidebar();
+                    this.ui.renderDashboard();
+                } catch(e) {
+                    console.error("App init failed:", e);
+                }
+            },
+
+            refresh() {
+                this.ui.renderSidebar();
+                if (this.state.activeNote) {
+                    this.ui.renderNoteEditor(this.state.activeNote);
+                } else if (this.state.activeNotebook) {
+                    this.ui.renderNotebookView(this.state.activeNotebook);
+                } else {
+                    this.ui.renderDashboard();
+                }
+            },
+
+            ui: {
+                // Sidebar Rendering
+                async renderSidebar() {
+                    const container = document.getElementById('sidebar-tree');
+                    container.innerHTML = '';
+
+                    // Get Root Collections (parentId: null)
+                    const allCols = await dbService.getAll('collections');
+                    const rootCols = allCols.filter(c => c.parentId === null); // Loose equality for null/undefined
+
+                    if (rootCols.length === 0) {
+                        container.innerHTML = '<div class="p-2 text-sm text-gray-500 italic">No collections yet.</div>';
+                    }
+
+                    for (const col of rootCols) {
+                        container.appendChild(await this.createCollectionNode(col));
+                    }
+                },
+
+                async createCollectionNode(col) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'ml-2 border-l border-gray-200 pl-2 mt-1';
+                    
+                    const header = document.createElement('div');
+                    header.className = 'flex items-center justify-between group cursor-pointer py-1 px-2 rounded hover:bg-gray-100';
+                    const isExpanded = app.state.expandedCollections.has(col.id);
+                    
+                    header.innerHTML = `
+                        <div class="flex items-center gap-2 text-sm text-gray-700 font-medium truncate">
+                            <i class="fa-solid fa-${isExpanded ? 'folder-open' : 'folder'} text-indigo-400"></i>
+                            ${col.name}
+                        </div>
+                        <button onclick="event.stopPropagation(); app.handlers.openModal('collection', ${col.id})" class="text-xs text-gray-400 opacity-0 group-hover:opacity-100 hover:text-indigo-600">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    `;
+
+                    header.onclick = async () => {
+                        if (app.state.expandedCollections.has(col.id)) {
+                            app.state.expandedCollections.delete(col.id);
+                        } else {
+                            app.state.expandedCollections.add(col.id);
+                        }
+                        app.ui.renderSidebar(); // Re-render to show children
+                    };
+
+                    wrapper.appendChild(header);
+
+                    if (isExpanded) {
+                        const children = await dbService.getChildren(col.id);
+                        
+                        // Render Sub-Collections
+                        for (const subCol of children.collections) {
+                            wrapper.appendChild(await this.createCollectionNode(subCol));
+                        }
+                        
+                        // Render Notebooks
+                        for (const nb of children.notebooks) {
+                            const nbEl = document.createElement('div');
+                            nbEl.className = `ml-4 mt-1 flex items-center justify-between py-1 px-2 rounded cursor-pointer text-sm ${app.state.activeNotebook === nb.id ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-gray-600 hover:bg-gray-50'}`;
+                            nbEl.innerHTML = `<span class="truncate"><i class="fa-solid fa-book-bookmark mr-2 text-emerald-500"></i>${nb.name}</span>`;
+                            nbEl.onclick = (e) => {
+                                e.stopPropagation();
+                                app.state.activeNotebook = nb.id;
+                                app.state.activeNote = null;
+                                app.ui.renderSidebar(); // Update active state styling
+                                app.ui.renderNotebookView(nb.id);
+                            };
+                            wrapper.appendChild(nbEl);
+                        }
+
+                        if (children.collections.length === 0 && children.notebooks.length === 0) {
+                            const empty = document.createElement('div');
+                            empty.className = 'ml-4 text-xs text-gray-400 italic py-1';
+                            empty.innerText = 'Empty';
+                            wrapper.appendChild(empty);
+                        }
+                        
+                        // Add Notebook Button inside collection
+                        const addNbBtn = document.createElement('div');
+                        addNbBtn.className = 'ml-4 mt-1 text-xs text-gray-400 hover:text-emerald-600 cursor-pointer py-1';
+                        addNbBtn.innerHTML = '<i class="fa-solid fa-plus-circle"></i> Add Notebook';
+                        addNbBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            app.handlers.openModal('notebook', col.id);
+                        };
+                        wrapper.appendChild(addNbBtn);
+                    }
+
+                    return wrapper;
+                },
+
+                async renderNotebookView(notebookId) {
+                    const notes = await dbService.getNotes(notebookId);
+                    const notebooks = await dbService.getAll('notebooks');
+                    const currentNb = notebooks.find(n => n.id === notebookId);
+
+                    const main = document.getElementById('main-view');
+                    main.innerHTML = `
+                        <div class="max-w-4xl mx-auto animate-fade-in">
+                            <div class="mb-8 border-b border-gray-200 pb-4 flex justify-between items-end">
+                                <div>
+                                    <h5 class="text-sm text-gray-500 uppercase tracking-wide font-semibold mb-1">Notebook</h5>
+                                    <h2 class="text-3xl font-bold text-gray-800">${currentNb ? currentNb.name : 'Unknown Notebook'}</h2>
+                                </div>
+                                <button onclick="app.handlers.createNote(${notebookId})" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow-sm text-sm font-medium transition-colors">
+                                    <i class="fa-solid fa-pen-to-square mr-2"></i>New Note
+                                </button>
+                            </div>
+
+                            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                ${notes.map(note => `
+                                    <div onclick="app.handlers.openNote(${note.id})" class="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h3 class="font-bold text-gray-800 group-hover:text-indigo-600 transition-colors">${note.title}</h3>
+                                            <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
+                                        </div>
+                                        <p class="text-xs text-gray-400">Created: ${new Date(note.created).toLocaleDateString()}</p>
+                                    </div>
+                                `).join('')}
+                                ${notes.length === 0 ? '<div class="col-span-full text-center py-10 text-gray-400 border-2 border-dashed border-gray-200 rounded-lg">No notes in this notebook yet. Create one!</div>' : ''}
+                            </div>
+                        </div>
+                    `;
+                },
+
+                async renderNoteEditor(noteId) {
+                    const notes = await dbService.getAll('notes');
+                    const note = notes.find(n => n.id === noteId);
+                    const cells = await dbService.getCells(noteId);
+
+                    const main = document.getElementById('main-view');
+                    main.innerHTML = `
+                        <div class="max-w-3xl mx-auto pb-20">
+                            <!-- Breadcrumbs -->
+                            <div class="mb-4 text-sm text-gray-500 flex items-center gap-2">
+                                <span class="cursor-pointer hover:underline" onclick="app.ui.renderNotebookView(${note.notebookId})">Notebook</span>
+                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                                <span class="text-gray-800 font-medium">${note.title}</span>
+                            </div>
+
+                            <!-- Title Editor -->
+                            <input type="text" value="${note.title}" 
+                                onchange="app.handlers.updateNoteTitle(${note.id}, this.value)"
+                                class="w-full text-4xl font-bold text-gray-800 border-none bg-transparent focus:outline-none focus:ring-0 placeholder-gray-300 mb-8"
+                                placeholder="Note Title">
+
+                            <!-- Cells Container -->
+                            <div id="cells-container" class="space-y-4">
+                                <!-- Cells injected here -->
+                            </div>
+
+                            <!-- Add Cell Toolbar -->
+                            <div class="mt-8 flex justify-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+                                <button onclick="app.handlers.addCell(${note.id}, 'text')" class="p-2 bg-white border border-gray-200 rounded shadow-sm text-gray-600 hover:text-indigo-600 text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-paragraph"></i> Text
+                                </button>
+                                <button onclick="app.handlers.addCell(${note.id}, 'code')" class="p-2 bg-white border border-gray-200 rounded shadow-sm text-gray-600 hover:text-indigo-600 text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-code"></i> Code
+                                </button>
+                                <button onclick="app.handlers.addCell(${note.id}, 'check')" class="p-2 bg-white border border-gray-200 rounded shadow-sm text-gray-600 hover:text-indigo-600 text-sm flex items-center gap-2">
+                                    <i class="fa-regular fa-square-check"></i> Task
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    const container = document.getElementById('cells-container');
+                    cells.forEach(cell => {
+                        container.appendChild(this.createCellElement(cell));
+                    });
+                },
+
+                createCellElement(cell) {
+                    const div = document.createElement('div');
+                    div.className = 'group relative cell-enter';
+                    
+                    let contentHtml = '';
+                    if (cell.type === 'text') {
+                        contentHtml = `<textarea oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'" onchange="app.handlers.updateCell(${cell.id}, this.value)" class="w-full bg-white p-3 rounded border-l-4 border-transparent focus:border-indigo-400 focus:bg-gray-50 focus:outline-none resize-none overflow-hidden text-gray-700 leading-relaxed transition-colors" rows="1">${cell.content}</textarea>`;
+                    } else if (cell.type === 'code') {
+                        contentHtml = `<div class="bg-slate-800 rounded p-4 border-l-4 border-transparent focus-within:border-indigo-400"><textarea oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'" onchange="app.handlers.updateCell(${cell.id}, this.value)" class="w-full bg-transparent text-green-400 font-mono text-sm focus:outline-none resize-none overflow-hidden" rows="1">${cell.content}</textarea></div>`;
+                    } else if (cell.type === 'check') {
+                        const isChecked = cell.checked ? 'checked' : '';
+                        const lineThrough = cell.checked ? 'line-through text-gray-400' : 'text-gray-700';
+                        contentHtml = `
+                            <div class="flex items-center gap-3 bg-white p-2 rounded border border-transparent focus-within:border-indigo-200">
+                                <input type="checkbox" ${isChecked} onchange="app.handlers.toggleCheck(${cell.id}, this.checked)" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer">
+                                <input type="text" value="${cell.content}" onchange="app.handlers.updateCell(${cell.id}, this.value)" class="flex-1 bg-transparent focus:outline-none ${lineThrough}">
+                            </div>
+                        `;
+                    }
+
+                    div.innerHTML = `
+                        ${contentHtml}
+                        <button onclick="app.handlers.deleteCell(${cell.id}, ${cell.noteId})" class="absolute -right-8 top-2 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    `;
+                    
+                    // Auto-resize textarea on mount
+                    setTimeout(() => {
+                        const ta = div.querySelector('textarea');
+                        if(ta) { ta.style.height = ta.scrollHeight + 'px'; }
+                    }, 0);
+
+                    return div;
+                },
+
+                async renderDashboard() {
+                    app.state.activeNotebook = null;
+                    app.state.activeNote = null;
+                    app.ui.renderSidebar();
+
+                    const collections = await dbService.getAll('collections');
+                    const notebooks = await dbService.getAll('notebooks');
+                    const notes = await dbService.getAll('notes');
+                    const cells = await dbService.getAll('cells');
+
+                    const main = document.getElementById('main-view');
+                    main.innerHTML = `
+                        <div class="max-w-5xl mx-auto space-y-8 animate-fade-in">
+                            
+                            <!-- Header Info -->
+                            <div class="bg-indigo-600 text-white rounded-xl p-8 shadow-lg">
+                                <h1 class="text-3xl font-bold mb-2">Data Architecture Dashboard</h1>
+                                <p class="text-indigo-100 max-w-2xl">
+                                    This view visualizes the contents of the IndexedDB. 
+                                    The application stores data in a hierarchical structure: 
+                                    <strong>Collections → Notebooks → Notes → Cells</strong>.
+                                </p>
+                            </div>
+
+                            <!-- Metrics Grid -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm text-center">
+                                    <div class="text-3xl font-bold text-indigo-600 mb-1">${collections.length}</div>
+                                    <div class="text-xs text-gray-500 uppercase tracking-wider">Collections</div>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm text-center">
+                                    <div class="text-3xl font-bold text-emerald-600 mb-1">${notebooks.length}</div>
+                                    <div class="text-xs text-gray-500 uppercase tracking-wider">Notebooks</div>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm text-center">
+                                    <div class="text-3xl font-bold text-blue-600 mb-1">${notes.length}</div>
+                                    <div class="text-xs text-gray-500 uppercase tracking-wider">Notes</div>
+                                </div>
+                                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm text-center">
+                                    <div class="text-3xl font-bold text-purple-600 mb-1">${cells.length}</div>
+                                    <div class="text-xs text-gray-500 uppercase tracking-wider">Content Cells</div>
+                                </div>
+                            </div>
+
+                            <!-- Charts Area -->
+                            <div class="grid md:grid-cols-2 gap-6">
+                                
+                                <!-- Chart 1: Entity Distribution -->
+                                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+                                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                                        <i class="fa-solid fa-database text-gray-400"></i> Entity Volume
+                                    </h3>
+                                    <div class="flex-1 flex items-center justify-center">
+                                        <div class="chart-container">
+                                            <canvas id="chart-entities"></canvas>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-4 text-center">
+                                        Shows the count of each schema entity type currently in IndexedDB.
+                                    </p>
+                                </div>
+
+                                <!-- Chart 2: Cell Types -->
+                                <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col">
+                                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2">
+                                        <i class="fa-solid fa-layer-group text-gray-400"></i> Note Composition
+                                    </h3>
+                                    <div class="flex-1 flex items-center justify-center">
+                                        <div class="chart-container">
+                                            <canvas id="chart-cells"></canvas>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-4 text-center">
+                                        Breakdown of cell types (Text, Code, Checkbox) across all notes.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Initialize Charts
+                    this.initDashboardCharts(collections.length, notebooks.length, notes.length, cells);
+                },
+
+                initDashboardCharts(colCount, nbCount, noteCount, cells) {
+                    // Chart 1: Bar
+                    new Chart(document.getElementById('chart-entities'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Collections', 'Notebooks', 'Notes'],
+                            datasets: [{
+                                label: 'Count',
+                                data: [colCount, nbCount, noteCount],
+                                backgroundColor: ['#818cf8', '#34d399', '#60a5fa'],
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+
+                    // Chart 2: Doughnut (Cell Types)
+                    const textCount = cells.filter(c => c.type === 'text').length;
+                    const codeCount = cells.filter(c => c.type === 'code').length;
+                    const checkCount = cells.filter(c => c.type === 'check').length;
+
+                    new Chart(document.getElementById('chart-cells'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Text Blocks', 'Code Snippets', 'Tasks'],
+                            datasets: [{
+                                data: [textCount, codeCount, checkCount],
+                                backgroundColor: ['#94a3b8', '#1e293b', '#a78bfa'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '70%',
+                            plugins: { legend: { position: 'bottom' } }
+                        }
+                    });
+                },
+
+                openModal(type, parentId = null) {
+                    document.getElementById('modal-overlay').classList.remove('hidden');
+                    document.getElementById('modal-title').innerText = `New ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+                    document.getElementById('modal-type').value = type;
+                    document.getElementById('modal-parent-id').value = parentId || '';
+                    document.getElementById('modal-input').value = '';
+                    document.getElementById('modal-input').focus();
+                },
+
+                closeModal() {
+                    document.getElementById('modal-overlay').classList.add('hidden');
+                }
+            },
+
+            handlers: {
+                async submitModal() {
+                    const type = document.getElementById('modal-type').value;
+                    const rawParentId = document.getElementById('modal-parent-id').value;
+                    const parentId = rawParentId ? parseInt(rawParentId) : null;
+                    const name = document.getElementById('modal-input').value;
+
+                    if (!name) return;
+
+                    if (type === 'collection') {
+                        await dbService.add('collections', {
+                            name,
+                            parentId: parentId, // Can be null for root
+                            created: Date.now()
+                        });
+                        // Expand parent if it exists so we see the new item
+                        if (parentId) app.state.expandedCollections.add(parentId);
+                    } else if (type === 'notebook') {
+                        await dbService.add('notebooks', {
+                            name,
+                            collectionId: parentId,
+                            color: 'blue',
+                            created: Date.now()
+                        });
+                        if (parentId) app.state.expandedCollections.add(parentId);
+                    }
+
+                    app.ui.closeModal();
+                    app.refresh();
+                },
+
+                openModal(type, parentId) {
+                    app.ui.openModal(type, parentId);
+                },
+
+                async createNote(notebookId) {
+                    const noteId = await dbService.add('notes', {
+                        notebookId,
+                        title: 'Untitled Note',
+                        created: Date.now(),
+                        updated: Date.now()
+                    });
+                    
+                    // Add default text cell
+                    await dbService.add('cells', {
+                        noteId,
+                        type: 'text',
+                        content: '',
+                        order: 0
+                    });
+
+                    app.state.activeNote = noteId;
+                    app.refresh();
+                },
+
+                async openNote(noteId) {
+                    app.state.activeNote = noteId;
+                    app.ui.renderNoteEditor(noteId);
+                },
+
+                async updateNoteTitle(noteId, newTitle) {
+                    const note = (await dbService.getAll('notes')).find(n => n.id === noteId);
+                    if (note) {
+                        note.title = newTitle;
+                        note.updated = Date.now();
+                        await dbService.put('notes', note);
+                        // No full refresh needed, title is local
+                    }
+                },
+
+                async addCell(noteId, type) {
+                    const cells = await dbService.getCells(noteId);
+                    const maxOrder = cells.length > 0 ? Math.max(...cells.map(c => c.order)) : 0;
+                    
+                    await dbService.add('cells', {
+                        noteId,
+                        type,
+                        content: '',
+                        checked: type === 'check' ? false : undefined,
+                        order: maxOrder + 1
+                    });
+                    
+                    app.ui.renderNoteEditor(noteId); // Re-render to show new cell
+                },
+
+                async updateCell(cellId, content) {
+                    const tx = dbService.db.transaction('cells', 'readwrite');
+                    const store = tx.objectStore('cells');
+                    const req = store.get(cellId);
+                    
+                    req.onsuccess = () => {
+                        const cell = req.result;
+                        cell.content = content;
+                        store.put(cell);
+                    };
+                },
+
+                async toggleCheck(cellId, isChecked) {
+                    const tx = dbService.db.transaction('cells', 'readwrite');
+                    const store = tx.objectStore('cells');
+                    const req = store.get(cellId);
+                    
+                    req.onsuccess = () => {
+                        const cell = req.result;
+                        cell.checked = isChecked;
+                        store.put(cell);
+                        // Re-render handled by local DOM update usually, but here we can force strictly
+                        app.ui.renderNoteEditor(cell.noteId); 
+                    };
+                },
+                
+                async deleteCell(cellId, noteId) {
+                    if(confirm("Delete this cell?")) {
+                        await dbService.deleteCell(cellId);
+                        app.ui.renderNoteEditor(noteId);
+                    }
+                }
+            }
+        };
+
+        // Initialize App on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+
+    </script>
+</body>
+</html>

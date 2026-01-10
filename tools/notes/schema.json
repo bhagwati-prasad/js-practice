@@ -1,0 +1,470 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Notes Tool Data Schema",
+  "description": "Complete schema documentation for the Notes Tool application, including all entities and their relationships",
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-10",
+  
+  "overview": {
+    "hierarchy": "Collection → Notebook → Note → Cell",
+    "description": "The Notes Tool follows a hierarchical structure where Collections contain Notebooks and other Collections (nested), Notebooks contain Notes, and Notes contain Cells",
+    "storageKey": "note_data",
+    "storageTypes": ["localStorage", "sessionStorage"]
+  },
+
+  "rootDataStructure": {
+    "type": "object",
+    "description": "The top-level data structure stored in browser storage",
+    "properties": {
+      "collections": {
+        "type": "array",
+        "description": "Array of root-level collection objects",
+        "items": { "$ref": "#/definitions/Collection" }
+      },
+      "currentCollectionId": {
+        "type": ["string", "null"],
+        "description": "ID of the currently selected collection",
+        "pattern": "^id_[0-9]+_[a-z0-9]+$"
+      },
+      "currentNotebookId": {
+        "type": ["string", "null"],
+        "description": "ID of the currently selected notebook",
+        "pattern": "^id_[0-9]+_[a-z0-9]+$"
+      },
+      "currentNoteId": {
+        "type": ["string", "null"],
+        "description": "ID of the currently selected note",
+        "pattern": "^id_[0-9]+_[a-z0-9]+$"
+      }
+    },
+    "required": ["collections", "currentCollectionId", "currentNotebookId", "currentNoteId"]
+  },
+
+  "definitions": {
+    "Collection": {
+      "type": "object",
+      "description": "A Collection is a container that can hold Notebooks and other nested Collections. Collections can be organized hierarchically to create a tree structure.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the collection, generated using timestamp and random string",
+          "pattern": "^id_[0-9]+_[a-z0-9]+$",
+          "example": "id_1736524800000_abc123def"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the collection",
+          "default": "Untitled Collection",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "description": "Entity type identifier",
+          "const": "collection"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO 8601 timestamp of when the collection was created",
+          "format": "date-time",
+          "example": "2026-01-10T12:00:00.000Z"
+        },
+        "items": {
+          "type": "array",
+          "description": "Array of child items (Collections and Notebooks) contained within this collection",
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/Collection" },
+              { "$ref": "#/definitions/Notebook" }
+            ]
+          },
+          "default": []
+        }
+      },
+      "required": ["id", "name", "type", "createdAt", "items"],
+      "additionalProperties": false,
+      "metadata": {
+        "canContain": ["Collection", "Notebook"],
+        "canBeContainedBy": ["Collection", "Root"],
+        "canBeNested": true,
+        "maxNestingLevel": "unlimited"
+      }
+    },
+
+    "Notebook": {
+      "type": "object",
+      "description": "A Notebook is a container for Notes. It resides within a Collection and cannot be nested.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the notebook",
+          "pattern": "^id_[0-9]+_[a-z0-9]+$",
+          "example": "id_1736524801000_xyz789abc"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the notebook",
+          "default": "Untitled",
+          "minLength": 1
+        },
+        "type": {
+          "type": "string",
+          "description": "Entity type identifier",
+          "const": "notebook"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO 8601 timestamp of when the notebook was created",
+          "format": "date-time",
+          "example": "2026-01-10T12:00:00.000Z"
+        },
+        "notes": {
+          "type": "array",
+          "description": "Array of Note objects contained in this notebook",
+          "items": { "$ref": "#/definitions/Note" },
+          "default": []
+        }
+      },
+      "required": ["id", "name", "type", "createdAt", "notes"],
+      "additionalProperties": false,
+      "metadata": {
+        "canContain": ["Note"],
+        "canBeContainedBy": ["Collection"],
+        "canBeNested": false
+      }
+    },
+
+    "Note": {
+      "type": "object",
+      "description": "A Note is a document containing multiple Cells. Notes are stored within Notebooks and contain the actual content.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the note",
+          "pattern": "^id_[0-9]+_[a-z0-9]+$",
+          "example": "id_1736524802000_def456ghi"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title/name of the note",
+          "default": "Untitled",
+          "minLength": 1
+        },
+        "cells": {
+          "type": "array",
+          "description": "Array of Cell objects that make up the content of the note",
+          "items": { "$ref": "#/definitions/Cell" },
+          "default": []
+        },
+        "content": {
+          "type": "array",
+          "description": "Alias for cells array, maintained for backward compatibility. Always kept in sync with cells property",
+          "items": { "$ref": "#/definitions/Cell" }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO 8601 timestamp of when the note was created",
+          "format": "date-time",
+          "example": "2026-01-10T12:00:00.000Z"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO 8601 timestamp of when the note was last modified",
+          "format": "date-time",
+          "example": "2026-01-10T14:30:00.000Z"
+        }
+      },
+      "required": ["id", "title", "cells", "createdAt", "updatedAt"],
+      "additionalProperties": false,
+      "metadata": {
+        "canContain": ["Cell"],
+        "canBeContainedBy": ["Notebook"],
+        "canBeNested": false,
+        "backwardCompatibility": {
+          "content": "content property is maintained as alias to cells for backward compatibility"
+        }
+      }
+    },
+
+    "Cell": {
+      "type": "object",
+      "description": "A Cell is the smallest unit of content in the Notes Tool. Each cell contains text content and can be configured with different display modes.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the cell",
+          "pattern": "^id_[0-9]+_[a-z0-9]+$",
+          "example": "id_1736524803000_jkl789mno"
+        },
+        "text": {
+          "type": "string",
+          "description": "The text content of the cell. Can be plain text or code depending on codeMode setting",
+          "default": ""
+        },
+        "highlighted": {
+          "type": "boolean",
+          "description": "Whether the cell should be visually highlighted/emphasized in the UI",
+          "default": false
+        },
+        "codeMode": {
+          "type": "boolean",
+          "description": "Whether the cell should be rendered as code with syntax highlighting (uses Monaco Editor when enabled)",
+          "default": false
+        }
+      },
+      "required": ["id", "text", "highlighted", "codeMode"],
+      "additionalProperties": false,
+      "metadata": {
+        "canContain": null,
+        "canBeContainedBy": ["Note"],
+        "canBeNested": false,
+        "rendering": {
+          "normal": "Plain text editing with basic textarea",
+          "codeMode": "Monaco Editor with syntax highlighting"
+        }
+      }
+    }
+  },
+
+  "relationships": {
+    "hierarchy": {
+      "description": "Hierarchical relationships between entities",
+      "structure": [
+        {
+          "entity": "Root",
+          "contains": ["Collection"],
+          "description": "Root level can only contain Collection objects"
+        },
+        {
+          "entity": "Collection",
+          "contains": ["Collection", "Notebook"],
+          "description": "Collections can contain other Collections (nested) and Notebooks"
+        },
+        {
+          "entity": "Notebook",
+          "contains": ["Note"],
+          "description": "Notebooks contain Notes"
+        },
+        {
+          "entity": "Note",
+          "contains": ["Cell"],
+          "description": "Notes contain Cells"
+        },
+        {
+          "entity": "Cell",
+          "contains": [],
+          "description": "Cells are the leaf nodes and contain no nested entities"
+        }
+      ]
+    },
+    "currentSelection": {
+      "description": "The application maintains three pointers to track the currently selected entities",
+      "pointers": [
+        {
+          "name": "currentCollectionId",
+          "tracks": "Currently active/selected collection"
+        },
+        {
+          "name": "currentNotebookId",
+          "tracks": "Currently active/selected notebook"
+        },
+        {
+          "name": "currentNoteId",
+          "tracks": "Currently active/selected note"
+        }
+      ],
+      "rules": [
+        "When a collection is selected, notebook and note selections are cleared",
+        "When a notebook is selected, note selection is cleared",
+        "All pointers can be null to indicate no selection"
+      ]
+    }
+  },
+
+  "idGeneration": {
+    "description": "ID generation mechanism for all entities",
+    "pattern": "id_[timestamp]_[random]",
+    "format": {
+      "prefix": "id_",
+      "timestamp": "Date.now() - milliseconds since epoch",
+      "separator": "_",
+      "random": "Math.random().toString(36).substring(2, 11) - 9 character alphanumeric string"
+    },
+    "example": "id_1736524800000_abc123def",
+    "uniqueness": "Combination of timestamp and random string ensures uniqueness across all entities"
+  },
+
+  "pathResolution": {
+    "description": "The application supports path-based navigation using forward-slash separated strings",
+    "format": "Collection/[NestedCollection/.../]Notebook/Note",
+    "examples": [
+      "My Collection/My Notebook/My Note",
+      "Root/Nested/Deep/Notebook Name/Note Title"
+    ],
+    "usage": [
+      "Navigation between entities",
+      "Direct note access",
+      "Creating notes in specific locations"
+    ]
+  },
+
+  "storageFormat": {
+    "description": "Data persistence in browser storage",
+    "key": "note_data",
+    "drivers": ["localStorage", "sessionStorage"],
+    "format": "JSON",
+    "serialization": "JSON.stringify() for save, JSON.parse() for load",
+    "entireDataStructure": "The entire data object (with collections array and current selection pointers) is serialized and stored as a single JSON string"
+  },
+
+  "backwardCompatibility": {
+    "description": "Handling of legacy data structures",
+    "migrations": [
+      {
+        "from": "notebooks array at root level",
+        "to": "collections array with nested notebooks",
+        "migration": "Old notebooks array is wrapped in a default collection named 'My Collection'"
+      },
+      {
+        "from": "content property in notes",
+        "to": "cells property in notes",
+        "migration": "content is normalized to cells array, and both properties are kept in sync"
+      },
+      {
+        "from": "string cells",
+        "to": "object cells with id, text, highlighted, codeMode",
+        "migration": "String values are converted to cell objects with default properties"
+      }
+    ]
+  },
+
+  "metadataSummary": {
+    "Collection": {
+      "identifiers": ["id", "name", "type"],
+      "timestamps": ["createdAt"],
+      "relationships": ["items (children)"],
+      "state": [],
+      "content": []
+    },
+    "Notebook": {
+      "identifiers": ["id", "name", "type"],
+      "timestamps": ["createdAt"],
+      "relationships": ["notes (children)"],
+      "state": [],
+      "content": []
+    },
+    "Note": {
+      "identifiers": ["id", "title"],
+      "timestamps": ["createdAt", "updatedAt"],
+      "relationships": ["cells (children)", "content (alias to cells)"],
+      "state": [],
+      "content": ["cells/content arrays"]
+    },
+    "Cell": {
+      "identifiers": ["id"],
+      "timestamps": [],
+      "relationships": [],
+      "state": ["highlighted", "codeMode"],
+      "content": ["text"]
+    }
+  },
+
+  "features": {
+    "collections": [
+      "Hierarchical nesting (unlimited depth)",
+      "Contains notebooks and sub-collections",
+      "Drag-and-drop reorganization",
+      "Expandable/collapsible UI"
+    ],
+    "notebooks": [
+      "Container for related notes",
+      "Must be within a collection",
+      "Can be moved between collections"
+    ],
+    "notes": [
+      "Multiple cells per note",
+      "Creation and update timestamps",
+      "Title-based identification",
+      "Path-based access"
+    ],
+    "cells": [
+      "Rich text editing",
+      "Code mode with Monaco Editor",
+      "Highlighting capability",
+      "Individual cell management"
+    ],
+    "dataManagement": [
+      "Import/Export functionality",
+      "localStorage or sessionStorage options",
+      "Automatic data persistence",
+      "Search across all notes"
+    ]
+  },
+
+  "exampleData": {
+    "completeStructure": {
+      "collections": [
+        {
+          "id": "id_1736524800000_abc123def",
+          "name": "Work Projects",
+          "type": "collection",
+          "createdAt": "2026-01-10T12:00:00.000Z",
+          "items": [
+            {
+              "id": "id_1736524801000_ghi456jkl",
+              "name": "Project Alpha",
+              "type": "collection",
+              "createdAt": "2026-01-10T12:05:00.000Z",
+              "items": [
+                {
+                  "id": "id_1736524802000_mno789pqr",
+                  "name": "Design Notes",
+                  "type": "notebook",
+                  "createdAt": "2026-01-10T12:10:00.000Z",
+                  "notes": [
+                    {
+                      "id": "id_1736524803000_stu012vwx",
+                      "title": "UI Mockups",
+                      "cells": [
+                        {
+                          "id": "id_1736524804000_yza345bcd",
+                          "text": "Main dashboard design considerations",
+                          "highlighted": false,
+                          "codeMode": false
+                        },
+                        {
+                          "id": "id_1736524805000_efg678hij",
+                          "text": "const colors = { primary: '#007acc', secondary: '#6c757d' };",
+                          "highlighted": true,
+                          "codeMode": true
+                        }
+                      ],
+                      "content": [
+                        {
+                          "id": "id_1736524804000_yza345bcd",
+                          "text": "Main dashboard design considerations",
+                          "highlighted": false,
+                          "codeMode": false
+                        },
+                        {
+                          "id": "id_1736524805000_efg678hij",
+                          "text": "const colors = { primary: '#007acc', secondary: '#6c757d' };",
+                          "highlighted": true,
+                          "codeMode": true
+                        }
+                      ],
+                      "createdAt": "2026-01-10T12:15:00.000Z",
+                      "updatedAt": "2026-01-10T14:30:00.000Z"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "currentCollectionId": "id_1736524801000_ghi456jkl",
+      "currentNotebookId": "id_1736524802000_mno789pqr",
+      "currentNoteId": "id_1736524803000_stu012vwx"
+    }
+  }
+}

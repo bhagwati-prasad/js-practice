@@ -63,6 +63,7 @@
     overflow-y: auto;
     padding: var(--spacing-md) 0;
     flex: 1;
+    overflow-x: hidden;
 }
 
 /* Topic/Category Section */

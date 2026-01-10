@@ -1,0 +1,118 @@
+{
+  "collections": [
+    {
+      "id": "id_1736524800000_abc123",
+      "name": "Work",
+      "type": "collection",
+      "createdAt": "2026-01-10T12:00:00.000Z",
+      "items": [
+        {
+          "id": "id_1736524801000_def456",
+          "name": "Nested Collection",
+          "type": "collection",
+          "createdAt": "2026-01-10T12:05:00.000Z",
+          "items": [
+            {
+              "id": "id_1736524802000_ghi789",
+              "name": "Deep Notebook",
+              "type": "notebook",
+              "createdAt": "2026-01-10T12:10:00.000Z",
+              "notes": [
+                {
+                  "id": "id_1736524803000_jkl012",
+                  "title": "Deep Note",
+                  "cells": [
+                    {
+                      "id": "id_1736524804000_mno345",
+                      "text": "Plain text cell",
+                      "highlighted": false,
+                      "codeMode": false
+                    },
+                    {
+                      "id": "id_1736524805000_pqr678",
+                      "text": "const x = 42;",
+                      "highlighted": true,
+                      "codeMode": true
+                    }
+                  ],
+                  "content": [
+                    {
+                      "id": "id_1736524804000_mno345",
+                      "text": "Plain text cell",
+                      "highlighted": false,
+                      "codeMode": false
+                    },
+                    {
+                      "id": "id_1736524805000_pqr678",
+                      "text": "const x = 42;",
+                      "highlighted": true,
+                      "codeMode": true
+                    }
+                  ],
+                  "createdAt": "2026-01-10T12:15:00.000Z",
+                  "updatedAt": "2026-01-10T14:30:00.000Z"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "id_1736524806000_stu901",
+          "name": "Project Notebook",
+          "type": "notebook",
+          "createdAt": "2026-01-10T13:00:00.000Z",
+          "notes": [
+            {
+              "id": "id_1736524807000_vwx234",
+              "title": "Meeting Notes",
+              "cells": [
+                {
+                  "id": "id_1736524808000_yza567",
+                  "text": "Discussion points",
+                  "highlighted": false,
+                  "codeMode": false
+                }
+              ],
+              "content": [
+                {
+                  "id": "id_1736524808000_yza567",
+                  "text": "Discussion points",
+                  "highlighted": false,
+                  "codeMode": false
+                }
+              ],
+              "createdAt": "2026-01-10T13:05:00.000Z",
+              "updatedAt": "2026-01-10T13:05:00.000Z"
+            },
+            {
+              "id": "id_1736524809000_bcd890",
+              "title": "Action Items",
+              "cells": [],
+              "content": [],
+              "createdAt": "2026-01-10T13:10:00.000Z",
+              "updatedAt": "2026-01-10T13:10:00.000Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "id_1736524810000_efg123",
+      "name": "Personal",
+      "type": "collection",
+      "createdAt": "2026-01-10T14:00:00.000Z",
+      "items": [
+        {
+          "id": "id_1736524811000_hij456",
+          "name": "Journal",
+          "type": "notebook",
+          "createdAt": "2026-01-10T14:05:00.000Z",
+          "notes": []
+        }
+      ]
+    }
+  ],
+  "currentCollectionId": "id_1736524800000_abc123",
+  "currentNotebookId": "id_1736524806000_stu901",
+  "currentNoteId": "id_1736524807000_vwx234"
+}
