@@ -204,7 +204,7 @@ runButton.addEventListener('click', () => {
     console.log = (...args) => {
         logs.push(args.map(arg => {
             if(Array.isArray(arg)) {
-                return "[" + arg.join(", ") + "]";
+                return JSON.stringify(arg).replace(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/g, ', ');
             }
             if (typeof arg === 'object') {
                 return JSON.stringify(arg, null, 2);
