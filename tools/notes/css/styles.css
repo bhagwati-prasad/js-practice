@@ -25,6 +25,7 @@
     transition: background var(--transition-fast);
     gap: var(--spacing-xs);
     position: relative;
+    border-left: 3px transparent;
 }
 
 .tree-item:hover {

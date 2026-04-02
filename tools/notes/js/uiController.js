@@ -1054,11 +1054,19 @@ const UIController = (function() {
                 `Delete ${itemType === 'collection' ? 'Collection' : 'Notebook'}`,
                 `Are you sure you want to delete "${item.name}"${itemType === 'collection' ? ' and all its contents' : ' and all its notes'}? This action cannot be undone.`,
                 () => {
+                    let deleted = false;
                     if (itemType === 'collection') {
-                        NoteBook.deleteCollection(itemId);
+                        deleted = NoteBook.deleteCollection(itemId);
                     } else {
-                        NoteBook.deleteNotebook(itemId);
+                        deleted = NoteBook.deleteNotebook(itemId);
                     }
+
+                    if (!deleted) {
+                        const reason = NoteBook.getLastOperationError() || 'Unknown error while deleting item.';
+                        Modal.alert('Delete Failed', reason);
+                        return;
+                    }
+
                     renderCollections();
                     renderNotes();
                     renderEditor();
@@ -1109,7 +1117,12 @@ const UIController = (function() {
             if (itemId === targetCollectionId) return;
 
             // Move the item
-            NoteBook.moveItemToCollection(itemId, targetCollectionId, itemType);
+            const moved = NoteBook.moveItemToCollection(itemId, targetCollectionId, itemType);
+            if (!moved) {
+                const reason = NoteBook.getLastOperationError() || 'Unknown error while moving item.';
+                Modal.alert('Move Failed', reason);
+                return;
+            }
             
             // Show confirmation
             Modal.alert('Success', `"${item.name}" moved to "${targetCollection.name}".`, () => {

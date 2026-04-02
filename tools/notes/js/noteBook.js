@@ -12,6 +12,7 @@ const NoteBook = (function() {
         currentNotebookId: null,
         currentNoteId: null
     };
+    let lastOperationError = null;
 
     function generateId() {
         const rand = Math.random().toString(36).substring(2, 11);
@@ -19,7 +20,20 @@ const NoteBook = (function() {
     }
 
     function saveData() {
-        return StorageDriver.save(STORAGE_KEY, data);
+        const saved = StorageDriver.save(STORAGE_KEY, data);
+        if (!saved) {
+            lastOperationError = 'Failed to save data to storage.';
+        }
+        return saved;
+    }
+
+    function clearOperationError() {
+        lastOperationError = null;
+    }
+
+    function failOperation(message) {
+        lastOperationError = message;
+        return false;
     }
 
     function loadData() {
@@ -75,20 +89,41 @@ const NoteBook = (function() {
         return null;
     }
 
-    function findParentCollection(itemId, collections = data.collections, parent = null) {
+    function findParentCollection(itemId, collections = data.collections) {
         for (let col of collections) {
             if (col.items) {
                 for (let item of col.items) {
                     if (item.id === itemId) {
                         return col;
                     } else if (item.type === 'collection') {
-                        const found = findParentCollection(itemId, [item], col);
+                        const found = findParentCollection(itemId, [item]);
                         if (found) return found;
                     }
                 }
             }
         }
-        return parent;
+        return null;
+    }
+
+    function isDescendantCollection(sourceCollectionId, targetCollectionId) {
+        const source = findCollection(sourceCollectionId);
+        if (!source || !Array.isArray(source.items)) return false;
+
+        const stack = source.items.filter(item => item.type === 'collection');
+        while (stack.length > 0) {
+            const current = stack.pop();
+            if (current.id === targetCollectionId) return true;
+
+            if (Array.isArray(current.items)) {
+                current.items.forEach(item => {
+                    if (item.type === 'collection') {
+                        stack.push(item);
+                    }
+                });
+            }
+        }
+
+        return false;
     }
 
     function findNote(nbId, nId) {
@@ -223,6 +258,7 @@ const NoteBook = (function() {
     return {
         init: function() {
             loadData();
+            clearOperationError();
             if (data.collections.length === 0) {
                 const col = this.createCollection('collection-root');
                 this.createNotebook(col.id, 'My First Notebook');
@@ -289,6 +325,7 @@ const NoteBook = (function() {
         },
 
         deleteCollection: function(id) {
+            clearOperationError();
             const idx = data.collections.findIndex(c => c.id === id);
             if (idx !== -1) {
                 data.collections.splice(idx, 1);
@@ -297,8 +334,7 @@ const NoteBook = (function() {
                     data.currentNotebookId = null;
                     data.currentNoteId = null;
                 }
-                saveData();
-                return true;
+                return saveData() ? true : failOperation('Collection removed but failed to persist changes.');
             }
             
             const parent = findParentCollection(id);
@@ -311,12 +347,12 @@ const NoteBook = (function() {
                         data.currentNotebookId = null;
                         data.currentNoteId = null;
                     }
-                    saveData();
-                    return true;
+                    return saveData() ? true : failOperation('Collection removed but failed to persist changes.');
                 }
+                return failOperation('Collection parent found, but item is missing from parent items.');
             }
             
-            return false;
+            return failOperation('Collection not found.');
         },
 
         createNotebook: function(collectionId, name) {
@@ -356,11 +392,12 @@ const NoteBook = (function() {
         },
 
         deleteNotebook: function(id) {
+            clearOperationError();
             const parent = findParentCollection(id);
-            if (!parent) return false;
+            if (!parent) return failOperation('Notebook parent collection not found.');
             
             const idx = parent.items.findIndex(item => item.id === id);
-            if (idx === -1) return false;
+            if (idx === -1) return failOperation('Notebook not found inside its parent collection.');
             
             parent.items.splice(idx, 1);
             
@@ -369,19 +406,28 @@ const NoteBook = (function() {
                 data.currentNoteId = null;
             }
             
-            saveData();
-            return true;
+            return saveData() ? true : failOperation('Notebook removed but failed to persist changes.');
         },
 
         moveItemToCollection: function(itemId, targetCollectionId, itemType) {
+            clearOperationError();
+            if (itemType !== 'collection' && itemType !== 'notebook') {
+                return failOperation('Invalid item type for move operation.');
+            }
+
             const item = itemType === 'collection' 
                 ? findCollection(itemId)
                 : findNotebook(itemId);
             
             const targetCollection = findCollection(targetCollectionId);
             
-            if (!item || !targetCollection) return false;
-            if (itemId === targetCollectionId) return false; // Can't move to itself
+            if (!item) return failOperation('Source item not found.');
+            if (!targetCollection) return failOperation('Target collection not found.');
+            if (itemId === targetCollectionId) return failOperation('Cannot move an item into itself.');
+
+            if (itemType === 'collection' && isDescendantCollection(itemId, targetCollectionId)) {
+                return failOperation('Cannot move a collection into one of its descendants.');
+            }
             
             // Find current parent
             const parentCollection = itemType === 'collection'
@@ -391,8 +437,7 @@ const NoteBook = (function() {
             // If already in target collection, no need to move
             if (parentCollection && parentCollection.id === targetCollectionId) {
                 // Already in the right place, but return true to indicate success
-                saveData();
-                return true;
+                return saveData() ? true : failOperation('Item already in target collection, but failed to persist state.');
             }
             
             // Check if item already exists in target to prevent duplicates
@@ -401,8 +446,7 @@ const NoteBook = (function() {
             
             if (existsInTarget) {
                 // Already in target, don't add again
-                saveData();
-                return true;
+                return saveData() ? true : failOperation('Item already exists in target collection, but failed to persist state.');
             }
             
             // Remove from current parent
@@ -410,13 +454,19 @@ const NoteBook = (function() {
                 const idx = parentCollection.items.findIndex(i => i.id === itemId);
                 if (idx !== -1) {
                     parentCollection.items.splice(idx, 1);
+                } else {
+                    return failOperation('Source item missing from its parent collection.');
                 }
             } else if (itemType === 'collection') {
                 // Remove from root collections
                 const idx = data.collections.findIndex(c => c.id === itemId);
                 if (idx !== -1) {
                     data.collections.splice(idx, 1);
+                } else {
+                    return failOperation('Source collection not found at root level.');
                 }
+            } else {
+                return failOperation('Notebook parent collection not found.');
             }
             
             // Add to target collection
@@ -425,8 +475,11 @@ const NoteBook = (function() {
             }
             targetCollection.items.push(item);
             
-            saveData();
-            return true;
+            return saveData() ? true : failOperation('Item moved but failed to persist changes.');
+        },
+
+        getLastOperationError: function() {
+            return lastOperationError;
         },
 
         createNote: function(nbId, title, content) {
