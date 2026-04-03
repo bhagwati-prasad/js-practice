@@ -48,13 +48,13 @@ const CSS_STYLES = `
     }
 
     .cv-directory details > summary:before {
-        content: '📁';
+        content: '▸';
         margin-right: 8px;
         display: inline-block;
     }
 
     .cv-directory details[open] > summary:before {
-        content: '📂';
+        content: '▾';
     }
 
     .cv-directory .node-leaf {

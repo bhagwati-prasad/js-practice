@@ -72,7 +72,7 @@ const Draggable = (function() {
 
         draggedItem = treeItem;
         const nameSpan = treeItem.querySelector('.tree-item-name');
-        const itemType = treeItem.querySelector('.tree-item-icon').textContent === '📁' ? 'collection' : 'notebook';
+        const itemType = treeItem.dataset.itemType || 'notebook';
         
         // Extract item ID from the context (we need to enhance this)
         draggedItemType = itemType;
@@ -101,7 +101,7 @@ const Draggable = (function() {
 
         // Only allow dropping on collections
         const icon = treeItem.querySelector('.tree-item-icon');
-        if (icon && icon.textContent === '📁') {
+        if (treeItem.dataset.itemType === 'collection') {
             treeItem.classList.add('drop-target');
         }
     }

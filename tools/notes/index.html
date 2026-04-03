@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="css/text-block.css?v=1">
     <link rel="stylesheet" href="../../components/modal/modal.css">
     <link id="notesThemeLink" rel="stylesheet">
+    <link rel="stylesheet" href="../../components/contextMenu/contextMenu.css">
+    <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
     <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
 </head>
 <body>
@@ -50,10 +52,10 @@
             
             <div id="floatingToolbar" class="floating-toolbar">
                 <button class="tool-btn" id="toolSort">
-                    <span class="icon">AZ</span> Sort Lines
+                    <i data-lucide="a-arrow-down" class="icon" width="16" height="16"></i> Sort Lines
                 </button>
                 <button class="tool-btn" id="toolReplace">
-                    <span class="icon">🔍</span> Find/Replace
+                    <i data-lucide="search" class="icon" width="16" height="16"></i> Find/Replace
                 </button>
             </div>
         </div>
@@ -82,10 +84,10 @@
             <div class="settings-section">
                 <h3>Data Management</h3>
                 <div class="setting-item">
-                    <button class="primary-btn full-width" id="exportBtn">📤 Export Data</button>
+                    <button class="primary-btn full-width" id="exportBtn"><i data-lucide="upload" width="16" height="16"></i> Export Data</button>
                 </div>
                 <div class="setting-item">
-                    <button class="primary-btn full-width" id="importBtn">📥 Import Data</button>
+                    <button class="primary-btn full-width" id="importBtn"><i data-lucide="download" width="16" height="16"></i> Import Data</button>
                 </div>
             </div>
 
@@ -146,5 +148,6 @@
     <script src="../../components/modal/modal.js?v=3"></script>
     <script src="js/uiController.js?v=4"></script>
     <script src="/js/app.js?v=2"></script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>

@@ -17,7 +17,7 @@ class BenchmarkVisualizer {
       return;
     }
 
-    console.log('\n📊 Performance Distribution');
+    console.log('\n[#] Performance Distribution');
     console.log('=' .repeat(60));
 
     // Create histogram
@@ -77,7 +77,7 @@ class BenchmarkVisualizer {
     rawSamples.forEach((sample, index) => {
       const barLength = Math.round((sample / maxSample) * barWidth);
       const bar = '█'.repeat(barLength);
-      const gcMarker = gcIndices.has(index) ? ' ⚠️ GC' : '';
+      const gcMarker = gcIndices.has(index) ? ' [GC]' : '';
 
       console.log(
         `Run ${String(index + 1).padStart(3)}: ${bar} ${sample.toFixed(3)}ms${gcMarker}`
@@ -95,7 +95,7 @@ class BenchmarkVisualizer {
    * Visualize comparison between multiple results
    */
   static comparison(results, labels = []) {
-    console.log('\n📈 Benchmark Comparison');
+    console.log('\n[=] Benchmark Comparison');
     console.log('=' .repeat(60));
 
     const maxAvg = Math.max(...results.map(r => r.avg));
@@ -120,7 +120,7 @@ class BenchmarkVisualizer {
   static jitter(jitterAnalysis) {
     const { jitterScore, classification, outliers } = jitterAnalysis;
 
-    console.log('\n🔄 Jitter Analysis');
+    console.log('\n[~] Jitter Analysis');
     console.log('=' .repeat(60));
     console.log(`Jitter Score: ${jitterScore.toFixed(2)}%`);
     console.log(`Classification: ${classification.toUpperCase()}`);
@@ -143,7 +143,7 @@ class BenchmarkVisualizer {
   static gc(gcAnalysis) {
     const { detected, pauses } = gcAnalysis;
 
-    console.log('\n🗑️  Garbage Collection Analysis');
+    console.log('\n[GC] Garbage Collection Analysis');
     console.log('=' .repeat(60));
     console.log(`GC Detected: ${detected ? 'YES' : 'NO'}`);
     console.log(`Pause Count: ${pauses.length}`);
@@ -166,7 +166,7 @@ class BenchmarkVisualizer {
    * Create a summary card
    */
   static summary(result) {
-    console.log('\n📋 Benchmark Summary');
+    console.log('\n[>>] Benchmark Summary');
     console.log('╔════════════════════════════════════════════════════════╗');
     console.log(`║ Average:  ${String(result.avg.toFixed(3) + 'ms').padEnd(47)} ║`);
     console.log(`║ Min:      ${String(result.min.toFixed(3) + 'ms').padEnd(47)} ║`);

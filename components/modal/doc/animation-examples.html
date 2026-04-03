@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modal Animation Examples</title>
     <link rel="stylesheet" href="modal.css">
+    <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -191,14 +192,14 @@
 
             <!-- Zoom Animation -->
             <div class="animation-card">
-                <h3>🔍 Zoom</h3>
+                <h3><i data-lucide="zoom-in" width="16" height="16"></i> Zoom</h3>
                 <p>Modal scales up from a small size with a playful bounce effect.</p>
                 <button class="btn" id="btn-zoom">Try Zoom Animation</button>
             </div>
 
             <!-- Flip Animation -->
             <div class="animation-card">
-                <h3>🔄 Flip</h3>
+                <h3><i data-lucide="flip-horizontal-2" width="16" height="16"></i> Flip</h3>
                 <p>3D flip effect that rotates the modal into view. Adds a unique, modern touch.</p>
                 <button class="btn" id="btn-flip">Try Flip Animation</button>
             </div>
@@ -220,7 +221,7 @@
 
         <!-- Advanced Usage Section -->
         <div class="advanced-section">
-            <h2>🚀 Advanced Usage</h2>
+            <h2><i data-lucide="zap" width="20" height="20"></i> Advanced Usage</h2>
             
             <h3 style="color: #764ba2; margin-top: 24px; margin-bottom: 12px;">Custom Animation</h3>
             <p>Create your own custom animations using the ModalAnimations.create() method:</p>
@@ -282,6 +283,7 @@ const modal = new Modal({
         </div>
     </div>
 
+    <script>lucide.createIcons();</script>
     <script src="modal.js"></script>
     <script>
         // Helper function to create modal with specific animation

@@ -15,14 +15,16 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" crossorigin="use-credentials" />
-    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script></head>
+    <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
+    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
+</head>
 <body>
     <header>
         <div id="benchmarkPage" class="header">
             <div class="flex1 toolbar">
                 <button id="toggleLeftSidebar" class="primary-btn">Sample Functions</button>
             </div>
-            <h1>🚀 Benchmark Lab</h1>
+            <h1><i data-lucide="zap" class="heading-icon" width="22" height="22"></i> Benchmark Lab</h1>
             <div class="flex1 end-align toolbar">
                 <button id="runBenchmarkBtn" class="primary-btn">Run Benchmark</button>
                 <button id="resetBtn" class="primary-btn">Reset</button>
@@ -175,7 +177,7 @@
                                 <p class="factors-intro">JavaScript performance benchmarks can be influenced by many factors. Understanding these helps interpret results accurately.</p>
                                 
                                 <div class="factor-category">
-                                    <h5>🔄 Runtime & Engine</h5>
+                                    <h5><i data-lucide="refresh-cw" class="section-icon" width="14" height="14"></i> Runtime & Engine</h5>
                                     <ul class="factor-list">
                                         <li><strong>Event Loop Jitter:</strong> Variability in task scheduling and execution timing. Running setTimeout with 0 delay does not guarantee immediate execution. Logging multiples runs can demonstrate this effect.</li>
                                         <li><strong>Garbage Collection (GC):</strong> Automatic memory cleanup pauses execution</li>
@@ -185,7 +187,7 @@
                                 </div>
 
                                 <div class="factor-category">
-                                    <h5>⚙️ Hardware & System</h5>
+                                    <h5><i data-lucide="cpu" class="section-icon" width="14" height="14"></i> Hardware & System</h5>
                                     <ul class="factor-list">
                                         <li><strong>CPU Scaling:</strong> Dynamic frequency adjustment affects performance</li>
                                         <li><strong>Thermal Throttling:</strong> CPU reduces frequency when overheating</li>
@@ -195,7 +197,7 @@
                                 </div>
 
                                 <div class="factor-category">
-                                    <h5>🌐 Browser & Tab</h5>
+                                    <h5><i data-lucide="globe" class="section-icon" width="14" height="14"></i> Browser & Tab</h5>
                                     <ul class="factor-list">
                                         <li><strong>Tab Inactivity:</strong> Browsers throttle inactive tabs to save resources</li>
                                         <li><strong>Other Tabs:</strong> Multiple tabs share browser process resources</li>
@@ -205,7 +207,7 @@
                                 </div>
 
                                 <div class="factor-category">
-                                    <h5>💾 Memory & Cache</h5>
+                                    <h5><i data-lucide="database" class="section-icon" width="14" height="14"></i> Memory & Cache</h5>
                                     <ul class="factor-list">
                                         <li><strong>Memory Pressure:</strong> Available RAM affects GC frequency and swap usage</li>
                                         <li><strong>CPU Cache:</strong> L1/L2/L3 cache hits vs misses impact speed</li>
@@ -214,7 +216,7 @@
                                 </div>
 
                                 <div class="factor-category">
-                                    <h5>📊 Benchmark Design</h5>
+                                    <h5><i data-lucide="bar-chart-2" class="section-icon" width="14" height="14"></i> Benchmark Design</h5>
                                     <ul class="factor-list">
                                         <li><strong>Warmup Phase:</strong> Insufficient warmup may not trigger JIT optimization</li>
                                         <li><strong>Sample Size:</strong> Too few iterations lead to unreliable measurements</li>
@@ -224,7 +226,7 @@
                                 </div>
 
                                 <div class="factor-note">
-                                    <strong>💡 Best Practice:</strong> Run benchmarks multiple times, on different occasions, and compare trends rather than absolute values. Use warmup iterations and sufficient sample sizes to minimize variance.
+                                    <strong><i data-lucide="lightbulb" class="section-icon" width="14" height="14"></i> Best Practice:</strong> Run benchmarks multiple times, on different occasions, and compare trends rather than absolute values. Use warmup iterations and sufficient sample sizes to minimize variance.
                                 </div>
                             </div>
                         </div>
@@ -386,6 +388,7 @@
     <script src="js/regression.js"></script>
     <script src="js/visualizer.js"></script>
     <script src="js/timeline-ui.js"></script>
+    <script>lucide.createIcons();</script>
     <script src="js/lab.js"></script>    <script src="../../components/leftSidebar/leftSidebar.js"></script>    <script>
         // Monaco Editor Setup
         window.editor = null;
@@ -723,10 +726,10 @@ return 'done';`
                 // Try to execute once
                 const result = testFn();
                 
-                appendConsole('✓ Validation passed!', 'success');
+                appendConsole('Validation passed.', 'success');
                 appendConsole(`Return value: ${JSON.stringify(result)}`);
             } catch (error) {
-                appendConsole(`✗ Validation failed: ${error.message}`, 'error');
+                appendConsole(`Validation failed: ${error.message}`, 'error');
             }
         });
 
@@ -792,7 +795,7 @@ return 'done';`
                                 <div class="timeline-bar" style="width: ${percentage}%"></div>
                             </div>
                             <span class="timeline-value">${sample.toFixed(3)} ms</span>
-                            ${isGC ? '<span class="gc-indicator">⚠️ GC</span>' : ''}
+                            ${isGC ? '<span class="gc-indicator"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> GC</span>' : ''}
                         </div>
                     `;
                 });

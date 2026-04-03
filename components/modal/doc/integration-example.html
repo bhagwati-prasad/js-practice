@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="../../components/modal/modal.css">
     
     <link id="notesThemeLink" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
     <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
 </head>
 <body>
@@ -52,10 +53,10 @@
                 
                 <div id="floatingToolbar" class="floating-toolbar">
                     <button class="tool-btn" id="toolSort">
-                        <span class="icon">AZ</span> Sort Lines
+                            <i data-lucide="a-arrow-down" class="icon" width="16" height="16"></i> Sort Lines
                     </button>
                     <button class="tool-btn" id="toolReplace">
-                        <span class="icon">🔍</span> Find/Replace
+                            <i data-lucide="search" class="icon" width="16" height="16"></i> Find/Replace
                     </button>
                 </div>
             </div>
@@ -120,5 +121,6 @@
     <!-- Your existing scripts -->
     <script src="js/uiController.js?v=3"></script>
     <script src="/js/app.js?v=2"></script>
+    <script>lucide.createIcons();</script>
 </body>
 </html>

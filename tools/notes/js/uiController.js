@@ -445,7 +445,9 @@ const UIController = (function() {
                 div.classList.add('active');
             }
             
-            const icon = isCollection ? '📁' : '📒';
+            const icon = isCollection
+                ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
             const hasChildren = isCollection && item.items && item.items.length > 0;
             const isExpanded = expandedCollections.has(item.id);
             div.classList.toggle('has-children', hasChildren);
@@ -454,14 +456,15 @@ const UIController = (function() {
             // Add data-item-id for drag-drop functionality
             div.dataset.itemId = item.id;
             div.draggable = true;
+            div.dataset.itemType = item.type;
 
             div.innerHTML = `
                 <span class="tree-item-icon">${icon}</span>
                 <span class="tree-item-name">${item.name}</span>
                 <div class="tree-item-actions">
                     ${isCollection ? `<button onclick="window.addItemToCollection('${item.id}')">+</button>` : ''}
-                    <button onclick="window.renameItem('${item.id}', '${item.type}')">✎</button>
-                    <button onclick="window.deleteItem('${item.id}', '${item.type}')">✕</button>
+                    <button onclick="window.renameItem('${item.id}', '${item.type}')" title="Rename"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>
+                    <button onclick="window.deleteItem('${item.id}', '${item.type}')" title="Delete"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
                 </div>
             `;
             

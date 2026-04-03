@@ -117,7 +117,7 @@ class RuntimeHealth {
    * Private helper to log results
    */
   _logResult(result) {
-    const prefix = result.ok ? '✓' : '✗';
+    const prefix = result.ok ? 'OK' : 'FAIL';
     const message = result.error 
       ? `${prefix} ${result.name}: ${result.error}`
       : `${prefix} ${result.name}`;

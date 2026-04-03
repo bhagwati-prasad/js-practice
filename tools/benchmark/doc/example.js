@@ -364,9 +364,9 @@ function validateFunction() {
       code: code,
       description: 'User-defined function'
     };
-    showValidationMessage('✓ Function is valid and ready to test', 'success');
+    showValidationMessage('Function is valid and ready to test', 'success');
   } catch (error) {
-    showValidationMessage(`✗ Invalid function: ${error.message}`, 'error');
+    showValidationMessage(`Invalid function: ${error.message}`, 'error');
     currentFunction = null;
   }
 }
@@ -407,7 +407,7 @@ function addVariable() {
   varInput.innerHTML = `
     <input type="text" class="var-name" placeholder="Variable name" value="newVar">
     <input type="text" class="var-values" placeholder="Values (comma separated)" value="1,2,3">
-    <button class="btn-remove-var" type="button">✕</button>
+    <button class="btn-remove-var" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   `;
   container.appendChild(varInput);
 }
@@ -426,7 +426,7 @@ async function runBenchmark() {
   const testMode = document.querySelector('input[name="test-mode"]:checked').value;
 
   // Show status
-  showStatus(`🏃 Running ${testMode} benchmark...`);
+  showStatus(`Running ${testMode} benchmark...`);
   document.getElementById('run-benchmark-btn').disabled = true;
   consoleOutput = [];
 
@@ -439,9 +439,9 @@ async function runBenchmark() {
       await runRegressionTest();
     }
 
-    showStatus('✓ Benchmark completed successfully!');
+    showStatus('Benchmark completed successfully.');
   } catch (error) {
-    showStatus(`✗ Benchmark failed: ${error.message}`);
+    showStatus(`Benchmark failed: ${error.message}`);
     console.error(error);
   } finally {
     document.getElementById('run-benchmark-btn').disabled = false;
@@ -458,7 +458,7 @@ async function runBasicBenchmark() {
 
   // Ensure BenchmarkJS is loaded
   if (!window.BenchmarkJS || !window.BenchmarkJS.setConfig) {
-    showStatus('✗ Error: BenchmarkJS not properly loaded. Please reload the page.');
+    showStatus('Error: BenchmarkJS not properly loaded. Please reload the page.');
     document.getElementById('run-benchmark-btn').disabled = false;
     return;
   }
@@ -567,7 +567,7 @@ function displayBasicResults(result) {
         </div>
         <div class="metric">
           <span class="label">GC Detected</span>
-          <span class="value">${result.gc.detected ? '⚠️ Yes' : '✓ No'}</span>
+          <span class="value">${result.gc.detected ? 'Yes' : 'No'}</span>
         </div>
       </div>
     </div>
@@ -637,7 +637,7 @@ function displayExperimentResults(report) {
                 <td>${r.measurement ? r.measurement.min.toFixed(3) : 'N/A'}</td>
                 <td>${r.measurement ? r.measurement.max.toFixed(3) : 'N/A'}</td>
                 <td>${r.measurement ? r.measurement.jitter.classification : 'N/A'}</td>
-                <td>${r.measurement ? (r.measurement.gc.detected ? '⚠️' : '✓') : 'N/A'}</td>
+                <td>${r.measurement ? (r.measurement.gc.detected ? 'Yes' : 'No') : 'N/A'}</td>
                 <td>${(r.confidence * 100).toFixed(0)}%</td>
               </tr>
             `).join('')}
@@ -657,7 +657,7 @@ function displayExperimentResults(report) {
 }
 
 function displayRegressionResults(result, check, history) {
-  const status = check.regression ? '⚠️ REGRESSION DETECTED' : '✓ No Regression';
+  const status = check.regression ? 'REGRESSION DETECTED' : 'No Regression';
   const statusColor = check.regression ? '#d32f2f' : '#388e3c';
 
   const html = `
@@ -705,7 +705,7 @@ function displayRegressionResults(result, check, history) {
                 <td>#${i + 1}</td>
                 <td>${h.avg.toFixed(3)}</td>
                 <td>${h.jitterClass}</td>
-                <td>${h.gcDetected ? '⚠️' : '✓'}</td>
+                <td>${h.gcDetected ? 'Yes' : 'No'}</td>
               </tr>
             `).join('')}
           </tbody>
@@ -728,7 +728,7 @@ function displayDiagnostics(jitter, gc) {
   // Jitter diagnostics
   html += `
     <div id="diagnostics-jitter" class="diagnostics-panel">
-      <h4>🔄 Jitter Analysis</h4>
+      <h4>Jitter Analysis</h4>
       <p><strong>Score:</strong> ${jitter.jitterScore.toFixed(2)}%</p>
       <p><strong>Classification:</strong> ${jitter.classification.toUpperCase()}</p>
       <p><strong>Outliers:</strong> ${jitter.outliers.length} detected</p>
@@ -744,7 +744,7 @@ function displayDiagnostics(jitter, gc) {
   // GC diagnostics
   html += `
     <div id="diagnostics-gc" class="diagnostics-panel">
-      <h4>🗑️ Garbage Collection</h4>
+      <h4>Garbage Collection</h4>
       <p><strong>Detected:</strong> ${gc.detected ? 'YES' : 'NO'}</p>
       <p><strong>Pauses:</strong> ${gc.pauses.length}</p>
       ${gc.pauses.length > 0 ? `
@@ -852,14 +852,14 @@ function resetAll() {
     <div class="variable-input">
       <input type="text" class="var-name" placeholder="Variable name" value="size">
       <input type="text" class="var-values" placeholder="Values (comma separated)" value="100,1000,10000">
-      <button class="btn-remove-var" type="button">✕</button>
+      <button class="btn-remove-var" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
     </div>
   `;
 
   // Reset results
   document.getElementById('results-container').innerHTML = `
     <div class="placeholder-empty">
-      <p>👈 Select a function and click "Run Benchmark" to start testing</p>
+      <p>Select a function and click "Run Benchmark" to start testing</p>
       <p class="subtitle">Choose from pre-populated samples or enter your own custom function</p>
     </div>
   `;

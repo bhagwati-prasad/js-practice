@@ -1,0 +1,108 @@
+/* ContextMenu Component
+   Uses app theme variables — works with both dark and light themes */
+
+.context-menu {
+    position: fixed;
+    z-index: 10000;
+    min-width: 160px;
+    max-width: 300px;
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    display: none;
+    user-select: none;
+    outline: none;
+}
+
+.context-menu--visible {
+    display: block;
+    animation: context-menu-appear 0.1s ease;
+}
+
+@keyframes context-menu-appear {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ── Items ── */
+
+.context-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px 6px 10px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--text-primary);
+    cursor: pointer;
+    outline: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 2px;
+    margin: 0 2px;
+}
+
+.context-menu__item:hover,
+.context-menu__item:focus {
+    background: var(--border-accent);
+    color: var(--text-white);
+}
+
+/* ── Disabled ── */
+
+.context-menu__item--disabled {
+    color: var(--text-muted);
+    cursor: default;
+    pointer-events: none;
+}
+
+/* ── Danger ── */
+
+.context-menu__item--danger {
+    color: var(--text-error);
+}
+
+.context-menu__item--danger:hover,
+.context-menu__item--danger:focus {
+    background: var(--text-error);
+    color: #ffffff;
+}
+
+/* ── Icon ── */
+
+.context-menu__icon {
+    width: 16px;
+    font-size: 12px;
+    text-align: center;
+    flex-shrink: 0;
+    /* Prevent icon hover colour override */
+    color: inherit;
+}
+
+/* ── Label ── */
+
+.context-menu__label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Separator ── */
+
+.context-menu__separator {
+    height: 1px;
+    margin: 4px 0;
+    background: var(--border-primary);
+    list-style: none;
+}

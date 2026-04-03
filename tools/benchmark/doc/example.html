@@ -6,12 +6,13 @@
   <title>BenchmarkJS Example - Performance Testing Playground</title>
   <link rel="stylesheet" href="lab.css">
   <link rel="stylesheet" href="example.css">
+  <script src="https://unpkg.com/lucide@0.475.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
   <div class="example-container">
     <!-- Header -->
     <header class="example-header">
-      <h1>🚀 BenchmarkJS Performance Playground</h1>
+      <h1><i data-lucide="zap" width="22" height="22"></i> BenchmarkJS Performance Playground</h1>
       <p>Test JavaScript performance with interactive benchmarking and visualization</p>
     </header>
 
@@ -146,7 +147,7 @@
                 <div class="variable-input">
                   <input type="text" class="var-name" placeholder="Variable name" value="size">
                   <input type="text" class="var-values" placeholder="Values (comma separated)" value="100,1000,10000">
-                  <button class="btn-remove-var" type="button">✕</button>
+                  <button class="btn-remove-var" type="button"><i data-lucide="x" width="14" height="14"></i></button>
                 </div>
               </div>
               <button id="add-variable-btn" class="btn btn-sm btn-secondary">+ Add Variable</button>
@@ -190,7 +191,7 @@
         <!-- Results Container -->
         <div id="results-container" class="results-container">
           <div class="placeholder-empty">
-            <p>👈 Select a function and click "Run Benchmark" to start testing</p>
+            <p>Select a function and click "Run Benchmark" to start testing</p>
             <p class="subtitle">Choose from pre-populated samples or enter your own custom function</p>
           </div>
         </div>
@@ -235,5 +236,6 @@
   <script src="../js/timeline-ui.js"></script>
   <script src="../js/lab.js"></script>
   <script src="example.js"></script>
+  <script>lucide.createIcons();</script>
 </body>
 </html>
