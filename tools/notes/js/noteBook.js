@@ -227,6 +227,61 @@ const NoteBook = (function() {
         return cells.map(ensureCellObject);
     }
 
+    function normalizeReference(reference) {
+        if (!reference || typeof reference !== 'object') return null;
+
+        const pagePath = typeof reference.pagePath === 'string' ? reference.pagePath.trim() : '';
+        const contextType = typeof reference.contextType === 'string' ? reference.contextType.trim() : '';
+        const contextId = typeof reference.contextId === 'string' ? reference.contextId.trim() : '';
+
+        if (!pagePath || !contextType || !contextId) {
+            return null;
+        }
+
+        return {
+            pagePath,
+            contextType,
+            contextId,
+            label: typeof reference.label === 'string' ? reference.label.trim() : '',
+            createdAt: typeof reference.createdAt === 'string' && reference.createdAt
+                ? reference.createdAt
+                : new Date().toISOString()
+        };
+    }
+
+    function getReferenceKey(reference) {
+        if (!reference) return '';
+        return [reference.pagePath, reference.contextType, reference.contextId].join('::').toLowerCase();
+    }
+
+    function normalizeReferences(references = []) {
+        if (!Array.isArray(references)) return [];
+
+        const deduped = new Map();
+        references.forEach(ref => {
+            const normalized = normalizeReference(ref);
+            if (!normalized) return;
+            deduped.set(getReferenceKey(normalized), normalized);
+        });
+
+        return Array.from(deduped.values());
+    }
+
+    function ensureNoteReferences(note) {
+        if (!note) return note;
+
+        if (!Array.isArray(note.references)) {
+            if (note.reference && typeof note.reference === 'object') {
+                note.references = [note.reference];
+            } else {
+                note.references = [];
+            }
+        }
+
+        note.references = normalizeReferences(note.references);
+        return note;
+    }
+
     function ensureNoteCells(note) {
         if (!note) return note;
 
@@ -242,6 +297,7 @@ const NoteBook = (function() {
 
         note.cells = normalizeCells(note.cells) || [];
         note.content = note.cells;
+        ensureNoteReferences(note);
         return note;
     }
 
@@ -491,6 +547,7 @@ const NoteBook = (function() {
                 id: generateId(),
                 title: title || 'Untitled',
                 cells,
+                references: [],
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             });
@@ -548,6 +605,7 @@ const NoteBook = (function() {
             const sanitizedUpdates = Object.assign({}, updates);
             delete sanitizedUpdates.cells;
             delete sanitizedUpdates.content;
+            delete sanitizedUpdates.references;
 
             let nextCells = null;
             if (Array.isArray(updates.cells)) {
@@ -562,15 +620,177 @@ const NoteBook = (function() {
                 note.content = nextCells;
             }
 
+            if (Array.isArray(updates.references)) {
+                note.references = normalizeReferences(updates.references);
+            }
+
             Object.assign(note, sanitizedUpdates, {
                 updatedAt: new Date().toISOString()
             });
 
             // Keep alias in sync
             note.content = note.cells;
+            ensureNoteReferences(note);
             
             saveData();
             return note;
+        },
+
+        addNoteReference: function(nbId, nId, reference) {
+            const note = findNote(nbId, nId);
+            if (!note) return null;
+
+            ensureNoteCells(note);
+            const normalized = normalizeReference(reference);
+            if (!normalized) return null;
+
+            const key = getReferenceKey(normalized);
+            const existingIndex = note.references.findIndex(ref => getReferenceKey(ref) === key);
+
+            if (existingIndex !== -1) {
+                note.references[existingIndex] = {
+                    ...note.references[existingIndex],
+                    ...normalized,
+                    createdAt: note.references[existingIndex].createdAt || normalized.createdAt
+                };
+            } else {
+                note.references.push(normalized);
+            }
+
+            note.updatedAt = new Date().toISOString();
+            saveData();
+            return note.references;
+        },
+
+        removeNoteReference: function(nbId, nId, referenceMatcher) {
+            const note = findNote(nbId, nId);
+            if (!note) return false;
+
+            ensureNoteCells(note);
+
+            const target = normalizeReference(referenceMatcher);
+            if (!target) return false;
+
+            const targetKey = getReferenceKey(target);
+            const originalLength = note.references.length;
+            note.references = note.references.filter(ref => getReferenceKey(ref) !== targetKey);
+
+            if (note.references.length === originalLength) {
+                return false;
+            }
+
+            note.updatedAt = new Date().toISOString();
+            saveData();
+            return true;
+        },
+
+        findNotesByReference: function(referenceInput) {
+            const target = normalizeReference(referenceInput);
+            if (!target) return [];
+
+            const targetKey = getReferenceKey(target);
+            const results = [];
+            const notebooks = getAllNotebooks();
+
+            notebooks.forEach(nb => {
+                const notes = Array.isArray(nb.notes) ? nb.notes : [];
+                notes.forEach(note => {
+                    ensureNoteCells(note);
+                    const match = note.references.find(ref => getReferenceKey(ref) === targetKey);
+                    if (!match) return;
+
+                    results.push({
+                        notebookId: nb.id,
+                        notebookName: nb.name,
+                        note,
+                        reference: match
+                    });
+                });
+            });
+
+            results.sort((a, b) => {
+                const left = a.note.updatedAt || '';
+                const right = b.note.updatedAt || '';
+                if (left === right) {
+                    return (a.note.title || '').localeCompare(b.note.title || '');
+                }
+                return left < right ? 1 : -1;
+            });
+
+            return results;
+        },
+
+        getPrimaryOrLatestReference: function(nbId, nId) {
+            const note = findNote(nbId, nId);
+            if (!note) return null;
+
+            ensureNoteCells(note);
+            if (!note.references.length) return null;
+
+            const sorted = [...note.references].sort((a, b) => {
+                const left = a.createdAt || '';
+                const right = b.createdAt || '';
+                return left < right ? 1 : -1;
+            });
+
+            return sorted[0] || null;
+        },
+
+        moveNoteToNotebook: function(sourceNotebookId, noteId, targetNotebookId, options = {}) {
+            clearOperationError();
+
+            const sourceNotebook = findNotebook(sourceNotebookId);
+            const targetNotebook = findNotebook(targetNotebookId);
+
+            if (!sourceNotebook) return failOperation('Source notebook not found.');
+            if (!targetNotebook) return failOperation('Target notebook not found.');
+
+            const sourceIndex = Array.isArray(sourceNotebook.notes)
+                ? sourceNotebook.notes.findIndex(n => n.id === noteId)
+                : -1;
+
+            if (sourceIndex === -1) return failOperation('Note not found in source notebook.');
+
+            const note = sourceNotebook.notes[sourceIndex];
+            if (!note) return failOperation('Note not available to move.');
+
+            if (sourceNotebookId === targetNotebookId) {
+                if (options && typeof options.title === 'string' && options.title.trim()) {
+                    note.title = options.title.trim();
+                    note.updatedAt = new Date().toISOString();
+                    saveData();
+                }
+                return {
+                    notebookId: sourceNotebookId,
+                    note: ensureNoteCells(note)
+                };
+            }
+
+            sourceNotebook.notes.splice(sourceIndex, 1);
+            if (!Array.isArray(targetNotebook.notes)) {
+                targetNotebook.notes = [];
+            }
+
+            if (options && typeof options.title === 'string' && options.title.trim()) {
+                note.title = options.title.trim();
+            }
+            note.updatedAt = new Date().toISOString();
+            ensureNoteCells(note);
+
+            targetNotebook.notes.push(note);
+
+            if (data.currentNoteId === noteId) {
+                data.currentNotebookId = targetNotebookId;
+            }
+
+            if (!saveData()) {
+                return failOperation('Note moved but failed to persist changes.');
+            }
+
+            return {
+                notebookId: targetNotebookId,
+                note
+            };
         },
 
         deleteNote: function(nbId, nId) {
