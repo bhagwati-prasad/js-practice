@@ -15,8 +15,8 @@ const UIController = (function() {
                     reject(new Error('Monaco loader not available'));
                     return;
                 }
-                require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } });
-                require(['vs/editor/editor.main'], function() {
+                require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.53.0/min/vs' } });
+                require(['vs/editor/editor.main', 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.53.0/min/vs/markdown.d9a6aaa6.min.js'], function() {
                     resolve(window.monaco);
                 }, reject);
             });
@@ -449,7 +449,7 @@ const UIController = (function() {
         function renderItemElement(item, level = 0) {
             const div = document.createElement('div');
             div.className = 'tree-item';
-            div.style.paddingLeft = (level * 20 + 15) + 'px';
+            div.style.setProperty('--tree-indent', level);
             
             const isCollection = item.type === 'collection';
             const isNotebook = item.type === 'notebook';
@@ -490,25 +490,16 @@ const UIController = (function() {
             // Show full item name on hover when text is truncated
             nameSpan.setAttribute('title', item.name || '');
             
-            // Click on name to select
-            nameSpan.addEventListener('click', function(e) {
-                e.stopPropagation();
-                if (isCollection) {
-                    NoteBook.setCurrentCollection(item.id);
-                    if (hasChildren && !expandedCollections.has(item.id)) {
-                        expandedCollections.add(item.id);
-                    }
-                } else if (isNotebook) {
-                    NoteBook.setCurrentNotebook(item.id);
+            // Main click handler - mimics VS Code Explorer behavior
+            div.addEventListener('click', function(e) {
+                // Prevent event from bubbling if user clicks action buttons
+                if (e.target.closest('.tree-item-actions')) {
+                    return;
                 }
-                renderCollections();
-                renderNotes();
-                renderEditor();
-            });
-
-            // Icon click toggles expand for collections; selects notebooks
-            iconSpan.addEventListener('click', function(e) {
+                
                 e.stopPropagation();
+                
+                // For collections with children: toggle expansion
                 if (isCollection && hasChildren) {
                     if (expandedCollections.has(item.id)) {
                         expandedCollections.delete(item.id);
@@ -516,8 +507,13 @@ const UIController = (function() {
                         expandedCollections.add(item.id);
                     }
                     renderCollections();
-                } else if (isNotebook) {
-                    NoteBook.setCurrentNotebook(item.id);
+                } else {
+                    // For collections without children or notebooks: select the item
+                    if (isCollection) {
+                        NoteBook.setCurrentCollection(item.id);
+                    } else if (isNotebook) {
+                        NoteBook.setCurrentNotebook(item.id);
+                    }
                     renderCollections();
                     renderNotes();
                     renderEditor();
@@ -527,7 +523,9 @@ const UIController = (function() {
             if (hasChildren) {
                 const childrenContainer = document.createElement('div');
                 childrenContainer.className = 'tree-children';
-                childrenContainer.style.display = isExpanded ? 'block' : 'none';
+                if (isExpanded) {
+                    childrenContainer.classList.add('visible');
+                }
                 
                 // Recursively render children
                 item.items.forEach(child => {
@@ -701,7 +699,7 @@ const UIController = (function() {
             note.content = [];
         }
 
-        elements.floatingToolbar.classList.add('visible');
+        //elements.floatingToolbar.classList.add('visible');
 
         elements.editorArea.innerHTML = `
             <div class="note-editor" id="noteEditorCard">
@@ -737,7 +735,7 @@ const UIController = (function() {
             return 'block_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
-        function createTextBlock(text = '', blockId = null, isHighlighted = false, isCodeMode = false) {
+        function createTextBlock(text = '', blockId = null, isHighlighted = false, blockMode = 'markdown') {
             const id = blockId || generateBlockId();
             const wrapper = document.createElement('div');
             wrapper.className = 'text-block-card';
@@ -763,10 +761,42 @@ const UIController = (function() {
             sortBtn.textContent = 'Sort';
             sortBtn.title = 'Sort this block';
 
-            const codeBtn = document.createElement('button');
-            codeBtn.className = 'text-block-card__btn';
-            codeBtn.textContent = isCodeMode ? 'Text' : 'Code';
-            codeBtn.title = 'Toggle code mode';
+            const modeDropdown = document.createElement('div');
+            modeDropdown.className = 'text-block-card__mode-dropdown';
+            const modeBtn = document.createElement('button');
+            modeBtn.className = 'text-block-card__btn text-block-card__mode-btn';
+            modeBtn.textContent = blockMode.charAt(0).toUpperCase() + blockMode.slice(1);
+            modeBtn.title = 'Select block mode';
+            
+            const modeMenu = document.createElement('div');
+            modeMenu.className = 'text-block-card__mode-menu';
+            const modes = ['text', 'code', 'markdown'];
+            modes.forEach(mode => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'text-block-card__mode-item' + (mode === blockMode ? ' active' : '');
+                menuItem.textContent = mode.charAt(0).toUpperCase() + mode.slice(1);
+                menuItem.dataset.mode = mode;
+                menuItem.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    setBlockMode(mode);
+                    modeMenu.classList.remove('visible');
+                });
+                modeMenu.appendChild(menuItem);
+            });
+            
+            modeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                modeMenu.classList.toggle('visible');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!modeDropdown.contains(e.target)) {
+                    modeMenu.classList.remove('visible');
+                }
+            });
+            
+            modeDropdown.appendChild(modeBtn);
+            modeDropdown.appendChild(modeMenu);
 
             const highlightBtn = document.createElement('button');
             highlightBtn.className = 'text-block-card__btn';
@@ -779,7 +809,7 @@ const UIController = (function() {
             deleteBtn.title = 'Delete this block';
 
             actions.appendChild(sortBtn);
-            actions.appendChild(codeBtn);
+            actions.appendChild(modeDropdown);
             actions.appendChild(highlightBtn);
             actions.appendChild(deleteBtn);
 
@@ -793,8 +823,9 @@ const UIController = (function() {
             textarea.className = 'text-block';
             textarea.value = text;
             textarea.placeholder = 'Type ...';
-            textarea.dataset.mode = isCodeMode ? 'code' : 'text';
+            textarea.dataset.mode = blockMode;
             let codeContainer = null;
+            let markdownPreview = null;
             
             // Auto-resize function
             function autoResize() {
@@ -807,9 +838,9 @@ const UIController = (function() {
                 const blockIndex = note.content.findIndex(b => b.id === id);
                 if (blockIndex !== -1) {
                     note.content[blockIndex].text = this.value;
-                    note.content[blockIndex].codeMode = note.content[blockIndex].codeMode || false;
+                    note.content[blockIndex].blockMode = blockMode;
                 } else {
-                    note.content.push({ id, text: this.value, highlighted: false, codeMode: isCodeMode });
+                    note.content.push({ id, text: this.value, highlighted: false, blockMode: blockMode });
                 }
                 triggerSave();
             });
@@ -833,16 +864,24 @@ const UIController = (function() {
                 }
             });
 
-            function setCodeMode(enable) {
+            function setBlockMode(newMode) {
                 const blockIndex = note.content.findIndex(b => b.id === id);
 
-                if (enable) {
+                // Hide all current renderers
+                if (textarea) textarea.style.display = 'none';
+                if (codeContainer) codeContainer.remove();
+                if (markdownPreview) markdownPreview.remove();
+
+                blockMode = newMode;
+                textarea.dataset.mode = newMode;
+
+                if (newMode === 'code') {
                     loadMonaco().then(monaco => {
                         if (blockEditors.has(id)) {
+                            codeContainer.style.display = 'block';
                             return;
                         }
 
-                        textarea.style.display = 'none';
                         codeContainer = document.createElement('div');
                         codeContainer.className = 'text-block-card__code';
                         body.appendChild(codeContainer);
@@ -863,57 +902,53 @@ const UIController = (function() {
                             const idx = note.content.findIndex(b => b.id === id);
                             if (idx !== -1) {
                                 note.content[idx].text = value;
-                                note.content[idx].codeMode = true;
+                                note.content[idx].blockMode = 'code';
                             }
                             triggerSave();
                         });
 
                         blockEditors.set(id, editor);
                         if (blockIndex !== -1) {
-                            note.content[blockIndex].codeMode = true;
+                            note.content[blockIndex].blockMode = 'code';
                         }
-                        codeBtn.textContent = 'Text';
-                        textarea.dataset.mode = 'code';
                         triggerSave();
                     }).catch(err => {
                         console.error('Monaco load failed', err);
                     });
-                } else {
+                } else if (newMode === 'markdown') {
+                    loadMonaco().then(monaco => {
+                        // Use monaco markdown rendering for preview
+                        //                     }).catch(err => {
+                        console.error('Monaco load failed', err);
+                    });
+                } else { // text mode
+                    textarea.style.display = 'block';
                     const editor = blockEditors.get(id);
                     if (editor) {
-                        const value = editor.getValue();
-                        textarea.value = value;
                         editor.dispose();
                         blockEditors.delete(id);
                     }
-                    if (codeContainer) {
-                        codeContainer.remove();
-                        codeContainer = null;
+                    if (blockIndex !== -1) {
+                        note.content[blockIndex].blockMode = 'text';
                     }
-                    textarea.style.display = 'block';
-                    const idx = note.content.findIndex(b => b.id === id);
-                    if (idx !== -1) {
-                        note.content[idx].codeMode = false;
-                        note.content[idx].text = textarea.value;
-                    }
-                    codeBtn.textContent = 'Code';
-                    textarea.dataset.mode = 'text';
-                    triggerSave();
                 }
-            }
 
-            codeBtn.addEventListener('click', function() {
-                const blockIndex = note.content.findIndex(b => b.id === id);
-                const isCurrentlyCode = blockIndex !== -1 ? !!note.content[blockIndex].codeMode : textarea.dataset.mode === 'code';
-                setCodeMode(!isCurrentlyCode);
-            });
+                // Update UI
+                modeMenu.querySelectorAll('.text-block-card__mode-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.mode === newMode) {
+                        item.classList.add('active');
+                    }
+                });
+                modeBtn.textContent = newMode.charAt(0).toUpperCase() + newMode.slice(1);
+                triggerSave();
+            }
 
             highlightBtn.addEventListener('click', function() {
                 const blockIndex = note.content.findIndex(b => b.id === id);
                 const nextState = !(blockIndex !== -1 ? !!note.content[blockIndex].highlighted : isHighlighted);
                 if (blockIndex !== -1) {
                     note.content[blockIndex].highlighted = nextState;
-                    note.content[blockIndex].codeMode = note.content[blockIndex].codeMode || false;
                 }
                 wrapper.classList.toggle('text-block-card--highlight', nextState);
                 highlightBtn.textContent = nextState ? 'Unhighlight' : 'Highlight';
@@ -948,20 +983,21 @@ const UIController = (function() {
             wrapper.appendChild(header);
             wrapper.appendChild(body);
 
-            // Auto-enable code mode if stored
-            if (isCodeMode) {
-                setTimeout(() => setCodeMode(true), 0);
+            // Auto-enable mode if stored
+            if (blockMode === 'code' || blockMode === 'markdown') {
+                setTimeout(() => setBlockMode(blockMode), 0);
             }
 
             return wrapper;
         }
 
         note.content.forEach(block => {
+            const blockMode = block.blockMode || (block.codeMode ? 'code' : 'markdown');
             const blockEl = createTextBlock(
                 block.text,
                 block.id,
                 !!block.highlighted,
-                !!block.codeMode
+                blockMode
             );
             contentContainer.appendChild(blockEl);
         });
@@ -969,8 +1005,8 @@ const UIController = (function() {
         contentContainer.addEventListener('click', function(e) {
             if (e.target === contentContainer) {
                 const newBlockId = generateBlockId();
-                note.content.push({ id: newBlockId, text: '', highlighted: false, codeMode: false });
-                const newBlock = createTextBlock('', newBlockId, false, false);
+                note.content.push({ id: newBlockId, text: '', highlighted: false, blockMode: 'markdown' });
+                const newBlock = createTextBlock('', newBlockId, false, 'markdown');
                 contentContainer.appendChild(newBlock);
                 newBlock.querySelector('textarea').focus();
                 triggerSave();

@@ -19,7 +19,8 @@
 .tree-item {
     display: flex;
     align-items: center;
-    padding: var(--spacing-sm) var(--spacing-lg);
+    padding: var(--spacing-xs) var(--spacing-lg);
+    padding-left: calc(var(--tree-indent, 0) * 20px + var(--spacing-lg));
     cursor: pointer;
     border-radius: var(--radius-sm);
     transition: background var(--transition-fast);
@@ -41,23 +42,25 @@
 .tree-item::before {
     content: '';
     position: absolute;
-    left: 6px;
+    left: calc(var(--tree-indent, 0) * 20px - 4px);
     top: 50%;
     transform: translateY(-50%) rotate(0deg);
-    font-family: 'Material Icons', 'Material Symbols Outlined', sans-serif;
-    font-size: 16px;
-    line-height: 1;
     color: var(--text-subtle);
     transition: transform 0.2s ease, color 0.2s ease;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tree-item.has-children::before {
-    content: '\203A';
-    font-size: 20px;
+    content: '\276F';
+    font-size: 14px;
 }
 
 .tree-item.has-children.expanded::before {
-    transform: translateY(-40%) rotate(90deg);
+    transform: translateY(-50%) rotate(90deg);
     color: var(--text-primary);
 }
 
@@ -114,6 +117,21 @@
 
 .tree-children {
     margin-left: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease,
+                visibility 0.25s ease;
+    pointer-events: none;
+}
+
+.tree-children.visible {
+    max-height: 10000px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 /* Drag and drop styles */
