@@ -89,7 +89,7 @@
     width: 100%;
 }
 
-.text-block-card__code {
+.text-block-card__code, .text-block-card__markdown {
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-sm);
     overflow: hidden;

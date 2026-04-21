@@ -15,8 +15,8 @@ const UIController = (function() {
                     reject(new Error('Monaco loader not available'));
                     return;
                 }
-                require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } });
-                require(['vs/editor/editor.main'], function() {
+                require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.53.0/min/vs' } });
+                require(['vs/editor/editor.main', 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.53.0/min/vs/markdown.d9a6aaa6.min.js'], function() {
                     resolve(window.monaco);
                 }, reject);
             });
@@ -916,74 +916,11 @@ const UIController = (function() {
                         console.error('Monaco load failed', err);
                     });
                 } else if (newMode === 'markdown') {
-                    let markdownParser = null;
-
-                    function initializeMarkdown(lib) {
-                        const markedLib = lib || window.marked || window.marked?.default;
-                        if (typeof markedLib === 'function') {
-                            markdownParser = markedLib;
-                        } else if (markedLib && typeof markedLib.parse === 'function') {
-                            markdownParser = markedLib.parse.bind(markedLib);
-                        } else if (markedLib && typeof markedLib.default?.parse === 'function') {
-                            markdownParser = markedLib.default.parse.bind(markedLib.default);
-                        } else {
-                            console.error('Markdown parser is not available');
-                            return;
-                        }
-
-                        markdownPreview = document.createElement('div');
-                        markdownPreview.className = 'text-block-card__markdown-preview';
-                        markdownPreview.innerHTML = markdownParser(textarea.value || '');
-                        body.appendChild(markdownPreview);
-
-                        if (blockIndex !== -1) {
-                            note.content[blockIndex].blockMode = 'markdown';
-                        }
-                    }
-
-                    function loadMarkedLibrary(callback) {
-                        if (window.marked && (typeof window.marked === 'function' || typeof window.marked.parse === 'function')) {
-                            callback(window.marked);
-                            return;
-                        }
-
-                        if (typeof require === 'function' && require.amd) {
-                            require(['https://cdn.jsdelivr.net/npm/marked/marked.min.js'], function(markedModule) {
-                                callback(markedModule || window.marked);
-                            }, function(err) {
-                                console.error('Failed to load marked via AMD:', err);
-                            });
-                            return;
-                        }
-
-                        const existingScript = document.querySelector('script[data-marked-loader]');
-                        if (existingScript) {
-                            existingScript.addEventListener('load', function() {
-                                callback(window.marked || window.marked?.default);
-                            });
-                            return;
-                        }
-
-                        const script = document.createElement('script');
-                        script.dataset.markedLoader = 'true';
-                        script.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-                        script.onload = function() {
-                            callback(window.marked || window.marked?.default);
-                        };
-                        script.onerror = function(err) {
-                            console.error('Failed to load marked script:', err);
-                        };
-                        document.head.appendChild(script);
-                    }
-
-                    loadMarkedLibrary(initializeMarkdown);
-
-                    textarea.addEventListener('input', function() {
-                        if (markdownPreview && markdownParser) {
-                            markdownPreview.innerHTML = markdownParser(this.value || '');
-                        }
+                    loadMonaco().then(monaco => {
+                        // Use monaco markdown rendering for preview
+                        //                     }).catch(err => {
+                        console.error('Monaco load failed', err);
                     });
-
                 } else { // text mode
                     textarea.style.display = 'block';
                     const editor = blockEditors.get(id);
