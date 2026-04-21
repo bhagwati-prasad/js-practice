@@ -107,19 +107,26 @@
     top: 100px;
     right: 40px;
     background: var(--bg-primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
     z-index: 500;
     border: 1px solid var(--border-primary);
     overflow: hidden;
-    display: none;
     width: 150px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
 }
 
 .floating-toolbar.visible {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 .primary-btn:hover {
