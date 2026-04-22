@@ -16,7 +16,7 @@ const UIController = (function() {
                     return;
                 }
                 require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.53.0/min/vs' } });
-                require(['vs/editor/editor.main', 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.53.0/min/vs/markdown.d9a6aaa6.min.js'], function() {
+                require(['vs/editor/editor.main'], function() {
                     resolve(window.monaco);
                 }, reject);
             });
@@ -848,6 +848,7 @@ const UIController = (function() {
             setTimeout(autoResize, 0);
             
             textarea.addEventListener('blur', function() {
+                if (blockMode !== 'text') return;
                 if (this.value.trim() === '') {
                     const blockIndex = note.content.findIndex(b => b.id === id);
                     if (blockIndex !== -1) {
@@ -867,25 +868,27 @@ const UIController = (function() {
             function setBlockMode(newMode) {
                 const blockIndex = note.content.findIndex(b => b.id === id);
 
-                // Hide all current renderers
-                if (textarea) textarea.style.display = 'none';
-                if (codeContainer) codeContainer.remove();
-                if (markdownPreview) markdownPreview.remove();
+                // Always dispose any existing Monaco editor for this block
+                const existingEditor = blockEditors.get(id);
+                if (existingEditor) {
+                    existingEditor.dispose();
+                    blockEditors.delete(id);
+                }
+
+                // Remove old containers and reset references
+                textarea.style.display = 'none';
+                if (codeContainer) { codeContainer.remove(); codeContainer = null; }
+                if (markdownPreview) { markdownPreview.remove(); markdownPreview = null; }
 
                 blockMode = newMode;
                 textarea.dataset.mode = newMode;
 
                 if (newMode === 'code') {
+                    codeContainer = document.createElement('div');
+                    codeContainer.className = 'text-block-card__code';
+                    body.appendChild(codeContainer);
+
                     loadMonaco().then(monaco => {
-                        if (blockEditors.has(id)) {
-                            codeContainer.style.display = 'block';
-                            return;
-                        }
-
-                        codeContainer = document.createElement('div');
-                        codeContainer.className = 'text-block-card__code';
-                        body.appendChild(codeContainer);
-
                         const editor = monaco.editor.create(codeContainer, {
                             value: textarea.value || '',
                             language: 'javascript',
@@ -893,8 +896,18 @@ const UIController = (function() {
                             automaticLayout: true,
                             minimap: { enabled: false },
                             fontSize: 14,
-                            lineNumbers: 'on'
+                            lineNumbers: 'on',
+                            scrollBeyondLastLine: false
                         });
+
+                        const updateHeight = () => {
+                            const maxHeight = window.innerHeight - 200;
+                            const contentHeight = Math.min(editor.getContentHeight(), maxHeight);
+                            codeContainer.style.height = contentHeight + 'px';
+                            editor.layout();
+                        };
+                        editor.onDidContentSizeChange(updateHeight);
+                        updateHeight();
 
                         editor.onDidChangeModelContent(function() {
                             const value = editor.getValue();
@@ -908,37 +921,62 @@ const UIController = (function() {
                         });
 
                         blockEditors.set(id, editor);
-                        if (blockIndex !== -1) {
-                            note.content[blockIndex].blockMode = 'code';
-                        }
+                        if (blockIndex !== -1) note.content[blockIndex].blockMode = 'code';
                         triggerSave();
-                    }).catch(err => {
-                        console.error('Monaco load failed', err);
-                    });
+                    }).catch(err => console.error('Monaco load failed', err));
+
                 } else if (newMode === 'markdown') {
+                    codeContainer = document.createElement('div');
+                    codeContainer.className = 'text-block-card__code';
+                    body.appendChild(codeContainer);
+
                     loadMonaco().then(monaco => {
-                        // Use monaco markdown rendering for preview
-                        //                     }).catch(err => {
-                        console.error('Monaco load failed', err);
-                    });
+                        const editor = monaco.editor.create(codeContainer, {
+                            value: textarea.value || '',
+                            language: 'markdown',
+                            theme: 'vs-dark',
+                            automaticLayout: true,
+                            minimap: { enabled: false },
+                            fontSize: 14,
+                            lineNumbers: 'off',
+                            wordWrap: 'on',
+                            scrollBeyondLastLine: false
+                        });
+
+                        const updateHeight = () => {
+                            const maxHeight = window.innerHeight - 200;
+                            const contentHeight = Math.min(editor.getContentHeight(), maxHeight);
+                            codeContainer.style.height = contentHeight + 'px';
+                            editor.layout();
+                        };
+                        editor.onDidContentSizeChange(updateHeight);
+                        updateHeight();
+
+                        editor.onDidChangeModelContent(function() {
+                            const value = editor.getValue();
+                            textarea.value = value;
+                            const idx = note.content.findIndex(b => b.id === id);
+                            if (idx !== -1) {
+                                note.content[idx].text = value;
+                                note.content[idx].blockMode = 'markdown';
+                            }
+                            triggerSave();
+                        });
+
+                        blockEditors.set(id, editor);
+                        if (blockIndex !== -1) note.content[blockIndex].blockMode = 'markdown';
+                        triggerSave();
+                    }).catch(err => console.error('Monaco load failed', err));
+
                 } else { // text mode
                     textarea.style.display = 'block';
-                    const editor = blockEditors.get(id);
-                    if (editor) {
-                        editor.dispose();
-                        blockEditors.delete(id);
-                    }
-                    if (blockIndex !== -1) {
-                        note.content[blockIndex].blockMode = 'text';
-                    }
+                    if (blockIndex !== -1) note.content[blockIndex].blockMode = 'text';
                 }
 
                 // Update UI
                 modeMenu.querySelectorAll('.text-block-card__mode-item').forEach(item => {
                     item.classList.remove('active');
-                    if (item.dataset.mode === newMode) {
-                        item.classList.add('active');
-                    }
+                    if (item.dataset.mode === newMode) item.classList.add('active');
                 });
                 modeBtn.textContent = newMode.charAt(0).toUpperCase() + newMode.slice(1);
                 triggerSave();

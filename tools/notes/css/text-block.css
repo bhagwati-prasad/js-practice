@@ -93,7 +93,8 @@
     border: 1px solid var(--border-primary);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    height: 280px;
+    min-height: 120px;
+    max-height: calc(100vh - 200px);
     margin-top: var(--spacing-sm);
 }
 
